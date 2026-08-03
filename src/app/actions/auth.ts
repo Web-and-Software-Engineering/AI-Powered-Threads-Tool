@@ -22,7 +22,7 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
-  redirect('/')
+  return { redirect: '/' }
 }
 
 export async function signup(formData: FormData) {
@@ -57,7 +57,7 @@ export async function signup(formData: FormData) {
   }
 
   if (data?.session) {
-    redirect('/')
+    return { redirect: '/' }
   }
 
   return { success: 'Check your email for the confirmation link!' }

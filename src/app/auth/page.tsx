@@ -25,15 +25,17 @@ export default function AuthPage() {
         const result = await signup(formData)
         if (result?.error) {
           setError(result.error)
+        } else if (result?.redirect) {
+          window.location.href = result.redirect
         } else if (result?.success) {
           setSuccess(result.success)
         }
       } else {
         const result = await login(formData)
-        // Redirect is handled automatically on success by Server Action.
-        // If it returns, there was an error.
         if (result?.error) {
           setError(result.error)
+        } else if (result?.redirect) {
+          window.location.href = result.redirect
         }
       }
     } catch (err: any) {
