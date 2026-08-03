@@ -1,13 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Navigation } from '@/components/Navigation'
 import { ProfileWorkspace, ProfileData } from '@/components/ProfileWorkspace'
 import { GenerationWorkspace } from '@/components/GenerationWorkspace'
 import { AnalyticsDashboard, PostItem } from '@/components/AnalyticsDashboard'
+import { SetupModal } from '@/components/SetupModal'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'workspace' | 'profile' | 'analytics'>('workspace')
+  const [showSetupModal, setShowSetupModal] = useState(false)
 
   // Baseline User Profile Framework with Pocket Attributes
   const [profile, setProfile] = useState<ProfileData>({
@@ -22,6 +24,26 @@ export default function Home() {
     preferredTone: 'Authoritative, concise, insightful, punchy',
     writingStyleRules: 'Use clear numbered lists. Keep hooks under 10 words. Separate key insights with line breaks.',
   })
+
+  // Check if first-time setup is complete
+  useEffect(() => {
+    const isSetupComplete = localStorage.getItem('threadcraft_setup_complete')
+    if (!isSetupComplete) {
+      setProfile({
+        authorPersona: '',
+        personalityTraits: '',
+        likesDislikes: '',
+        values: '',
+        lifestyle: '',
+        dreams: '',
+        outlookOnLife: '',
+        targetAudience: '',
+        preferredTone: '',
+        writingStyleRules: '',
+      })
+      setShowSetupModal(true)
+    }
+  }, [])
 
   // Initial Posts state (mocked with initial data demonstrating loop status states)
   const [posts, setPosts] = useState<PostItem[]>([
@@ -70,6 +92,12 @@ If you want genuine conversations, double down on Threads.`,
 
   const handleSaveProfile = (newProfile: ProfileData) => {
     setProfile(newProfile)
+  }
+
+  const handleOnboardingSave = (newProfile: ProfileData) => {
+    setProfile(newProfile)
+    localStorage.setItem('threadcraft_setup_complete', 'true')
+    setShowSetupModal(false)
   }
 
   const handlePostCreated = (newPostData: {
@@ -143,6 +171,9 @@ If you want genuine conversations, double down on Threads.`,
       <footer className="hidden md:block border-t border-zinc-200 py-6 px-6 text-center text-xs text-zinc-500 font-mono-custom">
         ThreadCraft AI Engine • Optimized for Threads API Integration & Voice Analytics
       </footer>
+
+      {/* Forced onboarding setup modal */}
+      <SetupModal isOpen={showSetupModal} onSave={handleOnboardingSave} />
     </div>
   )
 }

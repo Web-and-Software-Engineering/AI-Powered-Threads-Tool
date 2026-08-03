@@ -1,7 +1,8 @@
 'use client'
 
 import React from 'react'
-import { PenSquare, FolderHeart, BarChart3, Sparkles } from 'lucide-react'
+import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut } from 'lucide-react'
+import { logout } from '@/app/actions/auth'
 
 interface NavigationProps {
   activeTab: 'workspace' | 'profile' | 'analytics'
@@ -9,6 +10,10 @@ interface NavigationProps {
 }
 
 export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
+  const handleLogout = async () => {
+    await logout()
+  }
+
   return (
     <>
       {/* Desktop Navigation Top Bar (hidden on mobile) */}
@@ -26,56 +31,75 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
             </div>
           </div>
 
-          <nav className="flex items-center gap-2 bg-zinc-100 p-1.5 rounded-xl border border-zinc-200">
-            <button
-              onClick={() => setActiveTab('workspace')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-                activeTab === 'workspace'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
-              }`}
-            >
-              <PenSquare className="w-4 h-4" />
-              Generator
-            </button>
+          <div className="flex items-center gap-4">
+            <nav className="flex items-center gap-2 bg-zinc-100 p-1.5 rounded-xl border border-zinc-200">
+              <button
+                onClick={() => setActiveTab('workspace')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                  activeTab === 'workspace'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                }`}
+              >
+                <PenSquare className="w-4 h-4" />
+                Generator
+              </button>
+
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                  activeTab === 'profile'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                }`}
+              >
+                <FolderHeart className="w-4 h-4" />
+                Pocket & Audience
+              </button>
+
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                  activeTab === 'analytics'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4" />
+                Analytics & Loop
+              </button>
+            </nav>
 
             <button
-              onClick={() => setActiveTab('profile')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-                activeTab === 'profile'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
-              }`}
+              onClick={handleLogout}
+              title="Sign Out"
+              className="p-2.5 rounded-xl bg-zinc-100 hover:bg-rose-50 text-zinc-500 hover:text-rose-600 border border-zinc-200 transition-colors cursor-pointer"
             >
-              <FolderHeart className="w-4 h-4" />
-              Pocket & Audience
+              <LogOut className="w-4.5 h-4.5" />
             </button>
-
-            <button
-              onClick={() => setActiveTab('analytics')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-                activeTab === 'analytics'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" />
-              Analytics & Loop
-            </button>
-          </nav>
+          </div>
         </div>
       </header>
 
-      {/* Mobile Header (Top Title Only) */}
+      {/* Mobile Header (Top Title Only + Logout) */}
       <header className="block md:hidden glass-panel border-b border-zinc-200/80 px-4 py-3 mb-6 sticky top-0 z-50">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center">
-            <Sparkles className="w-4.5 h-4.5 text-white" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center">
+              <Sparkles className="w-4.5 h-4.5 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-sm tracking-wide text-zinc-900">ThreadCraft Pocket</h1>
+              <p className="text-[10px] text-zinc-500 font-mono-custom">Automated Search & Analysis Loop</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-bold text-sm tracking-wide text-zinc-900">ThreadCraft Pocket</h1>
-            <p className="text-[10px] text-zinc-500 font-mono-custom">Automated Search & Analysis Loop</p>
-          </div>
+
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-xl bg-zinc-100 hover:bg-rose-50 text-zinc-500 hover:text-rose-600 border border-zinc-200 transition-colors cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </header>
 

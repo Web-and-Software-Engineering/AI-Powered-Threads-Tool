@@ -25,6 +25,11 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   const [generationStep, setGenerationStep] = useState<StepState>('idle')
   const [generatedDraft, setGeneratedDraft] = useState<string | null>(null)
 
+  const handleAutoFill = () => {
+    setTopic('Productivity frameworks for remote solopreneurs')
+    setCoreMessage('Doing deep focus blocks of 4 hours yields more results than working 14 hours fragmented.')
+  }
+
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!topic.trim()) return
@@ -97,7 +102,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
           </div>
 
           <form onSubmit={handleGenerate} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-5">
               {/* Topic Theme */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-purple-700 flex items-center gap-1.5">
@@ -120,12 +125,12 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                   <MessageSquare className="w-3.5 h-3.5" />
                   Key Message / Value to Deliver
                 </label>
-                <input
-                  type="text"
+                <textarea
+                  rows={3}
                   value={coreMessage}
                   onChange={(e) => setCoreMessage(e.target.value)}
                   placeholder="e.g. Sleep & deep work blocks beat grinding 14-hour days."
-                  className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                  className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-sans-custom leading-relaxed"
                 />
               </div>
             </div>
@@ -140,7 +145,16 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
               </span>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-3">
+              {process.env.NEXT_PUBLIC_ENABLE_TEST_TOOLS === 'true' && (
+                <button
+                  type="button"
+                  onClick={handleAutoFill}
+                  className="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                >
+                  ⚡ Auto-fill
+                </button>
+              )}
               <button
                 type="submit"
                 disabled={!topic.trim()}

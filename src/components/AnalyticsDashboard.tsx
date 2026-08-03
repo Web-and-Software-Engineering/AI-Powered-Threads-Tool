@@ -114,7 +114,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                   <span className="text-[11px] font-mono-custom text-purple-600 font-bold uppercase tracking-wider">
                     {post.topic || 'General Topic'}
                   </span>
-                  <p className="text-xs text-zinc-800 mt-1 whitespace-pre-wrap font-sans-custom leading-relaxed">
+                  <p className="text-xs text-zinc-800 mt-1 whitespace-pre-wrap break-words font-sans-custom leading-relaxed">
                     {post.generatedContent}
                   </p>
                 </div>
@@ -166,7 +166,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
               </div>
 
               {post.aiInsight && (
-                <div className={`p-3 rounded-xl border text-xs font-mono-custom flex items-center gap-2 ${
+                <div className={`p-3 rounded-xl border text-xs font-mono-custom flex items-center gap-2 min-w-0 ${
                   post.structureCloned 
                     ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                     : post.markedForRestart 
@@ -180,7 +180,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                         ? 'text-rose-600'
                         : 'text-purple-600'
                   }`} />
-                  {post.aiInsight}
+                  <span className="break-words flex-1">{post.aiInsight}</span>
                 </div>
               )}
             </div>

@@ -113,7 +113,7 @@ export function PostEditor({
                   <span className="text-xs font-bold text-zinc-900">@creator_brand</span>
                   <span className="text-[11px] text-zinc-400 font-mono-custom">Now</span>
                 </div>
-                <div className="mt-2 text-xs text-zinc-800 whitespace-pre-wrap leading-relaxed font-sans-custom">
+                <div className="mt-2 text-xs text-zinc-800 whitespace-pre-wrap break-words leading-relaxed font-sans-custom">
                   {content || <span className="text-zinc-400 italic">Draft is empty...</span>}
                 </div>
               </div>
