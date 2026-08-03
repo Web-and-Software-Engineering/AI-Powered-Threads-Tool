@@ -19,9 +19,9 @@ interface GenerateParams {
 }
 
 export async function generateThreadsPost(params: GenerateParams) {
-  const apiKey = process.env.OPENAI_API_KEY
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY
 
-  if (!apiKey || apiKey === 'your-openai-api-key-here') {
+  if (!apiKey || apiKey === 'your-openai-api-key-here' || apiKey === 'your-openrouter-api-key-here') {
     // Fallback template when API key is not configured yet
     return `${params.topic.toUpperCase()} 🚀
 
@@ -34,7 +34,14 @@ ${params.coreMessage ? params.coreMessage : 'Here is the key insight you need to
 What is your main takeaway? Let me know below. 👇`
   }
 
-  const openai = new OpenAI({ apiKey })
+  const openai = new OpenAI({
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: apiKey,
+    defaultHeaders: {
+      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      'X-OpenRouter-Title': 'ThreadCraft AI',
+    },
+  })
 
   const systemPrompt = `You are a high-performing social media content creator specializing in Threads posts.
 Your goal is to write a single-text Threads post (under 500 characters) that achieves maximum engagement.
@@ -66,7 +73,7 @@ Generate an authentic, high-converting Threads single-text post now:
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'google/gemini-2.5-flash',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
