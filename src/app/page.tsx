@@ -9,16 +9,21 @@ import { AnalyticsDashboard, PostItem } from '@/components/AnalyticsDashboard'
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'workspace' | 'profile' | 'analytics'>('workspace')
 
-  // Baseline User Profile Framework
+  // Baseline User Profile Framework with Pocket Attributes
   const [profile, setProfile] = useState<ProfileData>({
     authorPersona: 'AI Architect & Tech Solopreneur sharing actionable insights on software and automation.',
-    targetAudience: 'Developers, indie hackers, and SaaS founders building in public on Threads.',
-    backgroundInfo: 'Building AI tools, scaling web applications, and analyzing creator content.',
+    personalityTraits: 'Meticulous, pragmatic, contrarian, direct but conversational.',
+    likesDislikes: 'Likes: Clean code, deep coffee, async workflows. Dislikes: Long meetings, hype cycles.',
+    values: 'Value creation over consumption, building in public, automation leverage.',
+    lifestyle: 'Early morning coffee shop workspace, async daily schedule.',
+    dreams: 'Scale software products to $10k MRR and travel fully remote.',
+    outlookOnLife: 'Time is the ultimate leverage; build systems to buy back freedom.',
+    targetAudience: 'Developers, indie hackers, and SaaS founders building on Threads.',
     preferredTone: 'Authoritative, concise, insightful, punchy',
     writingStyleRules: 'Use clear numbered lists. Keep hooks under 10 words. Separate key insights with line breaks.',
   })
 
-  // Initial Posts state
+  // Initial Posts state (mocked with initial data demonstrating loop status states)
   const [posts, setPosts] = useState<PostItem[]>([
     {
       id: '1',
@@ -36,8 +41,10 @@ Build for workflows, not for novelty.`,
       status: 'published',
       publishedAt: '2026-07-30',
       analyticsSynced: true,
+      structureCloned: true,
+      markedForRestart: false,
       metrics: { likes: 342, replies: 48, views: 5210, reposts: 19 },
-      aiInsight: 'Top performer: Short numbered list format resulted in +85% more reposts.',
+      aiInsight: 'Excellent engagement metrics. Structure cloned into your writing guidelines.',
     },
     {
       id: '2',
@@ -54,8 +61,10 @@ If you want genuine conversations, double down on Threads.`,
       status: 'published',
       publishedAt: '2026-07-31',
       analyticsSynced: true,
-      metrics: { likes: 189, replies: 64, views: 3100, reposts: 12 },
-      aiInsight: 'High conversational yield: Reply count outperformed baseline by 40%.',
+      structureCloned: false,
+      markedForRestart: true,
+      metrics: { likes: 23, replies: 2, views: 310, reposts: 0 },
+      aiInsight: 'Engagement below target baseline. Marked for structure restart (scraping fresh references next run).',
     },
   ])
 
@@ -78,6 +87,8 @@ If you want genuine conversations, double down on Threads.`,
       status: 'published',
       publishedAt: new Date().toISOString().split('T')[0],
       analyticsSynced: false,
+      structureCloned: false,
+      markedForRestart: false,
       metrics: { likes: 0, replies: 0, views: 0, reposts: 0 },
     }
 
@@ -87,18 +98,23 @@ If you want genuine conversations, double down on Threads.`,
 
   const handleSyncAnalytics = () => {
     setPosts(
-      posts.map((post) => {
+      posts.map((post, index) => {
         if (!post.analyticsSynced || post.metrics?.likes === 0) {
+          const isHighEngagement = index % 2 === 0
           return {
             ...post,
             analyticsSynced: true,
+            structureCloned: isHighEngagement,
+            markedForRestart: !isHighEngagement,
             metrics: {
-              likes: Math.floor(Math.random() * 200) + 50,
-              replies: Math.floor(Math.random() * 40) + 10,
-              views: Math.floor(Math.random() * 3000) + 1000,
-              reposts: Math.floor(Math.random() * 15) + 3,
+              likes: isHighEngagement ? Math.floor(Math.random() * 200) + 150 : Math.floor(Math.random() * 20) + 2,
+              replies: isHighEngagement ? Math.floor(Math.random() * 40) + 20 : Math.floor(Math.random() * 4) + 0,
+              views: isHighEngagement ? Math.floor(Math.random() * 5000) + 3000 : Math.floor(Math.random() * 400) + 50,
+              reposts: isHighEngagement ? Math.floor(Math.random() * 15) + 8 : 0,
             },
-            aiInsight: 'Analyzed: Post structure saved into AI profile rules for future generations.',
+            aiInsight: isHighEngagement
+              ? 'Excellent engagement metrics. Structure cloned into your writing guidelines.'
+              : 'Engagement below target baseline. Marked for structure restart (scraping fresh references next run).',
           }
         }
         return post
@@ -107,10 +123,10 @@ If you want genuine conversations, double down on Threads.`,
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 flex flex-col font-sans-custom">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900 flex flex-col font-sans-custom pb-16 md:pb-0">
       <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="flex-1 px-6 pb-16">
+      <main className="flex-1 px-4 md:px-6 pb-16 md:pb-8">
         {activeTab === 'workspace' && (
           <GenerationWorkspace profile={profile} onPostCreated={handlePostCreated} />
         )}
@@ -124,7 +140,7 @@ If you want genuine conversations, double down on Threads.`,
         )}
       </main>
 
-      <footer className="border-t border-zinc-200 py-6 px-6 text-center text-xs text-zinc-500 font-mono-custom">
+      <footer className="hidden md:block border-t border-zinc-200 py-6 px-6 text-center text-xs text-zinc-500 font-mono-custom">
         ThreadCraft AI Engine • Optimized for Threads API Integration & Voice Analytics
       </footer>
     </div>

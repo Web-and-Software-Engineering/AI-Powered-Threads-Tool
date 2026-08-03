@@ -1,12 +1,17 @@
 'use client'
 
 import React, { useState } from 'react'
-import { User, Users, FileText, CheckCircle2, Sliders } from 'lucide-react'
+import { FolderHeart, Sparkles, User, Heart, Compass, ShieldAlert, CheckCircle2 } from 'lucide-react'
 
 export interface ProfileData {
   authorPersona: string
+  personalityTraits: string
+  likesDislikes: string
+  values: string
+  lifestyle: string
+  dreams: string
+  outlookOnLife: string
   targetAudience: string
-  backgroundInfo: string
   preferredTone: string
   writingStyleRules: string
 }
@@ -18,6 +23,7 @@ interface ProfileWorkspaceProps {
 
 export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
   const [formData, setFormData] = useState<ProfileData>(profile)
+  const [activeSubTab, setActiveSubTab] = useState<'pocket' | 'audience'>('pocket')
   const [saved, setSaved] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,97 +34,188 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-      <div className="glass-panel p-6 rounded-2xl border border-zinc-200 relative overflow-hidden">
+    <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in px-2 md:px-0">
+      <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="flex items-center gap-3 mb-4">
+
+        {/* Section Header */}
+        <div className="flex items-center gap-3 mb-6">
           <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 border border-purple-200">
-            <Sliders className="w-5 h-5" />
+            <FolderHeart className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-zinc-900">Voice & Persona Guidelines</h2>
+            <h2 className="text-lg md:text-xl font-bold text-zinc-900">Pocket & Audience Hub</h2>
             <p className="text-xs text-zinc-500 font-mono-custom">
-              Define the baseline framework used by the AI engine for every post.
+              Store your personal persona details ("Pocket") and target avatars.
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Author Persona */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-purple-700 flex items-center gap-2">
-                <User className="w-3.5 h-3.5" />
-                Who is the Author? (Persona)
-              </label>
-              <textarea
-                rows={4}
-                value={formData.authorPersona}
-                onChange={(e) => setFormData({ ...formData, authorPersona: e.target.value })}
-                placeholder="e.g. Senior Software Architect turned AI Solopreneur. Direct, insightful, and practical."
-                className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
-              />
+        {/* Sub-tabs */}
+        <div className="flex gap-2 border-b border-zinc-200 pb-3 mb-6">
+          <button
+            onClick={() => setActiveSubTab('pocket')}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeSubTab === 'pocket'
+                ? 'bg-purple-50 text-purple-700 border border-purple-200/60 shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-900'
+            }`}
+          >
+            ① The "Pocket" (My Persona)
+          </button>
+          <button
+            onClick={() => setActiveSubTab('audience')}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeSubTab === 'audience'
+                ? 'bg-purple-50 text-purple-700 border border-purple-200/60 shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-900'
+            }`}
+          >
+            ② "To Whom" (Target Audience)
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {activeSubTab === 'pocket' ? (
+            <div className="space-y-5">
+              {/* Pocket Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Self Introduction */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-purple-600" />
+                    Self-Introduction / Bio
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.authorPersona}
+                    onChange={(e) => setFormData({ ...formData, authorPersona: e.target.value })}
+                    placeholder="Briefly introduce yourself (expertise, status, etc.)"
+                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
+                  />
+                </div>
+
+                {/* Personality Traits */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+                    <Heart className="w-3.5 h-3.5 text-purple-600" />
+                    Personality Traits
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.personalityTraits}
+                    onChange={(e) => setFormData({ ...formData, personalityTraits: e.target.value })}
+                    placeholder="e.g. Enthusiastic, meticulous, slightly contrarian, direct yet warm"
+                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Likes & Dislikes */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                    Likes & Dislikes
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.likesDislikes}
+                    onChange={(e) => setFormData({ ...formData, likesDislikes: e.target.value })}
+                    placeholder="Likes: Clean code, deep coffee, indie hacks. Dislikes: Hype tech, endless meetings."
+                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
+                  />
+                </div>
+
+                {/* Dreams & Goals */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+                    <Compass className="w-3.5 h-3.5 text-purple-600" />
+                    Dreams & Long-term Goals
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.dreams}
+                    onChange={(e) => setFormData({ ...formData, dreams: e.target.value })}
+                    placeholder="e.g. Scaling my SaaS to $10k MRR and working 100% remote while traveling."
+                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Values & Lifestyle */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700">Values & Lifestyle</label>
+                  <input
+                    type="text"
+                    value={formData.lifestyle}
+                    onChange={(e) => setFormData({ ...formData, lifestyle: e.target.value })}
+                    placeholder="e.g. Asynchronous work, early mornings, active developer lifestyle"
+                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all"
+                  />
+                </div>
+
+                {/* Outlook on Life */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700">Outlook on Life</label>
+                  <input
+                    type="text"
+                    value={formData.outlookOnLife}
+                    onChange={(e) => setFormData({ ...formData, outlookOnLife: e.target.value })}
+                    placeholder="e.g. Leverage automation to gain freedom; value creation over consumption"
+                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all"
+                  />
+                </div>
+              </div>
             </div>
+          ) : (
+            <div className="space-y-5">
+              {/* Target Audience Profile */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-purple-600" />
+                  Target Customer / Reader Profile
+                </label>
+                <textarea
+                  rows={3}
+                  value={formData.targetAudience}
+                  onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
+                  placeholder="Describe your target audience (e.g. Housewives in their 30s, busy business owners in their 50s looking for AI integrations)"
+                  className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
+                />
+              </div>
 
-            {/* Target Audience */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-purple-700 flex items-center gap-2">
-                <Users className="w-3.5 h-3.5" />
-                Who is the Target Audience?
-              </label>
-              <textarea
-                rows={4}
-                value={formData.targetAudience}
-                onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
-                placeholder="e.g. Founders, indie hackers, and developers looking to scale their personal brand on Threads."
-                className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Tone */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700">Preferred Tone</label>
+                  <input
+                    type="text"
+                    value={formData.preferredTone}
+                    onChange={(e) => setFormData({ ...formData, preferredTone: e.target.value })}
+                    placeholder="e.g. Friendly, professional, humorous, empathetic"
+                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all"
+                  />
+                </div>
+
+                {/* Writing Rules */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-700">Formatting Constraints</label>
+                  <input
+                    type="text"
+                    value={formData.writingStyleRules}
+                    onChange={(e) => setFormData({ ...formData, writingStyleRules: e.target.value })}
+                    placeholder="e.g. Keep sentences under 12 words, no hashtags, end with a poll question"
+                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Preferred Tone */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-700">Preferred Tone</label>
-              <input
-                type="text"
-                value={formData.preferredTone}
-                onChange={(e) => setFormData({ ...formData, preferredTone: e.target.value })}
-                placeholder="e.g. Conversational, punchy, authoritative, lighthearted"
-                className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
-              />
-            </div>
-
-            {/* Background Info */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-700">Background Context</label>
-              <input
-                type="text"
-                value={formData.backgroundInfo}
-                onChange={(e) => setFormData({ ...formData, backgroundInfo: e.target.value })}
-                placeholder="e.g. Building SaaS products, sharing daily tech insights"
-                className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
-              />
-            </div>
-          </div>
-
-          {/* Writing Style Rules */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-purple-700 flex items-center gap-2">
-              <FileText className="w-3.5 h-3.5" />
-              Writing Style & Formatting Rules
-            </label>
-            <textarea
-              rows={4}
-              value={formData.writingStyleRules}
-              onChange={(e) => setFormData({ ...formData, writingStyleRules: e.target.value })}
-              placeholder="e.g. Use line breaks between thoughts. Keep sentences under 15 words. Start with a bold hook. No hashtags."
-              className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
-            />
-          </div>
-
-          <div className="flex justify-end items-center gap-4 pt-2">
+          {/* Action Row */}
+          <div className="flex justify-end items-center gap-4 pt-4 border-t border-zinc-100">
             {saved && (
               <span className="text-xs text-emerald-600 flex items-center gap-1.5 animate-fade-in font-mono-custom font-semibold">
                 <CheckCircle2 className="w-4 h-4" /> Guidelines saved & applied!
@@ -126,9 +223,9 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
             )}
             <button
               type="submit"
-              className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95"
+              className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center gap-2"
             >
-              Save Voice Profile
+              Save Changes
             </button>
           </div>
         </form>

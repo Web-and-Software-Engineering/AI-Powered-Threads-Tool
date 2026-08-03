@@ -7,6 +7,12 @@ interface GenerateParams {
   coreMessage: string
   referencePosts?: string
   authorPersona?: string
+  personalityTraits?: string
+  likesDislikes?: string
+  values?: string
+  lifestyle?: string
+  dreams?: string
+  outlookOnLife?: string
   targetAudience?: string
   preferredTone?: string
   writingStyleRules?: string
@@ -35,6 +41,11 @@ Your goal is to write a single-text Threads post (under 500 characters) that ach
 
 FRAMEWORK RULES TO FOLLOW:
 - AUTHOR PERSONA: ${params.authorPersona || 'Tech Entrepreneur & Solopreneur'}
+- PERSONALITY TRAITS: ${params.personalityTraits || 'Direct, practical, warm'}
+- LIKES & DISLIKES: ${params.likesDislikes || 'N/A'}
+- DREAMS & GOALS: ${params.dreams || 'N/A'}
+- VALUES & LIFESTYLE: ${params.lifestyle || 'N/A'}
+- OUTLOOK ON LIFE: ${params.outlookOnLife || 'N/A'}
 - TARGET AUDIENCE: ${params.targetAudience || 'Developers, creators, and indie hackers'}
 - PREFERRED TONE: ${params.preferredTone || 'Conversational, authoritative, punchy'}
 - WRITING STYLE RULES: ${params.writingStyleRules || 'Use clear line breaks, punchy hooks, and keep sentences short.'}
