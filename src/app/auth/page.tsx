@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react'
 import { login, signup, loginWithThreads } from '@/app/actions/auth'
-import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react'
 
 export default function AuthPage() {
   const [isRegister, setIsRegister] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -108,14 +110,49 @@ export default function AuthPage() {
               <Lock className="w-3.5 h-3.5 text-purple-600" />
               Password
             </label>
-            <input
-              type="password"
-              name="password"
-              required
-              placeholder="••••••••"
-              className="w-full bg-white border border-zinc-200 rounded-xl p-3.5 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                required
+                placeholder="••••••••"
+                className="w-full bg-white border border-zinc-200 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
+
+          {/* Confirm Password field (Register only) */}
+          {isRegister && (
+            <div className="space-y-1.5 animate-fade-in">
+              <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-purple-600" />
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  required
+                  placeholder="••••••••"
+                  className="w-full bg-white border border-zinc-200 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-600 transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Submit Button */}
           <button

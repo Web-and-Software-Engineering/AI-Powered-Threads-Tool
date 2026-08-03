@@ -1,12 +1,12 @@
 'use client'
 
 import React from 'react'
-import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut } from 'lucide-react'
+import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut, User } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 
 interface NavigationProps {
-  activeTab: 'workspace' | 'profile' | 'analytics'
-  setActiveTab: (tab: 'workspace' | 'profile' | 'analytics') => void
+  activeTab: 'workspace' | 'profile' | 'analytics' | 'account'
+  setActiveTab: (tab: 'workspace' | 'profile' | 'analytics' | 'account') => void
 }
 
 export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
@@ -67,6 +67,18 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
               >
                 <BarChart3 className="w-4 h-4" />
                 Analytics & Loop
+              </button>
+
+              <button
+                onClick={() => setActiveTab('account')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                  activeTab === 'account'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                }`}
+              >
+                <User className="w-4 h-4" />
+                Account
               </button>
             </nav>
 
@@ -133,6 +145,16 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
         >
           <BarChart3 className="w-5 h-5" />
           <span className="text-[10px] font-medium">Analytics</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('account')}
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+            activeTab === 'account' ? 'text-purple-600' : 'text-zinc-500'
+          }`}
+        >
+          <User className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Account</span>
         </button>
       </nav>
     </>

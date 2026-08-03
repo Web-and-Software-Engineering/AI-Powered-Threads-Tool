@@ -28,14 +28,23 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
+  const confirmPassword = formData.get('confirmPassword') as string
 
-  if (!email || !password) {
-    return { error: 'Email and password are required' }
+  if (!email || !password || !confirmPassword) {
+    return { error: 'All fields are required' }
+  }
+
+  if (password !== confirmPassword) {
+    return { error: 'Passwords do not match' }
+  }
+
+  if (password.length < 6) {
+    return { error: 'Password must be at least 6 characters long' }
   }
 
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -45,6 +54,10 @@ export async function signup(formData: FormData) {
 
   if (error) {
     return { error: error.message }
+  }
+
+  if (data?.session) {
+    redirect('/')
   }
 
   return { success: 'Check your email for the confirmation link!' }

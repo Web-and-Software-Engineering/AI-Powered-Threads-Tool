@@ -6,10 +6,17 @@ import { ProfileWorkspace, ProfileData } from '@/components/ProfileWorkspace'
 import { GenerationWorkspace } from '@/components/GenerationWorkspace'
 import { AnalyticsDashboard, PostItem } from '@/components/AnalyticsDashboard'
 import { SetupModal } from '@/components/SetupModal'
+import { AccountSettings } from '@/components/AccountSettings'
+import { getAccountDetails } from '@/app/actions/profile'
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'workspace' | 'profile' | 'analytics'>('workspace')
+  const [activeTab, setActiveTab] = useState<'workspace' | 'profile' | 'analytics' | 'account'>('workspace')
   const [showSetupModal, setShowSetupModal] = useState(false)
+  const [accountDetails, setAccountDetails] = useState<{
+    email: string
+    displayName: string
+    avatarUrl: string
+  } | null>(null)
 
   // Baseline User Profile Framework with Pocket Attributes
   const [profile, setProfile] = useState<ProfileData>({
@@ -44,6 +51,17 @@ export default function Home() {
       setShowSetupModal(true)
     }
   }, [])
+
+  // Load account details on mount and tab switch
+  useEffect(() => {
+    async function loadAccount() {
+      const details = await getAccountDetails()
+      if (details) {
+        setAccountDetails(details)
+      }
+    }
+    loadAccount()
+  }, [activeTab])
 
   // Initial Posts state (mocked with initial data demonstrating loop status states)
   const [posts, setPosts] = useState<PostItem[]>([
@@ -165,6 +183,15 @@ If you want genuine conversations, double down on Threads.`,
 
         {activeTab === 'analytics' && (
           <AnalyticsDashboard posts={posts} onSyncAnalytics={handleSyncAnalytics} />
+        )}
+
+        {activeTab === 'account' && (
+          <AccountSettings
+            key={accountDetails?.email || 'account'}
+            initialDisplayName={accountDetails?.displayName}
+            initialAvatarUrl={accountDetails?.avatarUrl}
+            initialEmail={accountDetails?.email}
+          />
         )}
       </main>
 
