@@ -5,6 +5,7 @@ import { Sparkles, MessageSquare, Lightbulb, Search, Loader2, CheckCircle2, Arro
 import { ProfileData } from './ProfileWorkspace'
 import { PostEditor } from './PostEditor'
 import { generateThreadsPost } from '@/app/actions/generate'
+import { publishToThreadsApi } from '@/app/actions/threads'
 
 interface GenerationWorkspaceProps {
   profile: ProfileData
@@ -74,7 +75,12 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     }
   }
 
-  const handlePublish = (finalContent: string) => {
+  const handlePublish = async (finalContent: string) => {
+    const result = await publishToThreadsApi(finalContent)
+    if (result?.error) {
+      return { error: result.error }
+    }
+
     onPostCreated({
       topic,
       coreMessage,
@@ -82,6 +88,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
       generatedContent: finalContent,
       status: 'published',
     })
+    return { success: true }
   }
 
   return (

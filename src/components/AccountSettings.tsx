@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { User, Shield, Key, AlertCircle, CheckCircle, Camera, Check, Eye, EyeOff } from 'lucide-react'
+import { User, Key, AlertCircle, CheckCircle, Camera, Check, Eye, EyeOff, Sparkles } from 'lucide-react'
 import { updateAccountProfile, changeUserPassword } from '@/app/actions/profile'
+import { getThreadsAuthUrl, disconnectThreads } from '@/app/actions/threads'
 
 // Pre-selected high-quality testing avatars
 const PRESET_AVATARS = [
@@ -16,12 +17,22 @@ interface AccountSettingsProps {
   initialDisplayName?: string
   initialAvatarUrl?: string
   initialEmail?: string
+  isThreadsUser?: boolean
+  threadsConnected?: boolean
+  threadsUsername?: string
+  threadsDisplayName?: string
+  threadsAvatarUrl?: string
 }
 
 export function AccountSettings({
   initialDisplayName = 'Content Creator',
   initialAvatarUrl = PRESET_AVATARS[0],
   initialEmail = 'creator@threadcraft.ai',
+  isThreadsUser = false,
+  threadsConnected = false,
+  threadsUsername = '',
+  threadsDisplayName = '',
+  threadsAvatarUrl = '',
 }: AccountSettingsProps) {
   const [displayName, setDisplayName] = useState(initialDisplayName)
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
@@ -36,6 +47,15 @@ export function AccountSettings({
   const [pwdError, setPwdError] = useState<string | null>(null)
   const [pwdSuccess, setPwdSuccess] = useState<string | null>(null)
   const [pwdSaving, setPwdSaving] = useState(false)
+
+  // Threads connection states
+  const [threadsConnecting, setThreadsConnecting] = useState(false)
+  const [threadsError, setThreadsError] = useState<string | null>(null)
+  const [threadsSuccess, setThreadsSuccess] = useState<string | null>(null)
+  const [isConnected, setIsConnected] = useState(threadsConnected)
+  const [connUsername, setConnUsername] = useState(threadsUsername)
+  const [connDisplayName, setConnDisplayName] = useState(threadsDisplayName)
+  const [connAvatarUrl, setConnAvatarUrl] = useState(threadsAvatarUrl)
 
   const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -84,6 +104,46 @@ export function AccountSettings({
       setPwdError(err.message || 'An unexpected error occurred.')
     } finally {
       setPwdSaving(false)
+    }
+  }
+
+  const handleConnectThreads = async () => {
+    setThreadsError(null)
+    setThreadsSuccess(null)
+    setThreadsConnecting(true)
+
+    if (isConnected) {
+      // Disconnect
+      try {
+        const result = await disconnectThreads()
+        if (result?.error) {
+          setThreadsError(result.error)
+        } else {
+          setIsConnected(false)
+          setConnUsername('')
+          setConnDisplayName('')
+          setConnAvatarUrl('')
+          setThreadsSuccess('Threads account unlinked successfully!')
+        }
+      } catch (err: any) {
+        setThreadsError(err.message || 'An error occurred during disconnect.')
+      } finally {
+        setThreadsConnecting(false)
+      }
+    } else {
+      // Connect / Link — redirect to Threads OAuth
+      try {
+        const result = await getThreadsAuthUrl()
+        if (result?.error) {
+          setThreadsError(result.error)
+          setThreadsConnecting(false)
+        } else if (result?.url) {
+          window.location.href = result.url
+        }
+      } catch (err: any) {
+        setThreadsError(err.message || 'An error occurred triggering OAuth.')
+        setThreadsConnecting(false)
+      }
     }
   }
 
@@ -269,6 +329,70 @@ export function AccountSettings({
               </div>
             </form>
           </div>
+        </div>
+      </div>
+
+      {/* Threads Connection Panel */}
+      <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 space-y-4">
+        <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" /> Linked Accounts
+        </h3>
+
+        {threadsError && (
+          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5 animate-fade-in min-w-0">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <span className="font-mono-custom break-all flex-1">{threadsError}</span>
+          </div>
+        )}
+
+        {threadsSuccess && (
+          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2.5 animate-fade-in min-w-0">
+            <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <span className="font-mono-custom break-all flex-1">{threadsSuccess}</span>
+          </div>
+        )}
+        
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+          <div className="flex items-center gap-3">
+            {isConnected && connAvatarUrl ? (
+              <img
+                src={connAvatarUrl}
+                alt={connDisplayName || connUsername}
+                className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-sm shrink-0"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-zinc-200 border-2 border-zinc-300 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-zinc-500" />
+              </div>
+            )}
+            <div className="space-y-0.5">
+              <span className="text-xs font-bold text-zinc-800 block">
+                {isConnected ? (connDisplayName || `@${connUsername}`) : 'Threads Account'}
+              </span>
+              <p className="text-xs text-zinc-500 font-mono-custom">
+                {isConnected 
+                  ? `@${connUsername} · Connected`
+                  : 'Connect your Threads account to publish directly from the app.'}
+              </p>
+            </div>
+          </div>
+          
+          <button
+            type="button"
+            onClick={handleConnectThreads}
+            disabled={threadsConnecting}
+            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-md whitespace-nowrap ${
+              isConnected 
+                ? 'bg-zinc-200 hover:bg-rose-50 hover:text-rose-600 text-zinc-700' 
+                : 'bg-black hover:bg-zinc-800 text-white shadow-zinc-950/20'
+            }`}
+          >
+            {threadsConnecting 
+              ? 'Processing...' 
+              : isConnected 
+                ? 'Disconnect Account' 
+                : 'Link Threads Account'}
+          </button>
         </div>
       </div>
     </div>

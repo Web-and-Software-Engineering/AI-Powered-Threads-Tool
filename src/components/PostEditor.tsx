@@ -7,7 +7,7 @@ interface PostEditorProps {
   initialContent: string
   topic: string
   coreMessage: string
-  onPublish: (content: string) => void
+  onPublish: (content: string) => Promise<{ error?: string; success?: boolean } | void>
   onRegenerate?: () => void
 }
 
@@ -21,6 +21,7 @@ export function PostEditor({
   const [content, setContent] = useState(initialContent)
   const [publishing, setPublishing] = useState(false)
   const [published, setPublished] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const charCount = content.length
   const maxChars = 500
@@ -29,13 +30,20 @@ export function PostEditor({
   const handlePublish = async () => {
     if (isOverLimit || !content.trim()) return
     setPublishing(true)
+    setError(null)
 
-    // Simulate Threads API publishing delay
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    onPublish(content)
-    setPublishing(false)
-    setPublished(true)
+    try {
+      const result = await onPublish(content)
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        setPublished(true)
+      }
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred during publishing.')
+    } finally {
+      setPublishing(false)
+    }
   }
 
   return (
@@ -83,7 +91,7 @@ export function PostEditor({
                 </span>
                 <div className="w-16 h-1.5 bg-zinc-200 rounded-full overflow-hidden">
                   <div
-                    className={`h-full transition-all ${
+                     className={`h-full transition-all ${
                       isOverLimit ? 'bg-rose-500' : 'bg-purple-600'
                     }`}
                     style={{ width: `${Math.min((charCount / maxChars) * 100, 100)}%` }}
@@ -122,6 +130,13 @@ export function PostEditor({
         </div>
       </div>
 
+      {error && (
+        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5 animate-fade-in min-w-0">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <span className="font-mono-custom break-all flex-1">{error}</span>
+        </div>
+      )}
+
       <div className="flex items-center justify-between pt-4 border-t border-zinc-100">
         <div className="text-xs text-zinc-500 font-mono-custom">
           {published ? (
@@ -129,7 +144,7 @@ export function PostEditor({
               <CheckCircle2 className="w-4 h-4" /> Published to Threads successfully!
             </span>
           ) : (
-            'Mock Threads OAuth API active'
+            'Threads API Active'
           )}
         </div>
 

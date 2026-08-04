@@ -51,6 +51,8 @@ export default function AuthPage() {
       const result = await loginWithThreads()
       if (result?.error) {
         setError(result.error)
+      } else if (result?.redirect) {
+        window.location.href = result.redirect
       }
     } catch (err: any) {
       setError(err.message || 'OAuth initialization failed.')

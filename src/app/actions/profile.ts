@@ -14,10 +14,32 @@ export async function getAccountDetails() {
     return null
   }
 
+  // Try to get richer profile from social_accounts (Threads OAuth users)
+  const { data: social } = await supabase
+    .from('social_accounts')
+    .select('display_name, avatar_url, username')
+    .eq('user_id', user.id)
+    .eq('platform', 'threads')
+    .maybeSingle()
+
+  const displayName =
+    social?.display_name ||
+    user.user_metadata?.display_name ||
+    user.email?.split('@')[0] ||
+    'Content Creator'
+
+  const avatarUrl =
+    social?.avatar_url ||
+    user.user_metadata?.avatar_url ||
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+
+  const isThreadsUser = user.email?.endsWith('@threads-auth.internal') ?? false
+
   return {
-    email: user.email || '',
-    displayName: user.user_metadata?.display_name || user.email?.split('@')[0] || 'Content Creator',
-    avatarUrl: user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+    email: isThreadsUser ? `@${social?.username || 'threads_user'}` : (user.email || ''),
+    displayName,
+    avatarUrl,
+    isThreadsUser,
   }
 }
 

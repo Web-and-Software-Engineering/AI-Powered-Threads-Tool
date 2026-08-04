@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Navigation } from '@/components/Navigation'
 import { ProfileWorkspace, ProfileData } from '@/components/ProfileWorkspace'
 import { GenerationWorkspace } from '@/components/GenerationWorkspace'
@@ -8,6 +8,7 @@ import { AnalyticsDashboard, PostItem } from '@/components/AnalyticsDashboard'
 import { SetupModal } from '@/components/SetupModal'
 import { AccountSettings } from '@/components/AccountSettings'
 import { getAccountDetails } from '@/app/actions/profile'
+import { checkThreadsConnection } from '@/app/actions/threads'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'workspace' | 'profile' | 'analytics' | 'account'>('workspace')
@@ -16,7 +17,13 @@ export default function Home() {
     email: string
     displayName: string
     avatarUrl: string
+    isThreadsUser?: boolean
   } | null>(null)
+  
+  const [threadsConnected, setThreadsConnected] = useState(false)
+  const [threadsUsername, setThreadsUsername] = useState('')
+  const [threadsDisplayName, setThreadsDisplayName] = useState('')
+  const [threadsAvatarUrl, setThreadsAvatarUrl] = useState('')
 
   // Baseline User Profile Framework with Pocket Attributes
   const [profile, setProfile] = useState<ProfileData>({
@@ -59,9 +66,25 @@ export default function Home() {
       if (details) {
         setAccountDetails(details)
       }
+      const conn = await checkThreadsConnection()
+      setThreadsConnected(conn.connected)
+      setThreadsUsername(conn.username || '')
+      setThreadsDisplayName(conn.displayName || '')
+      setThreadsAvatarUrl(conn.avatarUrl || '')
     }
     loadAccount()
   }, [activeTab])
+
+  // Handle ?tab= redirect from Threads OAuth callbacks
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
+    if (tab === 'account') {
+      setActiveTab('account')
+      // Clean the URL without a page reload
+      window.history.replaceState({}, '', '/')
+    }
+  }, [])
 
   // Initial Posts state (mocked with initial data demonstrating loop status states)
   const [posts, setPosts] = useState<PostItem[]>([
@@ -187,10 +210,15 @@ If you want genuine conversations, double down on Threads.`,
 
         {activeTab === 'account' && (
           <AccountSettings
-            key={accountDetails?.email || 'account'}
+            key={`${accountDetails?.email || 'account'}-${threadsConnected}`}
             initialDisplayName={accountDetails?.displayName}
             initialAvatarUrl={accountDetails?.avatarUrl}
             initialEmail={accountDetails?.email}
+            isThreadsUser={accountDetails?.isThreadsUser}
+            threadsConnected={threadsConnected}
+            threadsUsername={threadsUsername}
+            threadsDisplayName={threadsDisplayName}
+            threadsAvatarUrl={threadsAvatarUrl}
           />
         )}
       </main>

@@ -70,23 +70,19 @@ export async function logout() {
 }
 
 export async function loginWithThreads() {
-  const supabase = await createClient()
+  const appId = process.env.NEXT_PUBLIC_THREAD_APP_ID
 
-  // Supposing the Instagram/Threads OAuth client provider is configured in Supabase dashboard
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'instagram' as any,
-    options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
-    },
-  })
-
-  if (error) {
-    return { error: error.message }
+  if (!appId) {
+    return { error: 'Threads App ID is not configured' }
   }
 
-  if (data?.url) {
-    redirect(data.url)
-  }
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const callbackUrl = `${siteUrl}/auth/threads/login-callback`
+  const redirectUri = encodeURIComponent(callbackUrl)
+  const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish&response_type=code`
 
-  return { error: 'OAuth URL could not be generated' }
+  console.log('[Threads OAuth] Constructed URL:', url)
+  console.log('[Threads OAuth] Redirect URI (decoded):', callbackUrl)
+
+  return { redirect: url }
 }
