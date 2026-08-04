@@ -337,7 +337,7 @@ export function AccountSettings({
       {/* Threads Connection Panel */}
       <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 space-y-4">
         <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" /> Linked Accounts
+          <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" /> Linked Threads Account
         </h3>
 
         {threadsError && (
