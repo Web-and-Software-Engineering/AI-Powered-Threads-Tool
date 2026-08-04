@@ -382,27 +382,30 @@ export function AccountSettings({
                 </div>
               )}
               <div className="space-y-0.5">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-zinc-800 block">
-                  {isConnected ? (connDisplayName || `@${connUsername}`) : 'Threads Account'}
+              <span className="text-xs font-bold text-zinc-800 block">
+                {isConnected ? (connDisplayName || `@${connUsername}`) : 'Threads Account'}
+              </span>
+              <div className="flex items-center gap-2 flex-wrap text-xs text-zinc-500 font-mono-custom">
+                <span>
+                  {isConnected 
+                    ? `@${connUsername} · Connected`
+                    : 'Connect your Threads account to publish directly from the app.'}
                 </span>
                 {isConnected && (
-                  <a
-                    href={`https://threads.net/@${connUsername}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-purple-600 hover:text-purple-700 transition-colors inline-flex items-center gap-0.5 text-[10px] font-bold"
-                    title="View profile on Threads"
-                  >
-                    <ExternalLink className="w-3 h-3" /> View Profile
-                  </a>
+                  <>
+                    <span className="text-zinc-300 select-none">|</span>
+                    <a
+                      href={`https://threads.net/@${connUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-600 hover:text-purple-700 transition-colors inline-flex items-center gap-0.5 text-[10px] font-bold"
+                      title="View profile on Threads"
+                    >
+                      <ExternalLink className="w-3 h-3" /> View Profile
+                    </a>
+                  </>
                 )}
               </div>
-              <p className="text-xs text-zinc-500 font-mono-custom">
-                {isConnected 
-                  ? `@${connUsername} · Connected`
-                  : 'Connect your Threads account to publish directly from the app.'}
-              </p>
               {isConnected && threadsExpiresAt && (
                 <span className="text-[10px] text-zinc-400 font-mono-custom block mt-0.5">
                   Token active · Expires on {threadsExpiresAt}
