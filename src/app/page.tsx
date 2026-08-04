@@ -75,7 +75,7 @@ export default function Home() {
     loadAccount()
   }, [activeTab])
 
-  // Handle ?tab= redirect from Threads OAuth callbacks
+  // Synchronize activeTab with URL search parameters on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const tab = params.get('tab')
@@ -85,14 +85,26 @@ export default function Home() {
     if (error) {
       console.error('[Threads Callback Error] type:', error, 'details:', details)
       alert(`Threads Connection Failed: ${error}${details ? ` (${details})` : ''}`)
+      params.delete('error')
+      params.delete('details')
+      window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
     }
     
-    if (tab === 'account') {
-      setActiveTab('account')
-      // Clean the URL without a page reload
-      window.history.replaceState({}, '', '/')
+    if (tab && ['workspace', 'profile', 'analytics', 'account'].includes(tab)) {
+      setActiveTab(tab as any)
     }
   }, [])
+
+  // Sync activeTab state changes back to URL search parameters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const currentTab = params.get('tab')
+    
+    if (currentTab !== activeTab) {
+      params.set('tab', activeTab)
+      window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`)
+    }
+  }, [activeTab])
 
   // Initial Posts state (mocked with initial data demonstrating loop status states)
   const [posts, setPosts] = useState<PostItem[]>([
