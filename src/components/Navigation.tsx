@@ -1,15 +1,20 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut, User } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 
-interface NavigationProps {
-  activeTab: 'workspace' | 'profile' | 'analytics' | 'account'
-  setActiveTab: (tab: 'workspace' | 'profile' | 'analytics' | 'account') => void
-}
+export function Navigation() {
+  const pathname = usePathname()
+  
+  const activeTab = 
+    pathname === '/' ? 'workspace' :
+    pathname.startsWith('/profile') ? 'profile' :
+    pathname.startsWith('/analytics') ? 'analytics' :
+    pathname.startsWith('/account') ? 'account' : 'workspace';
 
-export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
   const handleLogout = async () => {
     await logout()
   }
@@ -33,8 +38,8 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
 
           <div className="flex items-center gap-4">
             <nav className="flex items-center gap-2 bg-zinc-100 p-1.5 rounded-xl border border-zinc-200">
-              <button
-                onClick={() => setActiveTab('workspace')}
+              <Link
+                href="/"
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'workspace'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
@@ -43,10 +48,10 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
               >
                 <PenSquare className="w-4 h-4" />
                 Generator
-              </button>
+              </Link>
 
-              <button
-                onClick={() => setActiveTab('profile')}
+              <Link
+                href="/profile"
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'profile'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
@@ -55,10 +60,10 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
               >
                 <FolderHeart className="w-4 h-4" />
                 Pocket & Audience
-              </button>
+              </Link>
 
-              <button
-                onClick={() => setActiveTab('analytics')}
+              <Link
+                href="/analytics"
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'analytics'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
@@ -67,10 +72,10 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
               >
                 <BarChart3 className="w-4 h-4" />
                 Analytics & Loop
-              </button>
+              </Link>
 
-              <button
-                onClick={() => setActiveTab('account')}
+              <Link
+                href="/account"
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'account'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
@@ -79,7 +84,7 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
               >
                 <User className="w-4 h-4" />
                 Account
-              </button>
+              </Link>
             </nav>
 
             <button
@@ -117,45 +122,45 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
 
       {/* Mobile Bottom Navigation Bar (sticky bottom) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-zinc-200 flex justify-around items-center py-2 px-4 shadow-lg shadow-black/5">
-        <button
-          onClick={() => setActiveTab('workspace')}
+        <Link
+          href="/"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
             activeTab === 'workspace' ? 'text-purple-600' : 'text-zinc-500'
           }`}
         >
           <PenSquare className="w-5 h-5" />
           <span className="text-[10px] font-medium">Generator</span>
-        </button>
+        </Link>
 
-        <button
-          onClick={() => setActiveTab('profile')}
+        <Link
+          href="/profile"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
             activeTab === 'profile' ? 'text-purple-600' : 'text-zinc-500'
           }`}
         >
           <FolderHeart className="w-5 h-5" />
           <span className="text-[10px] font-medium">Pocket</span>
-        </button>
+        </Link>
 
-        <button
-          onClick={() => setActiveTab('analytics')}
+        <Link
+          href="/analytics"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
             activeTab === 'analytics' ? 'text-purple-600' : 'text-zinc-500'
           }`}
         >
           <BarChart3 className="w-5 h-5" />
           <span className="text-[10px] font-medium">Analytics</span>
-        </button>
+        </Link>
 
-        <button
-          onClick={() => setActiveTab('account')}
+        <Link
+          href="/account"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
             activeTab === 'account' ? 'text-purple-600' : 'text-zinc-500'
           }`}
         >
           <User className="w-5 h-5" />
           <span className="text-[10px] font-medium">Account</span>
-        </button>
+        </Link>
       </nav>
     </>
   )

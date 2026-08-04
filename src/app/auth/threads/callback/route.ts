@@ -7,17 +7,17 @@ export async function GET(request: Request) {
   const errorMsg = searchParams.get('error')
 
   if (errorMsg) {
-    return NextResponse.redirect(`${origin}/?tab=account&error=threads_oauth_failed`)
+    return NextResponse.redirect(`${origin}/account?error=threads_oauth_failed`)
   }
   if (!code) {
-    return NextResponse.redirect(`${origin}/?tab=account&error=threads_no_code`)
+    return NextResponse.redirect(`${origin}/account?error=threads_no_code`)
   }
 
   const appId = process.env.NEXT_PUBLIC_THREAD_APP_ID
   const appSecret = process.env.NEXT_PUBLIC_THREAD_APP_SECRET
 
   if (!appId || !appSecret) {
-    return NextResponse.redirect(`${origin}/?tab=account&error=threads_env_missing`)
+    return NextResponse.redirect(`${origin}/account?error=threads_env_missing`)
   }
 
   const redirectUri = `${origin}/auth/threads/callback`
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
     const tokenData = await tokenRes.json()
     if (tokenData.error || tokenData.error_message) {
       console.error('Short-lived token exchange error:', tokenData)
-      return NextResponse.redirect(`${origin}/?tab=account&error=threads_token_exchange_failed`)
+      return NextResponse.redirect(`${origin}/account?error=threads_token_exchange_failed`)
     }
 
     const shortLivedToken = tokenData.access_token
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     )
     const longLivedData = await longLivedRes.json()
     if (longLivedData.error) {
-      return NextResponse.redirect(`${origin}/?tab=account&error=threads_long_token_failed`)
+      return NextResponse.redirect(`${origin}/account?error=threads_long_token_failed`)
     }
 
     const longLivedToken = longLivedData.access_token
@@ -83,7 +83,7 @@ export async function GET(request: Request) {
 
     if (existingMapping && existingMapping.user_id !== user.id) {
       return NextResponse.redirect(
-        `${origin}/?tab=account&error=threads_already_linked_to_another_user`
+        `${origin}/account?error=threads_already_linked_to_another_user`
       )
     }
 
@@ -106,12 +106,12 @@ export async function GET(request: Request) {
 
     if (upsertError) {
       console.error('Failed to upsert social account:', upsertError)
-      return NextResponse.redirect(`${origin}/?tab=account&error=threads_db_save_failed`)
+      return NextResponse.redirect(`${origin}/account?error=threads_db_save_failed`)
     }
 
-    return NextResponse.redirect(`${origin}/?tab=account`)
+    return NextResponse.redirect(`${origin}/account`)
   } catch (err: any) {
     console.error('Threads callback exception:', err)
-    return NextResponse.redirect(`${origin}/?tab=account&error=threads_callback_exception`)
+    return NextResponse.redirect(`${origin}/account?error=threads_callback_exception`)
   }
 }
