@@ -79,6 +79,14 @@ export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const tab = params.get('tab')
+    const error = params.get('error')
+    const details = params.get('details')
+    
+    if (error) {
+      console.error('[Threads Callback Error] type:', error, 'details:', details)
+      alert(`Threads Connection Failed: ${error}${details ? ` (${details})` : ''}`)
+    }
+    
     if (tab === 'account') {
       setActiveTab('account')
       // Clean the URL without a page reload
