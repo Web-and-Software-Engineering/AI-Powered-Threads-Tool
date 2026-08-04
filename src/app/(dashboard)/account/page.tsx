@@ -13,6 +13,7 @@ export default function AccountPage() {
     isThreadsUser?: boolean
   } | null>(null)
   
+  const [threadsLoading, setThreadsLoading] = useState(true)
   const [threadsConnected, setThreadsConnected] = useState(false)
   const [threadsUsername, setThreadsUsername] = useState('')
   const [threadsDisplayName, setThreadsDisplayName] = useState('')
@@ -21,15 +22,25 @@ export default function AccountPage() {
   // Load account details on client mount
   useEffect(() => {
     async function loadAccount() {
+      // Fetch profile details first so we can mount the page layout instantly
       const details = await getAccountDetails()
       if (details) {
         setAccountDetails(details)
       }
-      const conn = await checkThreadsConnection()
-      setThreadsConnected(conn.connected)
-      setThreadsUsername(conn.username || '')
-      setThreadsDisplayName(conn.displayName || '')
-      setThreadsAvatarUrl(conn.avatarUrl || '')
+      
+      // Check Threads connection status asynchronously in background
+      setThreadsLoading(true)
+      try {
+        const conn = await checkThreadsConnection()
+        setThreadsConnected(conn.connected)
+        setThreadsUsername(conn.username || '')
+        setThreadsDisplayName(conn.displayName || '')
+        setThreadsAvatarUrl(conn.avatarUrl || '')
+      } catch (err) {
+        console.error('Failed to load Threads connection status:', err)
+      } finally {
+        setThreadsLoading(false)
+      }
     }
     loadAccount()
   }, [])
@@ -68,6 +79,7 @@ export default function AccountPage() {
       threadsUsername={threadsUsername}
       threadsDisplayName={threadsDisplayName}
       threadsAvatarUrl={threadsAvatarUrl}
+      threadsLoading={threadsLoading}
     />
   )
 }

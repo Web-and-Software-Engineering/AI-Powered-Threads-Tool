@@ -22,6 +22,7 @@ interface AccountSettingsProps {
   threadsUsername?: string
   threadsDisplayName?: string
   threadsAvatarUrl?: string
+  threadsLoading?: boolean
 }
 
 export function AccountSettings({
@@ -33,6 +34,7 @@ export function AccountSettings({
   threadsUsername = '',
   threadsDisplayName = '',
   threadsAvatarUrl = '',
+  threadsLoading = false,
 }: AccountSettingsProps) {
   const [displayName, setDisplayName] = useState(initialDisplayName)
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
@@ -352,48 +354,61 @@ export function AccountSettings({
           </div>
         )}
         
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 border border-zinc-200">
-          <div className="flex items-center gap-3">
-            {isConnected && connAvatarUrl ? (
-              <img
-                src={connAvatarUrl}
-                alt={connDisplayName || connUsername}
-                className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-sm shrink-0"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-zinc-200 border-2 border-zinc-300 flex items-center justify-center shrink-0">
-                <Sparkles className="w-4 h-4 text-zinc-500" />
+        {threadsLoading ? (
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 border border-zinc-200 animate-pulse">
+            <div className="flex items-center gap-3 w-full">
+              <div className="w-10 h-10 rounded-full bg-zinc-200 shrink-0" />
+              <div className="space-y-2 flex-1">
+                <div className="h-3 bg-zinc-200 rounded w-1/4" />
+                <div className="h-2 bg-zinc-200 rounded w-1/2" />
               </div>
-            )}
-            <div className="space-y-0.5">
-              <span className="text-xs font-bold text-zinc-800 block">
-                {isConnected ? (connDisplayName || `@${connUsername}`) : 'Threads Account'}
-              </span>
-              <p className="text-xs text-zinc-500 font-mono-custom">
-                {isConnected 
-                  ? `@${connUsername} · Connected`
-                  : 'Connect your Threads account to publish directly from the app.'}
-              </p>
             </div>
+            <div className="h-8 bg-zinc-200 rounded-xl w-32 shrink-0 hidden md:block" />
           </div>
-          
-          <button
-            type="button"
-            onClick={handleConnectThreads}
-            disabled={threadsConnecting}
-            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-md whitespace-nowrap ${
-              isConnected 
-                ? 'bg-zinc-200 hover:bg-rose-50 hover:text-rose-600 text-zinc-700' 
-                : 'bg-black hover:bg-zinc-800 text-white shadow-zinc-950/20'
-            }`}
-          >
-            {threadsConnecting 
-              ? 'Processing...' 
-              : isConnected 
-                ? 'Disconnect Account' 
-                : 'Link Threads Account'}
-          </button>
-        </div>
+        ) : (
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+            <div className="flex items-center gap-3">
+              {isConnected && connAvatarUrl ? (
+                <img
+                  src={connAvatarUrl}
+                  alt={connDisplayName || connUsername}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-sm shrink-0"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-zinc-200 border-2 border-zinc-300 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4 h-4 text-zinc-500" />
+                </div>
+              )}
+              <div className="space-y-0.5">
+                <span className="text-xs font-bold text-zinc-800 block">
+                  {isConnected ? (connDisplayName || `@${connUsername}`) : 'Threads Account'}
+                </span>
+                <p className="text-xs text-zinc-500 font-mono-custom">
+                  {isConnected 
+                    ? `@${connUsername} · Connected`
+                    : 'Connect your Threads account to publish directly from the app.'}
+                </p>
+              </div>
+            </div>
+            
+            <button
+              type="button"
+              onClick={handleConnectThreads}
+              disabled={threadsConnecting}
+              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-md whitespace-nowrap ${
+                isConnected 
+                  ? 'bg-zinc-200 hover:bg-rose-50 hover:text-rose-600 text-zinc-700' 
+                  : 'bg-black hover:bg-zinc-800 text-white shadow-zinc-950/20'
+              }`}
+            >
+              {threadsConnecting 
+                ? 'Processing...' 
+                : isConnected 
+                  ? 'Disconnect Account' 
+                  : 'Link Threads Account'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
