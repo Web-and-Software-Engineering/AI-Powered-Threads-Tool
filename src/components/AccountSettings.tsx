@@ -5,13 +5,8 @@ import { User, Key, AlertCircle, CheckCircle, Camera, Check, Eye, EyeOff, Sparkl
 import { updateAccountProfile, changeUserPassword } from '@/app/actions/profile'
 import { getThreadsAuthUrl, disconnectThreads } from '@/app/actions/threads'
 
-// Pre-selected high-quality testing avatars
-const PRESET_AVATARS = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
-]
+// Default fallback avatar
+const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
 
 interface AccountSettingsProps {
   initialDisplayName?: string
@@ -28,7 +23,7 @@ interface AccountSettingsProps {
 
 export function AccountSettings({
   initialDisplayName = 'Content Creator',
-  initialAvatarUrl = PRESET_AVATARS[0],
+  initialAvatarUrl = DEFAULT_AVATAR,
   initialEmail = 'creator@threadcraft.ai',
   isThreadsUser = false,
   threadsConnected = false,
@@ -60,6 +55,29 @@ export function AccountSettings({
   const [connUsername, setConnUsername] = useState(threadsUsername)
   const [connDisplayName, setConnDisplayName] = useState(threadsDisplayName)
   const [connAvatarUrl, setConnAvatarUrl] = useState(threadsAvatarUrl)
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfileError(null)
+    setProfileSuccess(null)
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 512000) {
+        setProfileError('Image must be smaller than 500KB.')
+        return
+      }
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setAvatarUrl(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click()
+  }
 
   const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -190,31 +208,29 @@ export function AccountSettings({
 
             {/* Avatar picker */}
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-zinc-700 block">Profile Photo Selection</label>
+              <label className="text-[11px] font-bold text-zinc-700 block">Profile Photo</label>
               <div className="flex items-center gap-4">
                 <img
                   src={avatarUrl}
                   alt="Profile"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-purple-600 shadow-md shrink-0"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-purple-600 shadow-md shrink-0 bg-zinc-100"
                 />
-                <div className="grid grid-cols-4 gap-2">
-                  {PRESET_AVATARS.map((url, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setAvatarUrl(url)}
-                      className={`relative w-10 h-10 rounded-full overflow-hidden border-2 transition-all hover:scale-105 active:scale-95 cursor-pointer ${
-                        avatarUrl === url ? 'border-purple-600' : 'border-zinc-200'
-                      }`}
-                    >
-                      <img src={url} alt="preset avatar" className="w-full h-full object-cover" />
-                      {avatarUrl === url && (
-                        <div className="absolute inset-0 bg-purple-600/30 flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      )}
-                    </button>
-                  ))}
+                <div className="space-y-1.5">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={triggerFileInput}
+                    className="px-4 py-2 border border-zinc-200 hover:border-purple-500 hover:text-purple-600 bg-white text-zinc-700 rounded-xl text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
+                  >
+                    Upload Photo
+                  </button>
+                  <p className="text-[10px] text-zinc-400">Supports JPG, PNG or WEBP. Max 500KB.</p>
                 </div>
               </div>
             </div>
