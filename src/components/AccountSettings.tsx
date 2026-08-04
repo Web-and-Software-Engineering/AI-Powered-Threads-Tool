@@ -232,11 +232,13 @@ export function AccountSettings({
                 />
               </div>
 
-              {/* Read Only Email */}
+              {/* Read Only Email / Username */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-500 block">Registered Email (Read Only)</label>
+                <label className="text-[11px] font-bold text-zinc-500 block">
+                  {isThreadsUser ? 'Threads Account (Read Only)' : 'Registered Email (Read Only)'}
+                </label>
                 <input
-                  type="email"
+                  type={isThreadsUser ? 'text' : 'email'}
                   disabled
                   value={initialEmail}
                   className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs text-zinc-400 font-mono-custom select-none cursor-not-allowed"
