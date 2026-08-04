@@ -138,8 +138,11 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}/auth?error=threads_unauthenticated`)
     }
 
+    // Use a fresh Supabase client instance to ensure the authorization headers carry the active session cookie
+    const dbClient = await createClient()
+
     // Upsert social_accounts record (enforced unique by user_id+platform constraint)
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await dbClient
       .from('social_accounts')
       .upsert(
         {
