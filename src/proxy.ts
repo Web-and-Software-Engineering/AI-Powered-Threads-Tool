@@ -47,7 +47,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth', request.url))
   }
 
-  if (user && isAuthPage && request.nextUrl.pathname !== '/auth/callback') {
+  const isAuthCallback =
+    request.nextUrl.pathname === '/auth/callback' ||
+    request.nextUrl.pathname.startsWith('/auth/threads/')
+
+  if (user && isAuthPage && !isAuthCallback) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
