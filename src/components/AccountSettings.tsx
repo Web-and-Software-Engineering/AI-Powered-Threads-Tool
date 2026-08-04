@@ -56,29 +56,6 @@ export function AccountSettings({
   const [connDisplayName, setConnDisplayName] = useState(threadsDisplayName)
   const [connAvatarUrl, setConnAvatarUrl] = useState(threadsAvatarUrl)
 
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfileError(null)
-    setProfileSuccess(null)
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.size > 512000) {
-        setProfileError('Image must be smaller than 500KB.')
-        return
-      }
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setAvatarUrl(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click()
-  }
-
   const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setProfileError(null)
@@ -206,32 +183,16 @@ export function AccountSettings({
               </div>
             )}
 
-            {/* Avatar picker */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-zinc-700 block">Profile Photo</label>
-              <div className="flex items-center gap-4">
-                <img
-                  src={avatarUrl}
-                  alt="Profile"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-purple-600 shadow-md shrink-0 bg-zinc-100"
-                />
-                <div className="space-y-1.5">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={triggerFileInput}
-                    className="px-4 py-2 border border-zinc-200 hover:border-purple-500 hover:text-purple-600 bg-white text-zinc-700 rounded-xl text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
-                  >
-                    Upload Photo
-                  </button>
-                  <p className="text-[10px] text-zinc-400">Supports JPG, PNG or WEBP. Max 500KB.</p>
-                </div>
+            {/* Read-Only Profile Photo */}
+            <div className="flex items-center gap-4 pb-2">
+              <img
+                src={avatarUrl}
+                alt="Profile"
+                className="w-16 h-16 rounded-full object-cover border-2 border-purple-600 shadow-md shrink-0 bg-zinc-100"
+              />
+              <div>
+                <span className="text-[11px] font-bold text-zinc-500 block uppercase tracking-wider">Profile Photo</span>
+                <p className="text-xs text-zinc-400">Synced via your linked Threads profile.</p>
               </div>
             </div>
 
