@@ -18,6 +18,7 @@ export default function AccountPage() {
   const [threadsUsername, setThreadsUsername] = useState('')
   const [threadsDisplayName, setThreadsDisplayName] = useState('')
   const [threadsAvatarUrl, setThreadsAvatarUrl] = useState('')
+  const [threadsExpiresAt, setThreadsExpiresAt] = useState('')
 
   // Load account details on client mount
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function AccountPage() {
         setThreadsUsername(conn.username || '')
         setThreadsDisplayName(conn.displayName || '')
         setThreadsAvatarUrl(conn.avatarUrl || '')
+        setThreadsExpiresAt(conn.expiresAt || '')
       } catch (err) {
         console.error('Failed to load Threads connection status:', err)
       } finally {
@@ -80,6 +82,7 @@ export default function AccountPage() {
       threadsDisplayName={threadsDisplayName}
       threadsAvatarUrl={threadsAvatarUrl}
       threadsLoading={threadsLoading}
+      threadsExpiresAt={threadsExpiresAt}
     />
   )
 }

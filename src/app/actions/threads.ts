@@ -32,7 +32,7 @@ export async function checkThreadsConnection() {
 
   const { data, error } = await supabase
     .from('social_accounts')
-    .select('account_id, username, display_name, avatar_url')
+    .select('account_id, username, display_name, avatar_url, expires_at')
     .eq('user_id', user.id)
     .eq('platform', 'threads')
     .maybeSingle()
@@ -46,6 +46,11 @@ export async function checkThreadsConnection() {
     username: data.username || `User #${data.account_id}`,
     displayName: data.display_name || data.username || '',
     avatarUrl: data.avatar_url || '',
+    expiresAt: data.expires_at ? new Date(data.expires_at).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }) : '',
   }
 }
 
