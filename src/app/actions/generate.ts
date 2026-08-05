@@ -61,6 +61,7 @@ CRITICAL CONSTRAINTS:
 - Single text post strictly under 500 characters.
 - Must deliver the specified core message clearly.
 - No spammy hashtags or cheesy engagement bait.
+- Strictly write in PLAIN TEXT. Never use Markdown formatting (do NOT use **bold**, *italics*, _italics_, or headings). Threads does not support rich text or markdown formatting and will display them as raw characters.
 `
 
   const userPrompt = `
