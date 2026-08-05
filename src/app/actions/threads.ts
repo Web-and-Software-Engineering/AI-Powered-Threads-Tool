@@ -85,9 +85,9 @@ export async function publishToThreadsApi(content: string) {
   const accessToken = account.access_token
 
   try {
-    // Step 1: Create media creation container
+    // Step 1: Create media creation container using 'me' alias
     const containerRes = await fetch(
-      `https://graph.threads.net/v1.0/${threadsUserId}/media?media_type=TEXT&text=${encodeURIComponent(
+      `https://graph.threads.net/v1.0/me/media?media_type=TEXT&text=${encodeURIComponent(
         content
       )}&access_token=${accessToken}`,
       { method: 'POST' }
@@ -102,9 +102,9 @@ export async function publishToThreadsApi(content: string) {
 
     const creationId = containerData.id
 
-    // Step 2: Publish the media container
+    // Step 2: Publish the media container using 'me' alias
     const publishRes = await fetch(
-      `https://graph.threads.net/v1.0/${threadsUserId}/media_publish?creation_id=${creationId}&access_token=${accessToken}`,
+      `https://graph.threads.net/v1.0/me/media_publish?creation_id=${creationId}&access_token=${accessToken}`,
       { method: 'POST' }
     )
 
