@@ -47,11 +47,12 @@ export default function AccountPage() {
     loadAccount()
   }, [])
 
-  // Handle URL errors on redirect back (e.g. from Threads)
+  // Handle URL errors and changes on redirect back (e.g. from Threads)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const error = params.get('error')
     const details = params.get('details')
+    const accountChanged = params.get('account_changed')
     
     if (error) {
       console.error('[Threads Callback Error] type:', error, 'details:', details)
@@ -59,6 +60,21 @@ export default function AccountPage() {
       params.delete('error')
       params.delete('details')
       window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
+    }
+
+    if (accountChanged === 'true') {
+      // Clear local storage AI data
+      localStorage.removeItem('threadcraft_profile')
+      localStorage.removeItem('threadcraft_posts')
+      localStorage.removeItem('threadcraft_setup_complete')
+      
+      alert('Threads account changed! All local and database AI profile data has been deleted.')
+
+      params.delete('account_changed')
+      window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
+      
+      // Reload page to refresh dashboard and workspace states
+      window.location.reload()
     }
   }, [])
 

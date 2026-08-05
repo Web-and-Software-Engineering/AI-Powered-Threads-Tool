@@ -87,6 +87,52 @@ export async function GET(request: Request) {
       )
     }
 
+    // Step 5.5: Check if the user is CHANGING their linked Threads account
+    const { data: currentConnection } = await supabase
+      .from('social_accounts')
+      .select('account_id')
+      .eq('user_id', user.id)
+      .eq('platform', 'threads')
+      .maybeSingle()
+
+    const accountChanged = currentConnection && currentConnection.account_id !== threadsUserId
+
+    if (accountChanged) {
+      console.log(`[Threads Callback] User ${user.id} changed linked Threads account from ${currentConnection.account_id} to ${threadsUserId}. Deleting accumulated AI data.`)
+
+      // Delete all generated posts for this user
+      const { error: deletePostsError } = await supabase
+        .from('posts')
+        .delete()
+        .eq('user_id', user.id)
+
+      if (deletePostsError) {
+        console.error('[Threads Callback] Failed to delete user posts:', deletePostsError)
+      }
+
+      // Reset the user profile persona details
+      const { error: resetProfileError } = await supabase
+        .from('user_profiles')
+        .update({
+          background_info: null,
+          writing_style_rules: null,
+          preferred_tone: null,
+          author_persona: null,
+          target_audience: null,
+          personality_traits: null,
+          likes_dislikes: null,
+          values: null,
+          lifestyle: null,
+          dreams: null,
+          outlook_on_life: null,
+        })
+        .eq('user_id', user.id)
+
+      if (resetProfileError) {
+        console.error('[Threads Callback] Failed to reset user profile:', resetProfileError)
+      }
+    }
+
     // Step 6: Upsert social_accounts
     const { error: upsertError } = await supabase
       .from('social_accounts')
@@ -109,7 +155,9 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${origin}/account?error=threads_db_save_failed`)
     }
 
-    return NextResponse.redirect(`${origin}/account`)
+    return NextResponse.redirect(
+      `${origin}/account${accountChanged ? '?account_changed=true' : ''}`
+    )
   } catch (err: any) {
     console.error('Threads callback exception:', err)
     return NextResponse.redirect(`${origin}/account?error=threads_callback_exception`)
