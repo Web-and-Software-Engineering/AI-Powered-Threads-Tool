@@ -22,24 +22,24 @@ export function Navigation() {
   return (
     <>
       {/* Desktop Navigation Bottom Bar (hidden on mobile) */}
-      <header className="hidden md:block fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass-panel border border-zinc-200/85 px-5 py-2.5 rounded-2xl shadow-2xl shadow-black/10 max-w-3xl w-full">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+      <header className="hidden md:block fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass-panel border border-zinc-200/85 px-6 py-2.5 rounded-2xl shadow-2xl shadow-black/10 max-w-max w-auto">
+        <div className="flex items-center justify-between gap-8 md:gap-12">
+          <div className="flex items-center gap-2.5 shrink-0">
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-md shadow-purple-500/20">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-sm tracking-wide text-zinc-900 flex items-center gap-1.5">
+              <h1 className="font-bold text-sm tracking-wide text-zinc-900 flex items-center gap-1.5 whitespace-nowrap">
                 ThreadCraft <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 font-semibold">Pocket</span>
               </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             <nav className="flex items-center gap-1.5 bg-zinc-100 p-1 rounded-xl border border-zinc-200">
               <Link
                 href="/profile"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'profile'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
@@ -51,7 +51,7 @@ export function Navigation() {
 
               <Link
                 href="/"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'workspace'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
@@ -63,7 +63,7 @@ export function Navigation() {
 
               <Link
                 href="/analytics"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'analytics'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
@@ -75,7 +75,7 @@ export function Navigation() {
 
               <Link
                 href="/account"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'account'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
@@ -89,7 +89,7 @@ export function Navigation() {
             <button
               onClick={handleLogout}
               title="Sign Out"
-              className="p-2 rounded-xl bg-zinc-100 hover:bg-rose-50 text-zinc-500 hover:text-rose-600 border border-zinc-200 transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-zinc-100 hover:bg-rose-50 text-zinc-500 hover:text-rose-600 border border-zinc-200 transition-colors cursor-pointer shrink-0"
             >
               <LogOut className="w-4 h-4" />
             </button>
