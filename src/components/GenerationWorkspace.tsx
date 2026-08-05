@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Sparkles, MessageSquare, Lightbulb, Search, Loader2, CheckCircle2, ArrowRight } from 'lucide-react'
 import { ProfileData } from './ProfileWorkspace'
 import { PostEditor } from './PostEditor'
 import { generateThreadsPost } from '@/app/actions/generate'
-import { publishToThreadsApi } from '@/app/actions/threads'
+import { publishToThreadsApi, checkThreadsConnection } from '@/app/actions/threads'
 
 interface GenerationWorkspaceProps {
   profile: ProfileData
@@ -25,6 +25,20 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   const [coreMessage, setCoreMessage] = useState('')
   const [generationStep, setGenerationStep] = useState<StepState>('idle')
   const [generatedDraft, setGeneratedDraft] = useState<string | null>(null)
+  const [threadsAccount, setThreadsAccount] = useState<{ username: string; avatarUrl: string } | null>(null)
+
+  useEffect(() => {
+    async function loadThreadsConnection() {
+      const conn = await checkThreadsConnection()
+      if (conn && conn.connected && conn.username) {
+        setThreadsAccount({
+          username: conn.username,
+          avatarUrl: conn.avatarUrl || '',
+        })
+      }
+    }
+    loadThreadsConnection()
+  }, [])
 
   const handleAutoFill = () => {
     setTopic('Productivity frameworks for remote solopreneurs')
@@ -261,6 +275,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
             topic={topic}
             coreMessage={coreMessage}
             onPublish={handlePublish}
+            threadsAccount={threadsAccount}
           />
         </div>
       )}

@@ -9,6 +9,7 @@ interface PostEditorProps {
   coreMessage: string
   onPublish: (content: string) => Promise<{ error?: string; success?: boolean } | void>
   onRegenerate?: () => void
+  threadsAccount?: { username: string; avatarUrl: string } | null
 }
 
 export function PostEditor({
@@ -17,6 +18,7 @@ export function PostEditor({
   coreMessage,
   onPublish,
   onRegenerate,
+  threadsAccount,
 }: PostEditorProps) {
   const [content, setContent] = useState(initialContent)
   const [publishing, setPublishing] = useState(false)
@@ -113,13 +115,24 @@ export function PostEditor({
           <label className="text-xs font-semibold text-zinc-700 block">Threads Live Preview</label>
           <div className="bg-white border border-zinc-200 rounded-xl p-5 space-y-4 shadow-sm">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-xs font-bold text-zinc-800">
-                You
-              </div>
+              {threadsAccount?.avatarUrl ? (
+                <img
+                  src={threadsAccount.avatarUrl}
+                  alt={threadsAccount.username}
+                  className="w-9 h-9 rounded-full object-cover border border-zinc-200"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-xs font-bold text-zinc-800 shrink-0">
+                  {threadsAccount?.username ? threadsAccount.username.slice(0, 2).toUpperCase() : 'You'}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-zinc-900">@creator_brand</span>
-                  <span className="text-[11px] text-zinc-400 font-mono-custom">Now</span>
+                  <span className="text-xs font-bold text-zinc-900 truncate">
+                    {threadsAccount?.username ? `@${threadsAccount.username}` : '@creator_brand'}
+                  </span>
+                  <span className="text-[11px] text-zinc-400 font-mono-custom shrink-0 ml-2">Now</span>
                 </div>
                 <div className="mt-2 text-xs text-zinc-800 whitespace-pre-wrap break-words leading-relaxed font-sans-custom">
                   {content || <span className="text-zinc-400 italic">Draft is empty...</span>}
