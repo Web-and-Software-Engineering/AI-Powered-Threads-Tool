@@ -39,18 +39,6 @@ export function Navigation() {
           <div className="flex items-center gap-4">
             <nav className="flex items-center gap-2 bg-zinc-100 p-1.5 rounded-xl border border-zinc-200">
               <Link
-                href="/"
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-                  activeTab === 'workspace'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
-                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
-                }`}
-              >
-                <PenSquare className="w-4 h-4" />
-                Generator
-              </Link>
-
-              <Link
                 href="/profile"
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'profile'
@@ -59,7 +47,19 @@ export function Navigation() {
                 }`}
               >
                 <FolderHeart className="w-4 h-4" />
-                Pocket & Audience
+                POCKET
+              </Link>
+
+              <Link
+                href="/"
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                  activeTab === 'workspace'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                }`}
+              >
+                <PenSquare className="w-4 h-4" />
+                Post Generation
               </Link>
 
               <Link
@@ -71,7 +71,7 @@ export function Navigation() {
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
-                Analytics & Loop
+                Analytics
               </Link>
 
               <Link
@@ -123,23 +123,23 @@ export function Navigation() {
       {/* Mobile Bottom Navigation Bar (sticky bottom) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-zinc-200 flex justify-around items-center py-2 px-4 shadow-lg shadow-black/5">
         <Link
-          href="/"
-          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-            activeTab === 'workspace' ? 'text-purple-600' : 'text-zinc-500'
-          }`}
-        >
-          <PenSquare className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Generator</span>
-        </Link>
-
-        <Link
           href="/profile"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
             activeTab === 'profile' ? 'text-purple-600' : 'text-zinc-500'
           }`}
         >
           <FolderHeart className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Pocket</span>
+          <span className="text-[10px] font-medium">POCKET</span>
+        </Link>
+
+        <Link
+          href="/"
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+            activeTab === 'workspace' ? 'text-purple-600' : 'text-zinc-500'
+          }`}
+        >
+          <PenSquare className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Post Generation</span>
         </Link>
 
         <Link
