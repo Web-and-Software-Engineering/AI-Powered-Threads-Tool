@@ -56,6 +56,8 @@ export function AccountSettings({
   const [connDisplayName, setConnDisplayName] = useState(threadsDisplayName)
   const [connAvatarUrl, setConnAvatarUrl] = useState(threadsAvatarUrl)
 
+  const [showDisconnectModal, setShowDisconnectModal] = useState(false)
+
   const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setProfileError(null)
@@ -404,7 +406,7 @@ export function AccountSettings({
             
             <button
               type="button"
-              onClick={handleConnectThreads}
+              onClick={isConnected ? () => setShowDisconnectModal(true) : handleConnectThreads}
               disabled={threadsConnecting}
               className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-md whitespace-nowrap ${
                 isConnected 
@@ -421,6 +423,48 @@ export function AccountSettings({
           </div>
         )}
       </div>
+
+      {showDisconnectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white border border-zinc-200 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-scale-in">
+            <div className="flex items-center gap-3 text-rose-600">
+              <AlertCircle className="w-6 h-6 shrink-0" />
+              <h4 className="text-base font-bold">Unlink Threads Account?</h4>
+            </div>
+            
+            <p className="text-xs text-zinc-600 leading-relaxed font-mono-custom">
+              Unlinking your Threads account will delete all generated posts, historical analytics, custom writing rules, and persona attributes permanently.
+            </p>
+
+            <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex gap-2.5 items-start">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <span className="text-[10px] text-rose-800 font-bold leading-normal">
+                CRITICAL WARNING: This will permanently wipe your accumulated AI-generated data. This action is irreversible.
+              </span>
+            </div>
+
+            <div className="flex justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDisconnectModal(false)}
+                className="px-4 py-2 text-zinc-600 hover:text-zinc-800 bg-zinc-100 hover:bg-zinc-200 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDisconnectModal(false)
+                  handleConnectThreads()
+                }}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-rose-600/25 transition-all active:scale-95 cursor-pointer"
+              >
+                Delete & Unlink
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
