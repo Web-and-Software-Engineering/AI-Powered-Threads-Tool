@@ -118,11 +118,20 @@ export function AccountSettings({
         if (result?.error) {
           setThreadsError(result.error)
         } else {
+          // Clear local storage AI data
+          localStorage.removeItem('threadcraft_profile')
+          localStorage.removeItem('threadcraft_posts')
+          localStorage.removeItem('threadcraft_setup_complete')
+
           setIsConnected(false)
           setConnUsername('')
           setConnDisplayName('')
           setConnAvatarUrl('')
-          setThreadsSuccess('Threads account unlinked successfully!')
+          setThreadsSuccess('Threads account unlinked successfully! All AI profile data has been deleted.')
+          
+          setTimeout(() => {
+            window.location.reload()
+          }, 1500)
         }
       } catch (err: any) {
         setThreadsError(err.message || 'An error occurred during disconnect.')

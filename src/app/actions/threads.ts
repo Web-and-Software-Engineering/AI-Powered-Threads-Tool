@@ -130,6 +130,39 @@ export async function disconnectThreads() {
     return { error: 'Not authenticated' }
   }
 
+  // Delete all generated posts for this user
+  const { error: deletePostsError } = await supabase
+    .from('posts')
+    .delete()
+    .eq('user_id', user.id)
+
+  if (deletePostsError) {
+    console.error('[Threads Disconnect] Failed to delete user posts:', deletePostsError)
+  }
+
+  // Reset the user profile persona details
+  const { error: resetProfileError } = await supabase
+    .from('user_profiles')
+    .update({
+      background_info: null,
+      writing_style_rules: null,
+      preferred_tone: null,
+      author_persona: null,
+      target_audience: null,
+      personality_traits: null,
+      likes_dislikes: null,
+      values: null,
+      lifestyle: null,
+      dreams: null,
+      outlook_on_life: null,
+    })
+    .eq('user_id', user.id)
+
+  if (resetProfileError) {
+    console.error('[Threads Disconnect] Failed to reset user profile:', resetProfileError)
+  }
+
+  // Delete the social account linking
   const { error } = await supabase
     .from('social_accounts')
     .delete()
