@@ -82,7 +82,7 @@ export async function loginWithThreads() {
   const origin = `https://${host}`
   const callbackUrl = `${origin}/auth/threads/login-callback`
   const redirectUri = encodeURIComponent(callbackUrl)
-  const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish&response_type=code`
+  const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish,threads_manage_insights&response_type=code`
 
   console.log('[Threads OAuth] Constructed URL:', url)
   console.log('[Threads OAuth] Redirect URI (decoded):', callbackUrl)

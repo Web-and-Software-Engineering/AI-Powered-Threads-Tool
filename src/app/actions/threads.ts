@@ -17,7 +17,7 @@ export async function getThreadsAuthUrl() {
   const origin = `https://${host}`
 
   const redirectUri = encodeURIComponent(`${origin}/auth/threads/callback`)
-  const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish&response_type=code`
+  const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish,threads_manage_insights&response_type=code`
 
   return { url }
 }
@@ -85,9 +85,9 @@ export async function publishToThreadsApi(content: string) {
   const accessToken = account.access_token
 
   try {
-    // Step 1: Create media creation container using 'me' alias
+    // Step 1: Create media creation container using /{threadsUserId}/threads
     const containerRes = await fetch(
-      `https://graph.threads.net/v1.0/me/media?media_type=TEXT&text=${encodeURIComponent(
+      `https://graph.threads.net/v1.0/${threadsUserId}/threads?media_type=TEXT&text=${encodeURIComponent(
         content
       )}&access_token=${accessToken}`,
       { method: 'POST' }
@@ -102,9 +102,9 @@ export async function publishToThreadsApi(content: string) {
 
     const creationId = containerData.id
 
-    // Step 2: Publish the media container using 'me' alias
+    // Step 2: Publish the media container using /{threadsUserId}/threads_publish
     const publishRes = await fetch(
-      `https://graph.threads.net/v1.0/me/media_publish?creation_id=${creationId}&access_token=${accessToken}`,
+      `https://graph.threads.net/v1.0/${threadsUserId}/threads_publish?creation_id=${creationId}&access_token=${accessToken}`,
       { method: 'POST' }
     )
 
