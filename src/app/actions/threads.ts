@@ -85,12 +85,20 @@ export async function publishToThreadsApi(content: string) {
   const accessToken = account.access_token
 
   try {
-    // Step 1: Create media creation container using /{threadsUserId}/threads
+    // Step 1: Create media creation container using POST request body
     const containerRes = await fetch(
-      `https://graph.threads.net/v1.0/${threadsUserId}/threads?media_type=TEXT&text=${encodeURIComponent(
-        content
-      )}&access_token=${accessToken}`,
-      { method: 'POST' }
+      `https://graph.threads.net/v1.0/${threadsUserId}/threads`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          media_type: 'TEXT',
+          text: content,
+          access_token: accessToken,
+        }),
+      }
     )
 
     const containerData = await containerRes.json()
@@ -102,10 +110,19 @@ export async function publishToThreadsApi(content: string) {
 
     const creationId = containerData.id
 
-    // Step 2: Publish the media container using /{threadsUserId}/threads_publish
+    // Step 2: Publish the media container using POST request body
     const publishRes = await fetch(
-      `https://graph.threads.net/v1.0/${threadsUserId}/threads_publish?creation_id=${creationId}&access_token=${accessToken}`,
-      { method: 'POST' }
+      `https://graph.threads.net/v1.0/${threadsUserId}/threads_publish`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          creation_id: creationId,
+          access_token: accessToken,
+        }),
+      }
     )
 
     const publishData = await publishRes.json()
