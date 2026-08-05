@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 
 export async function login(formData: FormData) {
   const email = formData.get('email') as string
@@ -76,8 +77,10 @@ export async function loginWithThreads() {
     return { error: 'Threads App ID is not configured' }
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  const callbackUrl = `${siteUrl}/auth/threads/login-callback`
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const origin = `https://${host}`
+  const callbackUrl = `${origin}/auth/threads/login-callback`
   const redirectUri = encodeURIComponent(callbackUrl)
   const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish&response_type=code`
 

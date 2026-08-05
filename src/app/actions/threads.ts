@@ -2,8 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+import { headers } from 'next/headers'
 
 export async function getThreadsAuthUrl() {
   const appId = process.env.NEXT_PUBLIC_THREAD_APP_ID
@@ -12,7 +11,12 @@ export async function getThreadsAuthUrl() {
     return { error: 'NEXT_PUBLIC_THREAD_APP_ID is not configured in env' }
   }
 
-  const redirectUri = encodeURIComponent(`${SITE_URL}/auth/threads/callback`)
+  // Dynamically resolve origin from host header, enforcing HTTPS protocol
+  const headersList = await headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const origin = `https://${host}`
+
+  const redirectUri = encodeURIComponent(`${origin}/auth/threads/callback`)
   const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish&response_type=code`
 
   return { url }
