@@ -20,7 +20,6 @@ async function exchangeCodeForTokens(code: string, redirectUri: string, appId: s
   }
 
   const shortLivedToken = tokenData.access_token
-  const threadsUserId = String(tokenData.user_id)
 
   // Step 2: Long-lived token
   const longLivedRes = await fetch(
@@ -39,6 +38,7 @@ async function exchangeCodeForTokens(code: string, redirectUri: string, appId: s
     `https://graph.threads.net/v1.0/me?fields=id,username,name,threads_profile_picture_url&access_token=${longLivedToken}`
   )
   const meData = await meRes.json()
+  const threadsUserId = String(meData.id)
 
   return {
     threadsUserId,
