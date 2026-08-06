@@ -260,7 +260,7 @@ const translations: Record<Language, Record<string, string>> = {
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en')
+  const [language, setLanguageState] = useState<Language>('jp')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -269,10 +269,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       setLanguageState(cached)
       document.documentElement.setAttribute('lang', cached)
     } else {
-      // Browser auto detect
-      const lang = navigator.language.startsWith('ja') ? 'jp' : 'en'
-      setLanguageState(lang)
-      document.documentElement.setAttribute('lang', lang)
+      // Default to jp
+      setLanguageState('jp')
+      document.documentElement.setAttribute('lang', 'jp')
     }
     setMounted(true)
   }, [])
