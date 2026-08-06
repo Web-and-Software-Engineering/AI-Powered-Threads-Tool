@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
-import { Users, Search, ShieldAlert, UserX, UserCheck, Shield, RefreshCw, CheckCircle2, Trash2 } from 'lucide-react'
-import { getUsersList, updateUserStatus, deleteUser } from '@/app/actions/admin'
+import { Users, Search, ShieldAlert, UserX, UserCheck, Shield, RefreshCw, CheckCircle2, Trash2, KeyRound, Eye, EyeOff } from 'lucide-react'
+import { getUsersList, updateUserStatus, deleteUser, resetUserPassword } from '@/app/actions/admin'
 import { getAccountDetails } from '@/app/actions/profile'
 import { useLanguage } from '@/components/LanguageContext'
 
@@ -38,6 +38,14 @@ export default function AdminPage() {
   const [durationOption, setDurationOption] = useState<'permanent' | '1day' | '7days' | '30days' | '1year' | 'custom'>('permanent')
   const [customDate, setCustomDate] = useState('')
   const [mounted, setMounted] = useState(false)
+
+  // State for Password Reset Modal
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [passwordModalUserId, setPasswordModalUserId] = useState<string | null>(null)
+  const [passwordModalEmail, setPasswordModalEmail] = useState<string>('')
+  const [newPassword, setNewPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [passwordResetting, setPasswordResetting] = useState(false)
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -219,6 +227,48 @@ export default function AdminPage() {
       showToast(language === 'jp' ? 'エラーが発生しました' : 'An error occurred', 'error')
     } finally {
       setActioningId(null)
+    }
+  }
+
+  const generateStrongPassword = () => {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%^&*'
+    let pwd = ''
+    for (let i = 0; i < 16; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    setNewPassword(pwd)
+    setShowPassword(true)
+  }
+
+  const handleOpenPasswordReset = (userId: string, email: string) => {
+    setPasswordModalUserId(userId)
+    setPasswordModalEmail(email)
+    setNewPassword('')
+    setShowPassword(false)
+    setShowPasswordModal(true)
+  }
+
+  const handleConfirmPasswordReset = async () => {
+    if (!passwordModalUserId || !newPassword) return
+    setPasswordResetting(true)
+    try {
+      const res = await resetUserPassword(passwordModalUserId, newPassword)
+      if (res.error) {
+        showToast(res.error, 'error')
+      } else {
+        showToast(
+          language === 'jp'
+            ? 'パスワードをリセットしました'
+            : 'Password reset successfully!'
+        )
+        setShowPasswordModal(false)
+        setPasswordModalUserId(null)
+      }
+    } catch (err) {
+      console.error(err)
+      showToast(language === 'jp' ? 'エラーが発生しました' : 'An error occurred', 'error')
+    } finally {
+      setPasswordResetting(false)
     }
   }
 
@@ -445,6 +495,16 @@ export default function AdminPage() {
                               {user.is_approved ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
                             </button>
 
+                            {/* Reset Password Button */}
+                            <button
+                              onClick={() => handleOpenPasswordReset(user.user_id, user.email)}
+                              disabled={actioningId === user.profile_id}
+                              className="p-2 rounded-xl bg-amber-50/50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/50 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                              title={language === 'jp' ? 'パスワードリセット' : 'Reset Password'}
+                            >
+                              <KeyRound className="w-4 h-4" />
+                            </button>
+
                             {/* Toggle Role Button */}
                             <button
                               onClick={() => handleToggleRole(user.profile_id, user.is_approved, user.role)}
@@ -571,6 +631,87 @@ export default function AdminPage() {
                 className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all active:scale-95 shadow-md shadow-purple-500/10 cursor-pointer"
               >
                 {language === 'jp' ? '承認を適用' : 'Approve User'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Password Reset Modal */}
+      {showPasswordModal && mounted && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 animate-fade-in">
+          <div className="w-full max-w-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+            {/* Ambient Glow */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400">
+                <KeyRound className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                  {language === 'jp' ? 'パスワードリセット' : 'Reset Password'}
+                </h3>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono-custom truncate max-w-[200px]">
+                  {passwordModalEmail}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-5 mt-3">
+              {language === 'jp'
+                ? '新しいパスワードを設定します。SUPABASE_SECRET_KEY が必要です。'
+                : 'Set a new password for this user. Requires SUPABASE_SECRET_KEY to be configured.'}
+            </p>
+
+            <div className="space-y-3 mb-5">
+              {/* Password input */}
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder={language === 'jp' ? '新しいパスワード (6文字以上)' : 'New password (min 6 characters)'}
+                  className="w-full bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-amber-500 transition-all font-mono-custom"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              {/* Generate password */}
+              <button
+                type="button"
+                onClick={generateStrongPassword}
+                className="w-full py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-xs font-semibold transition-all cursor-pointer"
+              >
+                ✦ {language === 'jp' ? 'ランダムな強力なパスワードを生成' : 'Generate strong random password'}
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false)
+                  setPasswordModalUserId(null)
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+              >
+                {language === 'jp' ? 'キャンセル' : 'Cancel'}
+              </button>
+              <button
+                onClick={handleConfirmPasswordReset}
+                disabled={passwordResetting || newPassword.length < 6}
+                className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-xs font-bold transition-all active:scale-95 shadow-md shadow-amber-500/20 cursor-pointer"
+              >
+                {passwordResetting
+                  ? (language === 'jp' ? 'リセット中...' : 'Resetting...')
+                  : (language === 'jp' ? 'パスワードを更新' : 'Update Password')}
               </button>
             </div>
           </div>

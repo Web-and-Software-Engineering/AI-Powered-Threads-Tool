@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 
 export async function getUsersList() {
@@ -112,3 +113,65 @@ export async function deleteUser(userId: string) {
   revalidatePath('/admin')
   return { success: true }
 }
+
+export async function resetUserPassword(userId: string, newPassword: string) {
+  const supabase = await createClient()
+
+  // Verify caller is authenticated
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Verify caller is admin
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('role, is_approved')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!profile || profile.role !== 'admin' || !profile.is_approved) {
+    return { error: 'Access denied: Admin privileges required' }
+  }
+
+  // Validate password
+  if (!newPassword || newPassword.length < 6) {
+    return { error: 'Password must be at least 6 characters' }
+  }
+
+  // Require the secret key (service_role) to use Admin Auth API
+  const secretKey = process.env.SUPABASE_SECRET_KEY
+  if (!secretKey) {
+    return { 
+      error: 'SUPABASE_SECRET_KEY is not configured. Add your Supabase service_role key to .env.local as SUPABASE_SECRET_KEY to enable admin password resets.' 
+    }
+  }
+
+  // Build admin client with secret key
+  const adminClient = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    secretKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  )
+
+  const { error: resetError } = await adminClient.auth.admin.updateUserById(userId, {
+    password: newPassword,
+  })
+
+  if (resetError) {
+    console.error('[Admin Actions] Failed to reset user password:', resetError)
+    return { error: resetError.message }
+  }
+
+  return { success: true }
+}
+
