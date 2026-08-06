@@ -20,6 +20,11 @@ interface GenerateParams {
 }
 
 export async function generateThreadsPost(params: GenerateParams) {
+  let resolvedReferences = params.referencePosts
+  if (params.referencePosts) {
+    resolvedReferences = await resolveReferenceUrls(params.referencePosts)
+  }
+
   const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY
 
   if (!apiKey || apiKey === 'your-openai-api-key-here' || apiKey === 'your-openrouter-api-key-here') {
@@ -87,7 +92,7 @@ ${params.language === 'jp' ? '- Write the final output post in Japanese (日本�
   const userPrompt = `
 Topic: ${params.topic}
 Key Message/Value to Deliver: ${params.coreMessage || 'N/A'}
-${params.referencePosts ? `Reference Posts for Pattern Matching:\n${params.referencePosts}` : ''}
+${resolvedReferences ? `Reference Posts for Pattern Matching:\n${resolvedReferences}` : ''}
 
 Generate an authentic, high-converting Threads single-text post now:
 `
@@ -106,6 +111,80 @@ Generate an authentic, high-converting Threads single-text post now:
     return response.choices[0]?.message?.content?.trim() || 'Failed to generate content.'
   } catch (error: any) {
     console.error('OpenAI Generation Error:', error)
-    return `[OpenAI Error: ${error.message || 'API error'}]. Falling back to template:\n\n${params.topic.toUpperCase()} 🚀\n\n${params.coreMessage}`
+    return `[OpenAI Error: ${error.message || 'API error'}]. Falling back to template:\n\n${params.topic.toUpperCase()}\n\n${params.coreMessage}`
+  }
+}
+
+async function resolveReferenceUrls(referencePosts: string): Promise<string> {
+  const lines = referencePosts.split('\n')
+  const resolvedLines: string[] = []
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      console.log(`[Generate Action] Attempting to resolve URL reference: ${trimmed}`)
+      const resolved = await fetchAndParseThreadsPost(trimmed)
+      resolvedLines.push(resolved)
+    } else {
+      resolvedLines.push(line)
+    }
+  }
+
+  return resolvedLines.join('\n')
+}
+
+async function fetchAndParseThreadsPost(url: string): Promise<string> {
+  try {
+    let fetchUrl = url
+    if (url.includes('threads.net')) {
+      const urlObj = new URL(url)
+      // Normalize pathname to ensure it points to the public embed endpoint
+      if (!urlObj.pathname.endsWith('/embed')) {
+        urlObj.pathname = urlObj.pathname.replace(/\/$/, '') + '/embed'
+      }
+      fetchUrl = urlObj.toString()
+    }
+
+    console.log(`[Generate Action] Fetching public embed reference: ${fetchUrl}`)
+    const res = await fetch(fetchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+      next: { revalidate: 3600 } // Cache for 1 hour
+    })
+
+    if (!res.ok) {
+      return `[Reference URL: ${url}] (Note: The server failed to fetch this link. Please write the output based on the theme & metadata in the URL if possible: ${url})`
+    }
+
+    const html = await res.text()
+    
+    // Attempt to match og:description or name description meta tags
+    const descMatch = html.match(/<meta[^>]*property="og:description"[^>]*content="([^"]*)"/i) ||
+                      html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"/i)
+
+    if (descMatch && descMatch[1]) {
+      let content = descMatch[1]
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&#x27;/g, "'")
+        .replace(/&#39;/g, "'")
+
+      // Catch fallback pages (such as redirect login gates)
+      if (content.includes('Join Threads to share ideas') || content.includes('Log in with your Instagram')) {
+        return `[Reference URL: ${url}] (Note: Meta restricted browser scraping on this page. Please write the output post using pattern matching guided by the URL context: ${url})`
+      }
+
+      return `[Reference Post Content from ${url}]:\n${content}`
+    }
+
+    return `[Reference URL: ${url}]`
+  } catch (err: any) {
+    console.error(`[Generate Action] Failed to resolve URL ${url}:`, err)
+    return `[Reference URL: ${url}]`
   }
 }
