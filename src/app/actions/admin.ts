@@ -69,3 +69,41 @@ export async function updateUserStatus(
   revalidatePath('/admin')
   return { success: true }
 }
+
+export async function deleteUser(userId: string) {
+  const supabase = await createClient()
+
+  // Verify caller is authenticated
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { error: 'Not authenticated' }
+  }
+
+  // Verify caller is admin
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('role, is_approved')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!profile || profile.role !== 'admin' || !profile.is_approved) {
+    return { error: 'Access denied: Admin privileges required' }
+  }
+
+  // Call delete_user_by_admin RPC
+  const { error: deleteError } = await supabase.rpc('delete_user_by_admin', {
+    target_user_id: userId,
+  })
+
+  if (deleteError) {
+    console.error('[Admin Actions] Failed to delete user:', deleteError)
+    return { error: deleteError.message }
+  }
+
+  revalidatePath('/admin')
+  return { success: true }
+}

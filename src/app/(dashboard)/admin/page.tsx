@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Users, Search, ShieldAlert, UserX, UserCheck, Shield, RefreshCw, CheckCircle2 } from 'lucide-react'
-import { getUsersList, updateUserStatus } from '@/app/actions/admin'
+import { Users, Search, ShieldAlert, UserX, UserCheck, Shield, RefreshCw, CheckCircle2, Trash2 } from 'lucide-react'
+import { getUsersList, updateUserStatus, deleteUser } from '@/app/actions/admin'
 import { getAccountDetails } from '@/app/actions/profile'
 import { useLanguage } from '@/components/LanguageContext'
 
@@ -107,6 +107,34 @@ export default function AdminPage() {
           language === 'jp'
             ? `役割を${newRole === 'admin' ? '管理者' : '一般ユーザー'}に変更しました`
             : `Role updated to ${newRole} successfully!`
+        )
+      }
+    } catch (err) {
+      console.error(err)
+      showToast(language === 'jp' ? 'エラーが発生しました' : 'An error occurred', 'error')
+    } finally {
+      setActioningId(null)
+    }
+  }
+
+  const handleDeleteUser = async (userId: string, email: string) => {
+    const confirmText = language === 'jp' 
+      ? `本当にこのユーザー (${email}) を完全に削除しますか？この操作は取り消せません。`
+      : `Are you sure you want to permanently delete user (${email})? This action cannot be undone.`
+    
+    if (!window.confirm(confirmText)) return
+
+    setActioningId(userId)
+    try {
+      const res = await deleteUser(userId)
+      if (res.error) {
+        showToast(res.error, 'error')
+      } else {
+        setUsers(prev => prev.filter(u => u.user_id !== userId))
+        showToast(
+          language === 'jp'
+            ? 'ユーザーを完全に削除しました。'
+            : 'User permanently deleted successfully.'
         )
       }
     } catch (err) {
@@ -318,6 +346,16 @@ export default function AdminPage() {
                               title="Toggle Role"
                             >
                               <Shield className="w-4 h-4" />
+                            </button>
+
+                            {/* Delete User Button */}
+                            <button
+                              onClick={() => handleDeleteUser(user.user_id, user.email)}
+                              disabled={actioningId === user.profile_id}
+                              className="p-2 rounded-xl bg-rose-50/50 dark:bg-rose-950/10 border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-455 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                              title="Delete User"
+                            >
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
