@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { Users, Search, ShieldAlert, UserX, UserCheck, Shield, RefreshCw, CheckCircle2, Trash2 } from 'lucide-react'
 import { getUsersList, updateUserStatus, deleteUser } from '@/app/actions/admin'
@@ -36,6 +37,7 @@ export default function AdminPage() {
   const [modalRole, setModalRole] = useState<string>('user')
   const [durationOption, setDurationOption] = useState<'permanent' | '1day' | '7days' | '30days' | '1year' | 'custom'>('permanent')
   const [customDate, setCustomDate] = useState('')
+  const [mounted, setMounted] = useState(false)
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -61,6 +63,7 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
+    setMounted(true)
     async function verifyAdmin() {
       const details = await getAccountDetails()
       if (!details || details.role !== 'admin') {
@@ -485,7 +488,7 @@ export default function AdminPage() {
       )}
 
       {/* Approval Duration Selection Modal */}
-      {showApprovalModal && (
+      {showApprovalModal && mounted && createPortal(
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 animate-fade-in">
           <div className="w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
             {/* Ambient Background Glow */}
@@ -571,7 +574,8 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
