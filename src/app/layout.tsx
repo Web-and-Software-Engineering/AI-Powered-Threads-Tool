@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeContext";
 
 export const metadata: Metadata = {
   title: "ThreadCraft AI • Threads Content Generator & Analytics Engine",
@@ -12,9 +13,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased light" suppressHydrationWarning>
-      <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900 font-sans-custom" suppressHydrationWarning>
-        {children}
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          try {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+          } catch (_) {}
+        `}} />
+      </head>
+      <body className="min-h-full flex flex-col bg-[var(--bg-main)] text-[var(--text-primary)] font-sans-custom transition-colors duration-200" suppressHydrationWarning>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

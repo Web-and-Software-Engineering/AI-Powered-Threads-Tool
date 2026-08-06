@@ -13,6 +13,18 @@
     --accent-threads: #ffffff;
   }
 
+  .dark {
+    --bg-main: #09090b;
+    --bg-card: rgba(24, 24, 27, 0.85);
+    --bg-card-hover: rgba(39, 39, 42, 0.9);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-color-active: rgba(168, 85, 247, 0.6);
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    --accent-purple: #a855f7;
+    --accent-threads: #18181b;
+  }
+
   body {
     background-color: var(--bg-main);
     color: var(--text-primary);

@@ -49,13 +49,13 @@ export function PostEditor({
   }
 
   return (
-    <div className="glass-panel p-6 rounded-2xl border border-zinc-200 space-y-6 animate-fade-in">
+    <div className="glass-panel p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
             Generated Single-Text Draft
           </h3>
-          <p className="text-xs text-zinc-500 font-mono-custom">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
             Review and refine your post before publishing directly to Threads.
           </p>
         </div>
@@ -63,7 +63,7 @@ export function PostEditor({
         {onRegenerate && (
           <button
             onClick={onRegenerate}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-700 hover:text-zinc-900 text-xs font-mono-custom transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-xs font-mono-custom transition-all"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Re-roll
           </button>
@@ -73,25 +73,25 @@ export function PostEditor({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Editor Column */}
         <div className="space-y-3">
-          <label className="text-xs font-semibold text-zinc-700 block">Editable Content</label>
+          <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">Editable Content</label>
           <div className="relative">
             <textarea
               rows={8}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full bg-white border border-zinc-200 rounded-xl p-4 text-sm text-zinc-900 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-sans-custom leading-relaxed shadow-sm"
+              className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-sans-custom leading-relaxed shadow-sm"
             />
 
             <div className="flex items-center justify-between mt-2 px-1">
-              <span className="text-[11px] text-zinc-500 font-mono-custom">
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono-custom">
                 Target: {topic ? `"${topic}"` : 'Single post'}
               </span>
 
               <div className="flex items-center gap-2 font-mono-custom text-xs">
-                <span className={isOverLimit ? 'text-rose-600 font-bold' : 'text-zinc-500'}>
+                <span className={isOverLimit ? 'text-rose-600 font-bold' : 'text-zinc-500 dark:text-zinc-400'}>
                   {charCount}/{maxChars}
                 </span>
-                <div className="w-16 h-1.5 bg-zinc-200 rounded-full overflow-hidden">
+                <div className="w-16 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                   <div
                      className={`h-full transition-all ${
                       isOverLimit ? 'bg-rose-500' : 'bg-purple-600'
@@ -112,30 +112,30 @@ export function PostEditor({
 
         {/* Live Preview Column */}
         <div className="space-y-3">
-          <label className="text-xs font-semibold text-zinc-700 block">Threads Live Preview</label>
-          <div className="bg-white border border-zinc-200 rounded-xl p-5 space-y-4 shadow-sm">
+          <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">Threads Live Preview</label>
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4 shadow-sm">
             <div className="flex items-start gap-3">
               {threadsAccount?.avatarUrl ? (
                 <img
                   src={threadsAccount.avatarUrl}
                   alt={threadsAccount.username}
-                  className="w-9 h-9 rounded-full object-cover border border-zinc-200"
+                  className="w-9 h-9 rounded-full object-cover border border-zinc-200 dark:border-zinc-850"
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center text-xs font-bold text-zinc-800 shrink-0">
+                <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 flex items-center justify-center text-xs font-bold text-zinc-800 dark:text-zinc-200 shrink-0">
                   {threadsAccount?.username ? threadsAccount.username.slice(0, 2).toUpperCase() : 'You'}
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-zinc-900 truncate">
+                  <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
                     {threadsAccount?.username ? `@${threadsAccount.username}` : '@creator_brand'}
                   </span>
-                  <span className="text-[11px] text-zinc-400 font-mono-custom shrink-0 ml-2">Now</span>
+                  <span className="text-[11px] text-zinc-400 dark:text-zinc-450 font-mono-custom shrink-0 ml-2">Now</span>
                 </div>
-                <div className="mt-2 text-xs text-zinc-800 whitespace-pre-wrap break-words leading-relaxed font-sans-custom">
-                  {content || <span className="text-zinc-400 italic">Draft is empty...</span>}
+                <div className="mt-2 text-xs text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap break-words leading-relaxed font-sans-custom">
+                  {content || <span className="text-zinc-400 dark:text-zinc-550 italic">Draft is empty...</span>}
                 </div>
               </div>
             </div>
@@ -144,16 +144,16 @@ export function PostEditor({
       </div>
 
       {error && (
-        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5 animate-fade-in min-w-0">
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900 text-xs text-rose-800 dark:text-rose-350 flex items-start gap-2.5 animate-fade-in min-w-0">
           <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <span className="font-mono-custom break-all flex-1">{error}</span>
         </div>
       )}
 
-      <div className="flex items-center justify-between pt-4 border-t border-zinc-100">
-        <div className="text-xs text-zinc-500 font-mono-custom">
+      <div className="flex items-center justify-between pt-4 border-t border-zinc-100 dark:border-zinc-800">
+        <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
           {published ? (
-            <span className="text-emerald-600 flex items-center gap-1.5 font-semibold">
+            <span className="text-emerald-600 dark:text-emerald-450 flex items-center gap-1.5 font-semibold">
               <CheckCircle2 className="w-4 h-4" /> Published to Threads successfully!
             </span>
           ) : (
@@ -164,7 +164,7 @@ export function PostEditor({
         <button
           onClick={handlePublish}
           disabled={publishing || isOverLimit || !content.trim()}
-          className="flex items-center gap-2 px-6 py-2.5 bg-black text-white hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md"
+          className="flex items-center gap-2 px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md"
         >
           {publishing ? (
             <>

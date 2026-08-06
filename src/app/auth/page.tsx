@@ -60,8 +60,8 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-4 md:p-8 font-sans-custom">
-      <div className="w-full max-w-md glass-panel p-6 md:p-8 rounded-3xl border border-zinc-200 shadow-xl relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] flex items-center justify-center p-4 md:p-8 font-sans-custom transition-colors duration-200">
+      <div className="w-full max-w-md glass-panel p-6 md:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
         {/* Glow accent */}
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -71,21 +71,21 @@ export default function AuthPage() {
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-xl tracking-wide text-zinc-900">ThreadCraft Pocket</h1>
-            <p className="text-xs text-zinc-500 font-mono-custom">Automated Reference & Rewrite Loop</p>
+            <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">ThreadCraft Pocket</h1>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">Automated Reference & Rewrite Loop</p>
           </div>
         </div>
 
         {/* Status Alerts */}
         {error && (
-          <div className="p-3.5 mb-5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5 animate-fade-in min-w-0">
+          <div className="p-3.5 mb-5 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 text-xs text-rose-800 dark:text-rose-350 flex items-start gap-2.5 animate-fade-in min-w-0">
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
             <span className="font-mono-custom break-all whitespace-pre-wrap flex-1">{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="p-3.5 mb-5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2.5 animate-fade-in min-w-0">
+          <div className="p-3.5 mb-5 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 text-xs text-emerald-800 dark:text-emerald-350 flex items-start gap-2.5 animate-fade-in min-w-0">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
             <span className="font-mono-custom break-all whitespace-pre-wrap flex-1">{success}</span>
           </div>
@@ -95,7 +95,7 @@ export default function AuthPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email field */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-purple-600" />
               Email Address
             </label>
@@ -104,13 +104,13 @@ export default function AuthPage() {
               name="email"
               required
               placeholder="name@domain.com"
-              className="w-full bg-white border border-zinc-200 rounded-xl p-3.5 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+              className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
             />
           </div>
 
           {/* Password field */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-purple-600" />
               Password
             </label>
@@ -120,12 +120,12 @@ export default function AuthPage() {
                 name="password"
                 required
                 placeholder="••••••••"
-                className="w-full bg-white border border-zinc-200 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-600 transition-colors"
+                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-650 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -135,7 +135,7 @@ export default function AuthPage() {
           {/* Confirm Password field (Register only) */}
           {isRegister && (
             <div className="space-y-1.5 animate-fade-in">
-              <label className="text-xs font-bold text-zinc-700 flex items-center gap-1.5">
+              <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-purple-600" />
                 Confirm Password
               </label>
@@ -145,12 +145,12 @@ export default function AuthPage() {
                   name="confirmPassword"
                   required
                   placeholder="••••••••"
-                  className="w-full bg-white border border-zinc-200 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 dark:text-zinc-205 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-600 transition-colors"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-650 transition-colors"
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -171,15 +171,15 @@ export default function AuthPage() {
 
         {/* Divider */}
         <div className="relative flex py-5 items-center">
-          <div className="flex-grow border-t border-zinc-200"></div>
-          <span className="flex-shrink mx-4 text-zinc-400 text-[10px] font-mono-custom uppercase tracking-wider">or</span>
-          <div className="flex-grow border-t border-zinc-200"></div>
+          <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
+          <span className="flex-shrink mx-4 text-zinc-400 dark:text-zinc-550 text-[10px] font-mono-custom uppercase tracking-wider">or</span>
+          <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
         </div>
 
         {/* OAuth Button */}
         <button
           onClick={handleOAuthClick}
-          className="w-full py-3.5 bg-black hover:bg-zinc-900 text-white rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+          className="w-full py-3.5 bg-black dark:bg-white hover:bg-zinc-900 dark:hover:bg-zinc-100 text-white dark:text-black rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-md"
         >
           <Sparkles className="w-4.5 h-4.5 text-purple-400 animate-pulse" />
           Continue with Threads

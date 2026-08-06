@@ -160,12 +160,12 @@ export function AccountSettings({
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in px-2 md:px-0">
       {/* Tab Header Banner */}
-      <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200">
+      <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-2">
           <User className="w-5 h-5 text-purple-600" />
           <div>
-            <h2 className="text-xl font-bold text-zinc-900">Account Credentials</h2>
-            <p className="text-xs text-zinc-500 font-mono-custom">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Account Credentials</h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom font-medium">
               Manage your personal display name, profile avatar, and secure password updates.
             </p>
           </div>
@@ -174,9 +174,9 @@ export function AccountSettings({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Profile Card */}
-        <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 space-y-6 flex flex-col justify-between">
+        <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
               <Camera className="w-4 h-4 text-purple-600" /> Public Details
             </h3>
 
@@ -210,26 +210,26 @@ export function AccountSettings({
             <form onSubmit={handleUpdateProfile} className="space-y-4 pt-2">
               {/* Display Name Input */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-700 block">Display Name</label>
+                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">Display Name</label>
                 <input
                   type="text"
                   required
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
                 />
               </div>
 
               {/* Read Only Email / Username */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-500 block">
+                <label className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 block">
                   {isThreadsUser ? 'Threads Account (Read Only)' : 'Registered Email (Read Only)'}
                 </label>
                 <input
                   type={isThreadsUser ? 'text' : 'email'}
                   disabled
                   value={initialEmail}
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs text-zinc-400 font-mono-custom select-none cursor-not-allowed"
+                  className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-400 dark:text-zinc-500 font-mono-custom select-none cursor-not-allowed"
                 />
               </div>
 
@@ -247,9 +247,9 @@ export function AccountSettings({
         </div>
 
         {/* Password Card */}
-        <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 space-y-6 flex flex-col justify-between">
+        <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
               <Key className="w-4 h-4 text-purple-600" /> Password settings
             </h3>
 
@@ -270,7 +270,7 @@ export function AccountSettings({
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               {/* New Password */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-700 block">New Password</label>
+                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">New Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -278,7 +278,7 @@ export function AccountSettings({
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 pr-10 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
                   />
                   <button
                     type="button"
@@ -292,7 +292,7 @@ export function AccountSettings({
 
               {/* Confirm Password */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-700 block">Confirm New Password</label>
+                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">Confirm New Password</label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -300,7 +300,7 @@ export function AccountSettings({
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-white border border-zinc-200 rounded-xl p-3 pr-10 text-xs text-zinc-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
                   />
                   <button
                     type="button"
@@ -327,8 +327,8 @@ export function AccountSettings({
       </div>
 
       {/* Threads Connection Panel */}
-      <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 space-y-4">
-        <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
+      <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-4">
+        <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" /> Linked Threads Account
         </h3>
 
@@ -347,35 +347,35 @@ export function AccountSettings({
         )}
         
         {threadsLoading ? (
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 border border-zinc-200 animate-pulse">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 animate-pulse">
             <div className="flex items-center gap-3 w-full">
-              <div className="w-10 h-10 rounded-full bg-zinc-200 shrink-0" />
+              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-850 shrink-0" />
               <div className="space-y-2 flex-1">
-                <div className="h-3 bg-zinc-200 rounded w-1/4" />
-                <div className="h-2 bg-zinc-200 rounded w-1/2" />
+                <div className="h-3 bg-zinc-200 dark:bg-zinc-850 rounded w-1/4" />
+                <div className="h-2 bg-zinc-200 dark:bg-zinc-850 rounded w-1/2" />
               </div>
             </div>
-            <div className="h-8 bg-zinc-200 rounded-xl w-32 shrink-0 hidden md:block" />
+            <div className="h-8 bg-zinc-200 dark:bg-zinc-850 rounded-xl w-32 shrink-0 hidden md:block" />
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
             <div className="flex items-center gap-3">
               {isConnected && connAvatarUrl ? (
                 <img
                   src={connAvatarUrl}
                   alt={connDisplayName || connUsername}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 shadow-sm shrink-0"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 dark:border-purple-800 shadow-sm shrink-0"
                 />
               ) : (
-              <div className="w-10 h-10 rounded-full bg-zinc-200 border-2 border-zinc-300 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center shrink-0">
                   <Sparkles className="w-4 h-4 text-zinc-500" />
                 </div>
               )}
               <div className="space-y-0.5">
-              <span className="text-xs font-bold text-zinc-800 block">
+              <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 block">
                 {isConnected ? (connDisplayName || `@${connUsername}`) : 'Threads Account'}
               </span>
-              <div className="flex items-center gap-2 flex-wrap text-xs text-zinc-500 font-mono-custom">
+              <div className="flex items-center gap-2 flex-wrap text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
                 <span>
                   {isConnected 
                     ? `@${connUsername} · Connected`
@@ -383,12 +383,12 @@ export function AccountSettings({
                 </span>
                 {isConnected && (
                   <>
-                    <span className="text-zinc-300 select-none">|</span>
+                    <span className="text-zinc-300 dark:text-zinc-700 select-none">|</span>
                     <a
                       href={`https://threads.net/@${connUsername}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-600 hover:text-purple-700 transition-colors inline-flex items-center gap-0.5 text-[10px] font-bold"
+                      className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors inline-flex items-center gap-0.5 text-[10px] font-bold"
                       title="View profile on Threads"
                     >
                       <ExternalLink className="w-3 h-3" /> View Profile
@@ -397,7 +397,7 @@ export function AccountSettings({
                 )}
               </div>
               {isConnected && threadsExpiresAt && (
-                <span className="text-[10px] text-zinc-400 font-mono-custom block mt-0.5">
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono-custom block mt-0.5">
                   Token active · Expires on {threadsExpiresAt}
                 </span>
               )}
@@ -410,8 +410,8 @@ export function AccountSettings({
               disabled={threadsConnecting}
               className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-md whitespace-nowrap ${
                 isConnected 
-                  ? 'bg-zinc-200 hover:bg-rose-50 hover:text-rose-600 text-zinc-700' 
-                  : 'bg-black hover:bg-zinc-800 text-white shadow-zinc-950/20'
+                  ? 'bg-zinc-200 dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-zinc-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-450 border border-transparent dark:border-zinc-700' 
+                  : 'bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-zinc-950/20'
               }`}
             >
               {threadsConnecting 
@@ -426,19 +426,19 @@ export function AccountSettings({
 
       {showDisconnectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="bg-white border border-zinc-200 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-scale-in">
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-scale-in">
             <div className="flex items-center gap-3 text-rose-600">
               <AlertCircle className="w-6 h-6 shrink-0" />
               <h4 className="text-base font-bold">Unlink Threads Account?</h4>
             </div>
             
-            <p className="text-xs text-zinc-600 leading-relaxed font-mono-custom">
+            <p className="text-xs text-zinc-600 dark:text-zinc-350 leading-relaxed font-mono-custom">
               Unlinking your Threads account will delete all generated posts, historical analytics, custom writing rules, and persona attributes permanently.
             </p>
 
-            <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex gap-2.5 items-start">
+            <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 rounded-xl p-3.5 flex gap-2.5 items-start">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-              <span className="text-[10px] text-rose-800 font-bold leading-normal">
+              <span className="text-[10px] text-rose-800 dark:text-rose-300 font-bold leading-normal">
                 CRITICAL WARNING: This will permanently wipe your accumulated AI-generated data. This action is irreversible.
               </span>
             </div>
@@ -447,7 +447,7 @@ export function AccountSettings({
               <button
                 type="button"
                 onClick={() => setShowDisconnectModal(false)}
-                className="px-4 py-2 text-zinc-600 hover:text-zinc-800 bg-zinc-100 hover:bg-zinc-200 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                className="px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-transparent dark:border-zinc-700"
               >
                 Cancel
               </button>

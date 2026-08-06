@@ -50,13 +50,13 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in px-2 md:px-0">
       {/* Header & Sync Controller */}
-      <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <BarChart3 className="w-5 h-5 text-purple-600" />
-            <h2 className="text-xl font-bold text-zinc-900">Analysis & Restart Loop</h2>
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Analysis & Restart Loop</h2>
           </div>
-          <p className="text-xs text-zinc-500 font-mono-custom">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom font-medium">
             Monitor post engagement and trigger automated structure clone/restart routines.
           </p>
         </div>
@@ -73,11 +73,11 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
 
       {/* Synced AI Insights Banner */}
       {syncedLogs.length > 0 && (
-        <div className="glass-panel p-5 rounded-2xl border border-purple-200 bg-purple-50/60 space-y-2 animate-fade-in">
-          <h3 className="text-xs font-bold text-purple-800 flex items-center gap-2 uppercase tracking-wider font-mono-custom">
+        <div className="glass-panel p-5 rounded-2xl border border-purple-200 dark:border-purple-900/50 bg-purple-50/60 dark:bg-purple-950/20 space-y-2 animate-fade-in">
+          <h3 className="text-xs font-bold text-purple-800 dark:text-purple-300 flex items-center gap-2 uppercase tracking-wider font-mono-custom">
             <Sparkles className="w-4 h-4 text-purple-600" /> Loop Actions Log
           </h3>
-          <ul className="space-y-1.5 text-xs text-zinc-700 font-mono-custom">
+          <ul className="space-y-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-mono-custom">
             {syncedLogs.map((log, idx) => (
               <li key={idx} className="flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -90,12 +90,12 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
 
       {/* Posts List */}
       <div className="space-y-4">
-        <h3 className="text-sm font-bold text-zinc-700">Loop Tracking Posts ({posts.length})</h3>
+        <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Loop Tracking Posts ({posts.length})</h3>
 
         {posts.length === 0 ? (
-          <div className="glass-panel p-8 rounded-2xl border border-zinc-200 text-center space-y-2">
-            <Lightbulb className="w-8 h-8 text-zinc-400 mx-auto" />
-            <p className="text-xs text-zinc-500">No posts in tracking loop. Publish a draft to start.</p>
+          <div className="glass-panel p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center space-y-2">
+            <Lightbulb className="w-8 h-8 text-zinc-400 dark:text-zinc-500 mx-auto" />
+            <p className="text-xs text-zinc-500 dark:text-zinc-450">No posts in tracking loop. Publish a draft to start.</p>
           </div>
         ) : (
           posts.map((post) => (
@@ -103,25 +103,25 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
               key={post.id}
               className={`glass-panel p-5 rounded-2xl border transition-all space-y-4 ${
                 post.structureCloned 
-                  ? 'border-emerald-200 bg-emerald-50/10'
+                  ? 'border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/10 dark:bg-emerald-950/5'
                   : post.markedForRestart 
-                    ? 'border-rose-200 bg-rose-50/10'
-                    : 'border-zinc-200'
+                    ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50/10 dark:bg-rose-950/5'
+                    : 'border-zinc-200 dark:border-zinc-800'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <span className="text-[11px] font-mono-custom text-purple-600 font-bold uppercase tracking-wider">
+                  <span className="text-[11px] font-mono-custom text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">
                     {post.topic || 'General Topic'}
                   </span>
-                  <p className="text-xs text-zinc-800 mt-1 whitespace-pre-wrap break-words font-sans-custom leading-relaxed">
+                  <p className="text-xs text-zinc-800 dark:text-zinc-200 mt-1 whitespace-pre-wrap break-words font-sans-custom leading-relaxed">
                     {post.generatedContent}
                   </p>
                 </div>
                 
                 {/* Visual loop state badges */}
                 <div className="flex flex-col items-end gap-1.5 shrink-0">
-                  <span className="text-[10px] px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-800 border border-zinc-200 font-mono-custom font-semibold">
+                  <span className="text-[10px] px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-mono-custom font-semibold">
                     {post.status}
                   </span>
 
@@ -140,27 +140,27 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
               </div>
 
               {/* Metrics row */}
-              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-xs font-mono-custom">
-                <div className="flex items-center gap-4 md:gap-6 text-zinc-500">
-                  <span className="flex items-center gap-1 hover:text-zinc-900 transition-colors">
+              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-850 text-xs font-mono-custom">
+                <div className="flex items-center gap-4 md:gap-6 text-zinc-500 dark:text-zinc-400">
+                  <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                     <ThumbsUp className="w-3.5 h-3.5 text-purple-600" />
                     {post.metrics?.likes || 0}
                   </span>
-                  <span className="flex items-center gap-1 hover:text-zinc-900 transition-colors">
+                  <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                     <MessageCircle className="w-3.5 h-3.5 text-indigo-600" />
                     {post.metrics?.replies || 0}
                   </span>
-                  <span className="flex items-center gap-1 hover:text-zinc-900 transition-colors">
+                  <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                     <Eye className="w-3.5 h-3.5 text-cyan-600" />
                     {post.metrics?.views || 0}
                   </span>
-                  <span className="flex items-center gap-1 hover:text-zinc-900 transition-colors">
+                  <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                     <Repeat className="w-3.5 h-3.5 text-emerald-600" />
                     {post.metrics?.reposts || 0}
                   </span>
                 </div>
 
-                <span className="text-[10px] text-zinc-400">
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
                   Pub: {post.publishedAt}
                 </span>
               </div>
@@ -168,10 +168,10 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
               {post.aiInsight && (
                 <div className={`p-3 rounded-xl border text-xs font-mono-custom flex items-center gap-2 min-w-0 ${
                   post.structureCloned 
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300'
                     : post.markedForRestart 
-                      ? 'bg-rose-50 border-rose-200 text-rose-900'
-                      : 'bg-purple-50 border-purple-200 text-purple-900'
+                      ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-300'
+                      : 'bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40 text-purple-900 dark:text-purple-300'
                 }`}>
                   <Sparkles className={`w-3.5 h-3.5 shrink-0 ${
                     post.structureCloned 
