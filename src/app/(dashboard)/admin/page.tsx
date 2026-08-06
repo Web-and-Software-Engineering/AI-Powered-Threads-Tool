@@ -332,17 +332,13 @@ export default function AdminPage() {
       )}
 
       {toast && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl border backdrop-blur-md shadow-2xl animate-fade-in leading-relaxed min-w-[280px] max-w-sm ${
-          toast.type === 'success'
-            ? 'bg-emerald-500/10 border-emerald-500/35 text-emerald-800 dark:text-emerald-450'
-            : 'bg-rose-500/10 border-rose-500/35 text-rose-800 dark:text-rose-450'
-        }`}>
+        <div className="fixed top-6 right-6 md:top-8 md:right-8 z-[100] flex items-center gap-3 px-4 py-3 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border border-zinc-800 dark:border-zinc-200 shadow-2xl shadow-black/40 animate-fade-in leading-relaxed min-w-[300px] max-w-sm">
           {toast.type === 'success' ? (
             <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
           ) : (
             <ShieldAlert className="w-5 h-5 text-rose-500 shrink-0" />
           )}
-          <span className="text-xs font-semibold font-sans-custom">{toast.message}</span>
+          <span className="text-xs font-bold font-sans-custom">{toast.message}</span>
         </div>
       )}
     </div>
