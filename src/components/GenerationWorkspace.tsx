@@ -21,6 +21,116 @@ interface GenerationWorkspaceProps {
 
 type StepState = 'idle' | 'searching' | 'analyzing' | 'synthesizing' | 'drafting' | 'completed'
 
+const TEMPLATES_JP = {
+  developer: [
+    {
+      topic: 'テスト駆動開発（TDD）の誤解と真実',
+      core: 'TDDは単にバグを減らすための手法ではなく、より良いソフトウェアの「設計ツール」である。'
+    },
+    {
+      topic: '技術的負債の戦略的返済',
+      core: 'すべての負債をすぐに返済する必要はない。顧客価値を生む機能領域の負債にフォーカスして優先的に返済すべき。'
+    },
+    {
+      topic: 'シニアエンジニアの意思決定',
+      core: '最も優れたコードは、書かれなかったコードである。複雑なシステムを作るより、シンプルなアプローチで問題を回避する方が賢明。'
+    }
+  ],
+  solopreneur: [
+    {
+      topic: '1人ビジネスのレバレッジ設計',
+      core: '労働時間を増やすのではなく、ソフトウェアと自動化システムを構築して自分のクローンを作るべき。'
+    },
+    {
+      topic: '公開開発（Build in Public）の集客力',
+      core: '完璧な状態でリリースするより、開発プロセスや失敗を共有する方が信頼性の高いコミュニティを構築できる。'
+    },
+    {
+      topic: 'SaaSプロダクトの初期トラクション',
+      core: '初期ユーザー10人を集めるには、広告ではなく個別のDMや手動のオンボーディングが最も効果的。'
+    }
+  ],
+  productivity: [
+    {
+      topic: '毎日1つの小さな自動化が人生を変える理由',
+      core: '1日5分の手作業を自動化すると、年間で丸3日分の自由時間が手に入る。自動化は時間の福利効果を生む。'
+    },
+    {
+      topic: '非同期ワークフローの極意',
+      core: 'チャットに即レスするのをやめよう。まとまった集中ブロックを確保し、決まった時間にまとめて返信する方が生産的。'
+    },
+    {
+      topic: '断片的な14時間作業 vs 4時間のディープフォーカス',
+      core: '通知をすべて切り、1つのタスクに超集中する4時間は、マルチタスクをする14時間よりも圧倒的に高い成果を生む。'
+    }
+  ],
+  general: [
+    {
+      topic: 'AI時代に必要なサバイバルスキル',
+      core: 'AIの使い方自体よりも、解決すべき「正しい問題」を見つける課題発見能力こそが最も重要なスキルになる。'
+    },
+    {
+      topic: '時間対効果の最大化',
+      core: 'すべてをやろうとしない。最も重要なレバレッジポイントである20%のタスクにリソースの80%を注ぎ込むべき。'
+    }
+  ]
+}
+
+const TEMPLATES_EN = {
+  developer: [
+    {
+      topic: 'Debunking Test-Driven Development (TDD)',
+      core: 'TDD is not just a bug-reducing testing method, it is ultimately a software design tool.'
+    },
+    {
+      topic: 'Managing Technical Debt Strategy',
+      core: 'Don\'t rush to refactor everything. Focus on repaying debt in modules that directly impact user value creation.'
+    },
+    {
+      topic: 'Senior Engineer Decision Frameworks',
+      core: 'The best code is the code you didn\'t write. Simplicity wins over complex over-engineering every single time.'
+    }
+  ],
+  solopreneur: [
+    {
+      topic: 'Leverage for Solopreneurs',
+      core: 'Stop trading hours for dollars. Build software assets and automated systems that scale your output while you sleep.'
+    },
+    {
+      topic: 'The Power of Build in Public',
+      core: 'Sharing failures and code drafts creates a much stronger community than launching a polished product out of nowhere.'
+    },
+    {
+      topic: 'Getting Your First 10 SaaS Users',
+      core: 'Do things that don\'t scale. Send manual DMs and do custom onboarding calls instead of running paid ads.'
+    }
+  ],
+  productivity: [
+    {
+      topic: 'The Compound Effect of Automation',
+      core: 'Saving 5 minutes a day with a custom script buys you back 3 full days a year. Automation acts as compound interest for your time.'
+    },
+    {
+      topic: 'Asynchronous Team Workflows',
+      core: 'Stop instant messaging. Protect your focus blocks and reply to team chats in batch intervals to maximize output.'
+    },
+    {
+      topic: '4 Hours of Deep Focus vs 14 Hours of Distraction',
+      core: 'One singular deep work block with zero notifications produces more value than a fragmented, multi-tasking long day.'
+    }
+  ],
+  general: [
+    {
+      topic: 'Survival Skills in the AI Era',
+      core: 'The ability to identify the correct problem to solve is infinitely more valuable than knowing how to prompt AI.'
+    },
+    {
+      topic: 'Maximizing Return on Time',
+      core: 'Stop doing everything. Focus 80% of your energy on the top 20% high-leverage tasks that move the needle.'
+    }
+  ]
+}
+
 export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorkspaceProps) {
   const { t, language } = useLanguage()
   const [topic, setTopic] = useState('')
@@ -43,13 +153,32 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   }, [])
 
   const handleAutoFill = () => {
-    if (language === 'jp') {
-      setTopic('リモート個人開発者の生産性フレームワーク')
-      setCoreMessage('断片的な14時間作業より、4時間のディープフォーカスブロックを作る方が成果が上がる。')
-    } else {
-      setTopic('Productivity frameworks for remote solopreneurs')
-      setCoreMessage('Doing deep focus blocks of 4 hours yields more results than working 14 hours fragmented.')
+    const textToAnalyze = `${profile?.authorPersona || ''} ${profile?.targetAudience || ''} ${profile?.writingStyleRules || ''} ${profile?.personalityTraits || ''}`.toLowerCase()
+
+    let category: 'developer' | 'solopreneur' | 'productivity' | 'general' = 'general'
+
+    const devKeywords = ['dev', 'code', 'soft', 'engineer', 'tech', 'build', 'saas', '開発', 'エンジニア', 'プログラマ', '技術', '実装']
+    const bizKeywords = ['solopreneur', 'business', 'startup', 'founder', 'marketing', 'creator', '起業', 'ビジネス', '起業家', '創業者', 'マーケ']
+    const prodKeywords = ['productivity', 'time', 'autom', 'async', 'focus', '生産性', '時間', '自動化', '非同期', '集中']
+
+    const matchesDev = devKeywords.filter(kw => textToAnalyze.includes(kw)).length
+    const matchesBiz = bizKeywords.filter(kw => textToAnalyze.includes(kw)).length
+    const matchesProd = prodKeywords.filter(kw => textToAnalyze.includes(kw)).length
+
+    const maxMatches = Math.max(matchesDev, matchesBiz, matchesProd)
+
+    if (maxMatches > 0) {
+      if (maxMatches === matchesDev) category = 'developer'
+      else if (maxMatches === matchesBiz) category = 'solopreneur'
+      else if (maxMatches === matchesProd) category = 'productivity'
     }
+
+    const list = language === 'jp' ? TEMPLATES_JP[category] : TEMPLATES_EN[category]
+    const randomIdx = Math.floor(Math.random() * list.length)
+    const selected = list[randomIdx]
+
+    setTopic(selected.topic)
+    setCoreMessage(selected.core)
   }
 
   const handleGenerate = async (e: React.FormEvent) => {
