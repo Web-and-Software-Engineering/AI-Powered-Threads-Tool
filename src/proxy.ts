@@ -2,6 +2,18 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 export async function proxy(request: NextRequest) {
+  const { pathname, searchParams } = request.nextUrl
+
+  // Intercept Supabase password recovery codes that land on any page other than
+  // /auth/callback (this happens when Supabase's redirect_to is set to the site root).
+  const code = searchParams.get('code')
+  const type = searchParams.get('type')
+  if (code && type === 'recovery' && pathname !== '/auth/callback') {
+    const callbackUrl = request.nextUrl.clone()
+    callbackUrl.pathname = '/auth/callback'
+    return NextResponse.redirect(callbackUrl)
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -46,6 +58,7 @@ export async function proxy(request: NextRequest) {
 
   const isAuthCallback =
     request.nextUrl.pathname === '/auth/callback' ||
+    request.nextUrl.pathname === '/auth/update-password' ||
     request.nextUrl.pathname.startsWith('/auth/threads/')
 
   if (!user && !isAuthPage && !isPendingPage && !isAuthCallback) {
