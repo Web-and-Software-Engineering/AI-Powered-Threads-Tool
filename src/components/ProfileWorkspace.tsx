@@ -22,11 +22,42 @@ interface ProfileWorkspaceProps {
   onSave: (data: ProfileData) => void
 }
 
+const SAMPLE_JP_PROFILE: ProfileData = {
+  authorPersona: 'ソフトウェアと自動化に関する実践的な洞察を共有する、AIアーキテクト兼テック個人起業家（ソロプレナー）。',
+  personalityTraits: '几帳面、実用的、独自の視点を持つ、直接的でありながら会話的。',
+  likesDislikes: '好き: クリーンなコード、深煎りコーヒー、非同期ワークフロー。嫌い: 長時間の会議、中身のない流行。',
+  values: '消費よりも価値創造、ビルド・イン・パブリック（公開開発）、自動化によるレバレッジの活用。',
+  lifestyle: '早朝のカフェでのワークスペース、非同期のデイリースケジュール。',
+  dreams: 'ソフトウェア製品を月間経常収益（MRR）10,000ドルまでスケールさせ、完全リモートで旅をすること。',
+  outlookOnLife: '時間は究極のレバレッジであり、自由を買い戻すためのシステムを構築すること。',
+  targetAudience: 'Threadsで開発・構築をしているエンジニア、インディーハッカー、SaaS創業者。',
+  preferredTone: '説得力がある、簡潔、洞察に満ちた、パンチのある表現',
+  writingStyleRules: '明確な番号付きリストを使用する。フック（書き出し）は10字以内に抑える。重要な洞察は改行で区切る。',
+}
+
+const SAMPLE_EN_PROFILE: ProfileData = {
+  authorPersona: 'AI Architect & Tech Solopreneur sharing actionable insights on software and automation.',
+  personalityTraits: 'Meticulous, pragmatic, contrarian, direct but conversational.',
+  likesDislikes: 'Likes: Clean code, deep coffee, async workflows. Dislikes: Long meetings, hype cycles.',
+  values: 'Value creation over consumption, building in public, automation leverage.',
+  lifestyle: 'Early morning coffee shop workspace, async daily schedule.',
+  dreams: 'Scale software products to $10k MRR and travel fully remote.',
+  outlookOnLife: 'Time is the ultimate leverage; build systems to buy back freedom.',
+  targetAudience: 'Developers, indie hackers, and SaaS founders building on Threads.',
+  preferredTone: 'Authoritative, concise, insightful, punchy',
+  writingStyleRules: 'Use clear numbered lists. Keep hooks under 10 words. Separate key insights with line breaks.',
+}
+
 export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
   const { t, language } = useLanguage()
   const [formData, setFormData] = useState<ProfileData>(profile)
   const [activeSubTab, setActiveSubTab] = useState<'pocket' | 'audience'>('pocket')
   const [saved, setSaved] = useState(false)
+
+  const handleAutofill = () => {
+    const samples = language === 'jp' ? SAMPLE_JP_PROFILE : SAMPLE_EN_PROFILE
+    setFormData(samples)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -223,6 +254,14 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
                 <CheckCircle2 className="w-4 h-4" /> {t('profile.saved')}
               </span>
             )}
+            <button
+              type="button"
+              onClick={handleAutofill}
+              className="px-4 py-2.5 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer font-sans-custom"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-purple-650 dark:text-purple-400 shrink-0" />
+              {language === 'jp' ? 'サンプル自動入力' : 'Autofill Template'}
+            </button>
             <button
               type="submit"
               className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center gap-2 cursor-pointer font-sans-custom"
