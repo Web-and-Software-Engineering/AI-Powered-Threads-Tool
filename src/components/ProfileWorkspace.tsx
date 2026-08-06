@@ -40,7 +40,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
 
         {/* Section Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-805">
+          <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900">
             <FolderHeart className="w-5 h-5" />
           </div>
           <div>
@@ -52,7 +52,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
         </div>
 
         {/* Sub-tabs */}
-        <div className="flex gap-2 border-b border-zinc-200 dark:border-zinc-850 pb-3 mb-6">
+        <div className="flex gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-3 mb-6">
           <button
             onClick={() => setActiveSubTab('pocket')}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
@@ -215,7 +215,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
           )}
 
           {/* Action Row */}
-          <div className="flex justify-end items-center gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-850">
+          <div className="flex justify-end items-center gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             {saved && (
               <span className="text-xs text-emerald-600 flex items-center gap-1.5 animate-fade-in font-mono-custom font-semibold">
                 <CheckCircle2 className="w-4 h-4" /> Guidelines saved & applied!

@@ -140,7 +140,7 @@ export function Navigation() {
       </header>
 
       {/* Mobile Bottom Navigation Bar (sticky bottom) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-850 flex justify-around items-center py-2 px-4 shadow-lg shadow-black/5">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 flex justify-around items-center py-2 px-4 shadow-lg shadow-black/5">
         <Link
           href="/profile"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${

@@ -140,7 +140,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
               </div>
 
               {/* Metrics row */}
-              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-850 text-xs font-mono-custom">
+              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800 text-xs font-mono-custom">
                 <div className="flex items-center gap-4 md:gap-6 text-zinc-500 dark:text-zinc-400">
                   <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                     <ThumbsUp className="w-3.5 h-3.5 text-purple-600" />

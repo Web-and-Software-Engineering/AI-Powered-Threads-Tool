@@ -119,11 +119,11 @@ export function PostEditor({
                 <img
                   src={threadsAccount.avatarUrl}
                   alt={threadsAccount.username}
-                  className="w-9 h-9 rounded-full object-cover border border-zinc-200 dark:border-zinc-850"
+                  className="w-9 h-9 rounded-full object-cover border border-zinc-200 dark:border-zinc-800"
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 flex items-center justify-center text-xs font-bold text-zinc-800 dark:text-zinc-200 shrink-0">
+                <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-800 dark:text-zinc-200 shrink-0">
                   {threadsAccount?.username ? threadsAccount.username.slice(0, 2).toUpperCase() : 'You'}
                 </div>
               )}

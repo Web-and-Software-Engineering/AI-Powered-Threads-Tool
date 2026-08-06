@@ -349,13 +349,13 @@ export function AccountSettings({
         {threadsLoading ? (
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 animate-pulse">
             <div className="flex items-center gap-3 w-full">
-              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-850 shrink-0" />
+              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 shrink-0" />
               <div className="space-y-2 flex-1">
-                <div className="h-3 bg-zinc-200 dark:bg-zinc-850 rounded w-1/4" />
-                <div className="h-2 bg-zinc-200 dark:bg-zinc-850 rounded w-1/2" />
+                <div className="h-3 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4" />
+                <div className="h-2 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2" />
               </div>
             </div>
-            <div className="h-8 bg-zinc-200 dark:bg-zinc-850 rounded-xl w-32 shrink-0 hidden md:block" />
+            <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded-xl w-32 shrink-0 hidden md:block" />
           </div>
         ) : (
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
