@@ -23,26 +23,52 @@ interface ProfileWorkspaceProps {
 }
 
 const SAMPLE_JP_PROFILE: ProfileData = {
-  authorPersona: 'ソフトウェアと自動化に関する実践的な洞察を共有する、AIアーキテクト兼テック個人起業家（ソロプレナー）。',
-  personalityTraits: '几帳面、実用的、独自の視点を持つ、直接的でありながら会話的。',
-  likesDislikes: '好き: クリーンなコード、深煎りコーヒー、非同期ワークフロー。嫌い: 長時間の会議、中身のない流行。',
-  values: '消費よりも価値創造、ビルド・イン・パブリック（公開開発）、自動化によるレバレッジの活用。',
-  lifestyle: '早朝のカフェでのワークスペース、非同期のデイリースケジュール。',
-  dreams: 'ソフトウェア製品を月間経常収益（MRR）10,000ドルまでスケールさせ、完全リモートで旅をすること。',
-  outlookOnLife: '時間は究極のレバレッジであり、自由を買い戻すためのシステムを構築すること。',
+  authorPersona: `【自己紹介・経歴】
+ソフトウェアと自動化に関する実践的な洞察を共有する、AIアーキテクト兼テック個人起業家（ソロプレナー）。
+
+【性格・特徴】
+几帳面、実用的、独自の視点を持つ、直接的でありながら会話的。
+
+【好きなこと・嫌いなこと】
+好き: クリーンなコード、深煎りコーヒー、非同期ワークフロー。嫌い: 長時間の会議、中身のない流行。
+
+【将来の目標・夢】
+ソフトウェア製品を月間経常収益（MRR）10,000ドルまでスケールさせ、完全リモートで旅をすること。
+
+【ライフスタイル・価値観】
+早朝のカフェでのワークスペース、非同期のデイリースケジュール、ビルド・イン・パブリック（公開開発）。`,
+  personalityTraits: '',
+  likesDislikes: '',
+  values: '',
+  lifestyle: '',
+  dreams: '',
+  outlookOnLife: '',
   targetAudience: 'Threadsで開発・構築をしているエンジニア、インディーハッカー、SaaS創業者。',
   preferredTone: '説得力がある、簡潔、洞察に満ちた、パンチのある表現',
   writingStyleRules: '明確な番号付きリストを使用する。フック（書き出し）は10字以内に抑える。重要な洞察は改行で区切る。',
 }
 
 const SAMPLE_EN_PROFILE: ProfileData = {
-  authorPersona: 'AI Architect & Tech Solopreneur sharing actionable insights on software and automation.',
-  personalityTraits: 'Meticulous, pragmatic, contrarian, direct but conversational.',
-  likesDislikes: 'Likes: Clean code, deep coffee, async workflows. Dislikes: Long meetings, hype cycles.',
-  values: 'Value creation over consumption, building in public, automation leverage.',
-  lifestyle: 'Early morning coffee shop workspace, async daily schedule.',
-  dreams: 'Scale software products to $10k MRR and travel fully remote.',
-  outlookOnLife: 'Time is the ultimate leverage; build systems to buy back freedom.',
+  authorPersona: `[Bio & Background]
+AI Architect & Tech Solopreneur sharing actionable insights on software and automation.
+
+[Personality & Traits]
+Meticulous, pragmatic, contrarian, direct but conversational.
+
+[Likes & Dislikes]
+Likes: Clean code, deep coffee, async workflows. Dislikes: Long meetings, hype cycles.
+
+[Goals & Dreams]
+Scale software products to $10k MRR and travel fully remote.
+
+[Values & Lifestyle]
+Early morning coffee shop workspace, async daily schedule, building in public, automation leverage.`,
+  personalityTraits: '',
+  likesDislikes: '',
+  values: '',
+  lifestyle: '',
+  dreams: '',
+  outlookOnLife: '',
   targetAudience: 'Developers, indie hackers, and SaaS founders building on Threads.',
   preferredTone: 'Authoritative, concise, insightful, punchy',
   writingStyleRules: 'Use clear numbered lists. Keep hooks under 10 words. Separate key insights with line breaks.',
@@ -111,95 +137,19 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {activeSubTab === 'pocket' ? (
             <div className="space-y-5">
-              {/* Pocket Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Self Introduction */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-purple-600" />
-                    {t('profile.bio')}
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={formData.authorPersona}
-                    onChange={(e) => setFormData({ ...formData, authorPersona: e.target.value })}
-                    placeholder={t('profile.bio.placeholder')}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
-                  />
-                </div>
-
-                {/* Personality Traits */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                    <Heart className="w-3.5 h-3.5 text-purple-600" />
-                    {t('profile.traits')}
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={formData.personalityTraits}
-                    onChange={(e) => setFormData({ ...formData, personalityTraits: e.target.value })}
-                    placeholder={t('profile.traits.placeholder')}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Likes & Dislikes */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                    {t('profile.likes')}
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={formData.likesDislikes}
-                    onChange={(e) => setFormData({ ...formData, likesDislikes: e.target.value })}
-                    placeholder={t('profile.likes.placeholder')}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
-                  />
-                </div>
-
-                {/* Dreams & Goals */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                    <Compass className="w-3.5 h-3.5 text-purple-600" />
-                    {t('profile.dreams')}
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={formData.dreams}
-                    onChange={(e) => setFormData({ ...formData, dreams: e.target.value })}
-                    placeholder={t('profile.dreams.placeholder')}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Values & Lifestyle */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{t('profile.lifestyle')}</label>
-                  <input
-                    type="text"
-                    value={formData.lifestyle}
-                    onChange={(e) => setFormData({ ...formData, lifestyle: e.target.value })}
-                    placeholder={t('profile.lifestyle.placeholder')}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all"
-                  />
-                </div>
-
-                {/* Outlook on Life */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{t('profile.outlook')}</label>
-                  <input
-                    type="text"
-                    value={formData.outlookOnLife}
-                    onChange={(e) => setFormData({ ...formData, outlookOnLife: e.target.value })}
-                    placeholder={t('profile.outlook.placeholder')}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all"
-                  />
-                </div>
+              {/* Single Broad Pocket Notes Field */}
+              <div className="space-y-1.5 animate-fade-in">
+                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-purple-600" />
+                  {t('profile.bio')}
+                </label>
+                <textarea
+                  rows={10}
+                  value={formData.authorPersona}
+                  onChange={(e) => setFormData({ ...formData, authorPersona: e.target.value })}
+                  placeholder={t('profile.bio.placeholder')}
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed font-sans-custom"
+                />
               </div>
             </div>
           ) : (

@@ -60,12 +60,18 @@ What is your main takeaway? Let me know below. 👇`
 Your goal is to write a single-text Threads post (under 500 characters) that achieves maximum engagement.
 
 FRAMEWORK RULES TO FOLLOW:
-- AUTHOR PERSONA: ${params.authorPersona || 'Tech Entrepreneur & Solopreneur'}
-- PERSONALITY TRAITS: ${params.personalityTraits || 'Direct, practical, warm'}
-- LIKES & DISLIKES: ${params.likesDislikes || 'N/A'}
-- DREAMS & GOALS: ${params.dreams || 'N/A'}
-- VALUES & LIFESTYLE: ${params.lifestyle || 'N/A'}
-- OUTLOOK ON LIFE: ${params.outlookOnLife || 'N/A'}
+- POCKET PERSONA & BACKGROUND (Casual background, personality notes, values, lifestyle, dreams, or life views):
+${
+  [
+    params.authorPersona,
+    params.personalityTraits,
+    params.likesDislikes,
+    params.values,
+    params.lifestyle,
+    params.dreams,
+    params.outlookOnLife
+  ].filter((s): s is string => !!s).map(s => s.trim()).filter(s => s.length > 0).join('\n\n') || 'N/A'
+}
 - TARGET AUDIENCE: ${params.targetAudience || 'Developers, creators, and indie hackers'}
 - PREFERRED TONE: ${params.preferredTone || 'Conversational, authoritative, punchy'}
 - WRITING STYLE RULES: ${params.writingStyleRules || 'Use clear line breaks, punchy hooks, and keep sentences short.'}
