@@ -89,3 +89,52 @@ export async function loginWithThreads() {
 
   return { redirect: url }
 }
+
+export async function requestPasswordReset(formData: FormData) {
+  const email = formData.get('email') as string
+
+  if (!email) {
+    return { error: 'Email address is required' }
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?type=recovery`,
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  // Always return success to avoid email enumeration
+  return { success: 'If an account with that email exists, a password reset link has been sent.' }
+}
+
+export async function updatePassword(formData: FormData) {
+  const password = formData.get('password') as string
+  const confirmPassword = formData.get('confirmPassword') as string
+
+  if (!password || !confirmPassword) {
+    return { error: 'Both password fields are required' }
+  }
+
+  if (password !== confirmPassword) {
+    return { error: 'Passwords do not match' }
+  }
+
+  if (password.length < 6) {
+    return { error: 'Password must be at least 6 characters long' }
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  return { success: true }
+}
