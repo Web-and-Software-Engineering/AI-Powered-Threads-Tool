@@ -199,10 +199,10 @@ const translations: Record<Language, Record<string, string>> = {
     "analytics.card.restart": "再構築マーク",
 
     // Pocket (Profile)
-    "profile.title": "ペルソナ ＆ ターゲットハブ",
-    "profile.subtitle": "あなたのペルソナ情報 (Pocket) とターゲット属性を設定します。",
-    "profile.tab.pocket": "① The \"Pocket\" (あなたのペルソナ)",
-    "profile.tab.audience": "② \"To Whom\" (ターゲット属性)",
+    "profile.title": "ペルソナ＆ターゲット設定",
+    "profile.subtitle": "あなたのペルソナ情報とターゲット属性を設定します。",
+    "profile.tab.pocket": "① ペルソナ設定 (あなたの経歴・強み)",
+    "profile.tab.audience": "② ターゲット設定 (対象読者層)",
     "profile.bio": "自己紹介 / バイオ",
     "profile.bio.placeholder": "あなたの専門分野や略歴を紹介してください",
     "profile.traits": "性格の特徴",
