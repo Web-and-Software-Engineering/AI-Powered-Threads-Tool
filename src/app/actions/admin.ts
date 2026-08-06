@@ -30,7 +30,8 @@ export async function getUsersList() {
 export async function updateUserStatus(
   profileId: string,
   isApproved: boolean,
-  role: string
+  role: string,
+  approvedUntil?: string | null
 ) {
   const supabase = await createClient()
 
@@ -58,7 +59,11 @@ export async function updateUserStatus(
   // Update user_profile
   const { error: updateError } = await supabase
     .from('user_profiles')
-    .update({ is_approved: isApproved, role })
+    .update({ 
+      is_approved: isApproved, 
+      role, 
+      approved_until: isApproved ? (approvedUntil || null) : null 
+    })
     .eq('id', profileId)
 
   if (updateError) {

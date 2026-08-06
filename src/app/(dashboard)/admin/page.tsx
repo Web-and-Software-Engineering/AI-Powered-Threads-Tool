@@ -15,6 +15,7 @@ interface UserProfile {
   avatar_url: string
   role: string
   is_approved: boolean
+  approved_until?: string | null
   created_at: string
 }
 
@@ -28,6 +29,13 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'admin'>('all')
   const [actioningId, setActioningId] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+
+  // State for Approval Modal
+  const [showApprovalModal, setShowApprovalModal] = useState(false)
+  const [modalProfileId, setModalProfileId] = useState<string | null>(null)
+  const [modalRole, setModalRole] = useState<string>('user')
+  const [durationOption, setDurationOption] = useState<'permanent' | '1day' | '7days' | '30days' | '1year' | 'custom'>('permanent')
+  const [customDate, setCustomDate] = useState('')
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
@@ -65,21 +73,86 @@ export default function AdminPage() {
   }, [router])
 
   const handleToggleApproval = async (profileId: string, currentApproved: boolean, role: string) => {
-    setActioningId(profileId)
+    if (currentApproved) {
+      // Suspend user directly (no modal needed)
+      setActioningId(profileId)
+      try {
+        const res = await updateUserStatus(profileId, false, role, null)
+        if (res.error) {
+          showToast(res.error, 'error')
+        } else {
+          setUsers(prev =>
+            prev.map(u =>
+              u.profile_id === profileId 
+                ? { ...u, is_approved: false, approved_until: null } 
+                : u
+            )
+          )
+          showToast(
+            language === 'jp'
+              ? 'ユーザーの承認を解除しました'
+              : 'User approval removed successfully!'
+          )
+        }
+      } catch (err) {
+        console.error(err)
+        showToast(language === 'jp' ? 'エラーが発生しました' : 'An error occurred', 'error')
+      } finally {
+        setActioningId(null)
+      }
+    } else {
+      // Approving user: show duration selection modal
+      setModalProfileId(profileId)
+      setModalRole(role)
+      setDurationOption('permanent')
+      setCustomDate('')
+      setShowApprovalModal(true)
+    }
+  }
+
+  const handleConfirmApproval = async () => {
+    if (!modalProfileId) return
+
+    let approvedUntil: string | null = null
+
+    if (durationOption === '1day') {
+      approvedUntil = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    } else if (durationOption === '7days') {
+      approvedUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    } else if (durationOption === '30days') {
+      approvedUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    } else if (durationOption === '1year') {
+      approvedUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+    } else if (durationOption === 'custom') {
+      if (!customDate) {
+        showToast(
+          language === 'jp' ? '日付を選択してください' : 'Please select a custom date',
+          'error'
+        )
+        return
+      }
+      approvedUntil = new Date(customDate).toISOString()
+    }
+
+    setActioningId(modalProfileId)
+    setShowApprovalModal(false)
+
     try {
-      const res = await updateUserStatus(profileId, !currentApproved, role)
+      const res = await updateUserStatus(modalProfileId, true, modalRole, approvedUntil)
       if (res.error) {
         showToast(res.error, 'error')
       } else {
         setUsers(prev =>
           prev.map(u =>
-            u.profile_id === profileId ? { ...u, is_approved: !currentApproved } : u
+            u.profile_id === modalProfileId 
+              ? { ...u, is_approved: true, approved_until: approvedUntil } 
+              : u
           )
         )
         showToast(
           language === 'jp'
-            ? (currentApproved ? 'ユーザーの承認を解除しました' : 'ユーザーを承認しました')
-            : (currentApproved ? 'User approval removed successfully!' : 'User approved successfully!')
+            ? 'ユーザーを承認しました'
+            : 'User approved successfully!'
         )
       }
     } catch (err) {
@@ -87,6 +160,7 @@ export default function AdminPage() {
       showToast(language === 'jp' ? 'エラーが発生しました' : 'An error occurred', 'error')
     } finally {
       setActioningId(null)
+      setModalProfileId(null)
     }
   }
 
@@ -309,16 +383,46 @@ export default function AdminPage() {
 
                         {/* Approval status */}
                         <td className="py-4 px-6">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono-custom font-semibold ${
-                            user.is_approved
-                              ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-250 dark:border-emerald-900/50'
-                              : 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450 border border-amber-250 dark:border-amber-900/50'
-                          }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${user.is_approved ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                            {user.is_approved 
-                              ? (language === 'jp' ? '承認済み' : 'Approved') 
-                              : (language === 'jp' ? '承認待ち' : 'Pending')}
-                          </span>
+                          {(() => {
+                            const isExpired = user.is_approved && user.approved_until && new Date(user.approved_until) < new Date()
+                            return (
+                              <div className="flex flex-col gap-1.5 animate-fade-in">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono-custom font-semibold w-fit border ${
+                                  isExpired
+                                    ? 'bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 border-rose-250 dark:border-rose-900/50'
+                                    : user.is_approved
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-250 dark:border-emerald-900/50'
+                                    : 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-450 border border-amber-250 dark:border-amber-900/50'
+                                }`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${isExpired ? 'bg-rose-500' : user.is_approved ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                  {isExpired 
+                                    ? (language === 'jp' ? '期限切れ' : 'Expired')
+                                    : user.is_approved 
+                                    ? (language === 'jp' ? '承認済み' : 'Approved') 
+                                    : (language === 'jp' ? '承認待ち' : 'Pending')}
+                                </span>
+
+                                {user.is_approved && !isExpired && user.approved_until && (
+                                  <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono-custom pl-1">
+                                    {language === 'jp' ? '期限: ' : 'Expires: '}
+                                    {new Date(user.approved_until).toLocaleDateString(language === 'jp' ? 'ja-JP' : 'en-US', {
+                                      year: 'numeric',
+                                      month: 'short',
+                                      day: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </span>
+                                )}
+
+                                {user.is_approved && !user.approved_until && (
+                                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono-custom pl-1 animate-fade-in">
+                                    {language === 'jp' ? '無期限' : 'Permanent'}
+                                  </span>
+                                )}
+                              </div>
+                            )
+                          })()}
                         </td>
 
                         {/* Action buttons */}
@@ -377,6 +481,96 @@ export default function AdminPage() {
             <ShieldAlert className="w-5 h-5 text-rose-500 shrink-0" />
           )}
           <span className="text-xs font-bold font-sans-custom">{toast.message}</span>
+        </div>
+      )}
+
+      {/* Approval Duration Selection Modal */}
+      {showApprovalModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 animate-fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+            {/* Ambient Background Glow */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+              {language === 'jp' ? 'ユーザー承認期間の選択' : 'Select Approval Duration'}
+            </h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-5">
+              {language === 'jp'
+                ? 'このユーザーの有効期限を選択してください。期限が切れると自動的にアクセスが制限されます。'
+                : 'Select how long this user should remain approved. Once expired, access is revoked automatically.'}
+            </p>
+
+            <div className="space-y-3 mb-6">
+              {[
+                { value: 'permanent', label: language === 'jp' ? '無期限 (永久承認)' : 'Indefinite / Permanent' },
+                { value: '1day', label: language === 'jp' ? '24時間 (1日間)' : '24 Hours (1 Day)' },
+                { value: '7days', label: language === 'jp' ? '7日間 (1週間)' : '7 Days (1 Week)' },
+                { value: '30days', label: language === 'jp' ? '30日間 (1ヶ月間)' : '30 Days (1 Month)' },
+                { value: '1year', label: language === 'jp' ? '1年間 (365日間)' : '1 Year (365 Days)' },
+                { value: 'custom', label: language === 'jp' ? 'カスタム期限指定' : 'Custom Expiry Date' }
+              ].map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer text-xs font-semibold ${
+                    durationOption === opt.value
+                      ? 'bg-purple-50/50 dark:bg-purple-950/10 border-purple-500/50 text-purple-700 dark:text-purple-300'
+                      : 'bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/50 dark:hover:bg-zinc-850/30'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="duration"
+                    value={opt.value}
+                    checked={durationOption === opt.value}
+                    onChange={() => setDurationOption(opt.value as any)}
+                    className="sr-only"
+                  />
+                  <div
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                      durationOption === opt.value
+                        ? 'border-purple-500'
+                        : 'border-zinc-300 dark:border-zinc-700'
+                    }`}
+                  >
+                    {durationOption === opt.value && (
+                      <div className="w-2 h-2 rounded-full bg-purple-500" />
+                    )}
+                  </div>
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+
+              {/* Custom Date Input Field */}
+              {durationOption === 'custom' && (
+                <div className="pt-2 animate-fade-in">
+                  <input
+                    type="datetime-local"
+                    value={customDate}
+                    onChange={(e) => setCustomDate(e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 transition-all font-mono-custom"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowApprovalModal(false)
+                  setModalProfileId(null)
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+              >
+                {language === 'jp' ? 'キャンセル' : 'Cancel'}
+              </button>
+              <button
+                onClick={handleConfirmApproval}
+                className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all active:scale-95 shadow-md shadow-purple-500/10 cursor-pointer"
+              >
+                {language === 'jp' ? '承認を適用' : 'Approve User'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
