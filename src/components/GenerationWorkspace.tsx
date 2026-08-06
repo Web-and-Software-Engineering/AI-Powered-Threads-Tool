@@ -171,7 +171,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                 <button
                   type="button"
                   onClick={handleAutoFill}
-                  className="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-750 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                  className="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-750 text-zinc-700 dark:text-zinc-100 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
                 >
                   ⚡ Auto-fill
                 </button>
