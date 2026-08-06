@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Sparkles, MessageSquare, Lightbulb, Search, Loader2, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Sparkles, MessageSquare, Lightbulb, Search, Loader2, CheckCircle2, ArrowRight, FileText } from 'lucide-react'
 import { ProfileData } from './ProfileWorkspace'
 import { PostEditor } from './PostEditor'
 import { generateThreadsPost } from '@/app/actions/generate'
@@ -135,6 +135,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   const { t, language } = useLanguage()
   const [topic, setTopic] = useState('')
   const [coreMessage, setCoreMessage] = useState('')
+  const [referencePosts, setReferencePosts] = useState('')
   const [generationStep, setGenerationStep] = useState<StepState>('idle')
   const [generatedDraft, setGeneratedDraft] = useState<string | null>(null)
   const [threadsAccount, setThreadsAccount] = useState<{ username: string; avatarUrl: string } | null>(null)
@@ -179,6 +180,13 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
 
     setTopic(selected.topic)
     setCoreMessage(selected.core)
+
+    // Set mock reference pattern structures for pattern matching
+    setReferencePosts(
+      language === 'jp'
+        ? `【参考フック例】\n思わず目が留まる印象的な1行目のフック（書き出し）\n\n【構成のポイント】\n・具体的かつ実践的なメリットや事実を示す箇条書きポイント1\n・再現性の高い行動や数値を交えた箇条書きポイント2\n\n【結び】\n簡潔なまとめ、または読み手への問いかけやアクションの喚起。`
+        : `[Engaging Hook Example]\nAn attention-grabbing first line to hook readers instantly.\n\n[Structural Points]\n- Actionable insight or concrete benefit point 1\n- Measurable metric or proof of concept point 2\n\n[Call to Action]\nSimple concluding takeaway or conversational question.`
+    )
   }
 
   const handleGenerate = async (e: React.FormEvent) => {
@@ -206,6 +214,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
       const draft = await generateThreadsPost({
         topic,
         coreMessage,
+        referencePosts: referencePosts.trim() || undefined,
         authorPersona: profile.authorPersona,
         personalityTraits: profile.personalityTraits,
         likesDislikes: profile.likesDislikes,
@@ -235,7 +244,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     onPostCreated({
       topic,
       coreMessage,
-      referencePosts: '[Auto-scraped via AI Theme Search]',
+      referencePosts: referencePosts.trim() || '[Auto-scraped via AI Theme Search]',
       generatedContent: finalContent,
       status: 'published',
     })
@@ -288,6 +297,21 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                   value={coreMessage}
                   onChange={(e) => setCoreMessage(e.target.value)}
                   placeholder={t('gen.message.placeholder')}
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-sans-custom leading-relaxed"
+                />
+              </div>
+
+              {/* Reference Posts for Pattern Matching */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" />
+                  {t('gen.reference')}
+                </label>
+                <textarea
+                  rows={4}
+                  value={referencePosts}
+                  onChange={(e) => setReferencePosts(e.target.value)}
+                  placeholder={t('gen.reference.placeholder')}
                   className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-sans-custom leading-relaxed"
                 />
               </div>
