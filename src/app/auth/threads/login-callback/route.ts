@@ -93,6 +93,21 @@ export async function GET(request: Request) {
       password: syntheticPassword,
     })
 
+    // If there is an existing mapping, verify that it matches our synthetic user credentials.
+    // If sign-in failed or the ID does not match, it means this Threads account is linked to a different (email) account.
+    if (existingMapping) {
+      if (authError || (authData?.user && authData.user.id !== existingMapping.user_id)) {
+        if (!authError) {
+          await supabase.auth.signOut()
+        }
+        return NextResponse.redirect(
+          `${origin}/auth?error=threads_already_linked&details=${encodeURIComponent(
+            'This Threads account is already connected to another email account. Please log in with that email account.'
+          )}`
+        )
+      }
+    }
+
     if (authError) {
       // New user — sign up
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { login, signup, loginWithThreads } from '@/app/actions/auth'
 import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { useLanguage } from '@/components/LanguageContext'
@@ -42,8 +42,29 @@ export default function AuthPage() {
     if (lower.includes('rate limit')) {
       return 'リクエストの制限回数を超えました。しばらく時間をおいて再試行してください。'
     }
+    if (lower.includes('already connected') || lower.includes('already linked') || lower.includes('threads_already_linked')) {
+      return 'このThreadsアカウントは既に別のメールアドレスと連携されています。そのメールアドレスでログインしてください。'
+    }
     return msg
   }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const err = params.get('error')
+      if (err) {
+        let errorMsg = err
+        if (err === 'threads_db_save_failed') {
+          errorMsg = 'Threads connection database save failed.'
+        } else if (err === 'threads_already_linked') {
+          errorMsg = 'This Threads account is already connected to another email account. Please log in with that email account.'
+        }
+        setError(translateErrorMessage(errorMsg))
+        const newUrl = window.location.pathname
+        window.history.replaceState({}, document.title, newUrl)
+      }
+    }
+  }, [language])
 
   const translateSuccessMessage = (msg: string) => {
     if (language !== 'jp') return msg
