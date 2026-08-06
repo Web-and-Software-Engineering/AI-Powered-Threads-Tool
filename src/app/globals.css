@@ -25,6 +25,20 @@
     --accent-threads: #18181b;
   }
 
+  .dark input, .dark textarea {
+    background-color: #161618 !important; /* Premium dark input background */
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+  }
+
+  .dark input::placeholder, .dark textarea::placeholder {
+    color: #71717a !important;
+  }
+
+  .dark input:focus, .dark textarea:focus {
+    border-color: #a855f7 !important;
+  }
+
   body {
     background-color: var(--bg-main);
     color: var(--text-primary);
