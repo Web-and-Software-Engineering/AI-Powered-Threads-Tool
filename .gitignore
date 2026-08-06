@@ -40,6 +40,9 @@ yarn-error.log*
 # mcp (local-only server config)
 .mcp.json
 
+# local dev tooling
+.claude/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
