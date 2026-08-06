@@ -1,0 +1,304 @@
+'use client'
+
+import React, { createContext, useContext, useState, useEffect } from 'react'
+
+export type Language = 'en' | 'jp'
+
+export interface LanguageContextProps {
+  language: Language
+  setLanguage: (lang: Language) => void
+  t: (key: string) => string
+}
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    // Nav / Global
+    "nav.profile": "Persona",
+    "nav.generate": "Generator",
+    "nav.analytics": "Analytics",
+    "nav.account": "Settings",
+    "nav.signout": "Sign Out",
+    "global.theme.dark": "Dark Mode",
+    "global.theme.light": "Light Mode",
+
+    // Auth
+    "auth.title": "ThreadCraft Pocket",
+    "auth.subtitle": "Automated Reference & Rewrite Loop",
+    "auth.email": "Email Address",
+    "auth.password": "Password",
+    "auth.confirmPassword": "Confirm Password",
+    "auth.signin": "Sign In",
+    "auth.signup": "Create Account",
+    "auth.authenticating": "Authenticating...",
+    "auth.or": "or",
+    "auth.oauth": "Continue with Threads",
+    "auth.toSignup": "Don't have an account? Sign Up",
+    "auth.toSignin": "Already have an account? Sign In",
+
+    // Generator Workspace
+    "gen.title": "Create New Threads Post",
+    "gen.subtitle": "Enter your theme and target message. The AI handles Threads scraping and structure analysis.",
+    "gen.theme": "Desired Theme",
+    "gen.theme.placeholder": "e.g. Productivity habits for remote builders",
+    "gen.message": "Key Message / Value to Deliver",
+    "gen.message.placeholder": "e.g. Sleep & deep work blocks beat grinding 14-hour days.",
+    "gen.reference": "Reference Posts (Optional)",
+    "gen.reference.placeholder": "Paste example posts to analyze structure (one per line)...",
+    "gen.activePocket": "Active Pocket",
+    "gen.audience": "Audience",
+    "gen.loaded": "Loaded",
+    "gen.autofill": "Auto-fill",
+    "gen.loop": "Start Generation Loop",
+    "gen.loop.generating": "Analyzing & Generating...",
+    "gen.editor.title": "Threads Draft Preview",
+    "gen.editor.subtitle": "Double check alignment before publishing or saving.",
+    "gen.editor.charLimit": "characters remaining",
+    "gen.editor.saving": "Saving Draft...",
+    "gen.editor.saveSuccess": "Saved to history!",
+    "gen.editor.save": "Save to History",
+    "gen.editor.publish": "Publish to Threads",
+    "gen.editor.publishing": "Publishing...",
+    "gen.editor.publishSuccess": "Published successfully!",
+    "gen.editor.connectedAs": "Connected as",
+
+    // Analytics
+    "analytics.title": "Threads Performance Loop",
+    "analytics.subtitle": "Audit your live posts and trigger automatic optimizations.",
+    "analytics.sync": "Sync Performance Data",
+    "analytics.syncing": "Syncing...",
+    "analytics.postsCount": "Total Tracked Posts",
+    "analytics.avgLikes": "Average Likes",
+    "analytics.avgReplies": "Average Replies",
+    "analytics.empty": "No posts tracked yet. Generate and publish to view performance analytics.",
+    "analytics.card.connected": "Connected",
+    "analytics.card.failed": "Failed",
+    "analytics.card.draft": "Draft",
+    "analytics.card.pending": "Pending Publish",
+    "analytics.card.restart": "Marked for Restart",
+
+    // Pocket (Profile)
+    "profile.title": "Pocket & Audience Hub",
+    "profile.subtitle": "Store your personal persona details (\"Pocket\") and target avatars.",
+    "profile.tab.pocket": "① The \"Pocket\" (My Persona)",
+    "profile.tab.audience": "② \"To Whom\" (Target Audience)",
+    "profile.bio": "Self-Introduction / Bio",
+    "profile.bio.placeholder": "Briefly introduce yourself (expertise, status, etc.)",
+    "profile.traits": "Personality Traits",
+    "profile.traits.placeholder": "e.g. Enthusiastic, meticulous, slightly contrarian, direct yet warm",
+    "profile.likes": "Likes & Dislikes",
+    "profile.likes.placeholder": "Likes: Clean code, deep coffee. Dislikes: Endless meetings.",
+    "profile.dreams": "Dreams & Long-term Goals",
+    "profile.dreams.placeholder": "e.g. Scaling my SaaS to $10k MRR and traveling.",
+    "profile.lifestyle": "Values & Lifestyle",
+    "profile.lifestyle.placeholder": "e.g. Asynchronous work, early mornings, active developer lifestyle",
+    "profile.outlook": "Outlook on Life",
+    "profile.outlook.placeholder": "e.g. Leverage automation to gain freedom",
+    "profile.audience": "Target Customer / Reader Profile",
+    "profile.audience.placeholder": "Describe your target audience...",
+    "profile.tone": "Preferred Tone",
+    "profile.tone.placeholder": "e.g. Friendly, professional, humorous",
+    "profile.constraints": "Formatting Constraints",
+    "profile.constraints.placeholder": "e.g. Keep sentences under 12 words, no hashtags",
+    "profile.saved": "Guidelines saved & applied!",
+    "profile.save": "Save Changes",
+
+    // Settings (Account)
+    "settings.title": "Account Credentials",
+    "settings.subtitle": "Manage your personal display name, profile avatar, and secure password updates.",
+    "settings.public": "Public Details",
+    "settings.photo": "Profile Photo",
+    "settings.photo.subtitle": "Synced via your linked Threads profile.",
+    "settings.displayName": "Display Name",
+    "settings.username": "Threads Account (Read Only)",
+    "settings.email": "Registered Email (Read Only)",
+    "settings.save": "Update Details",
+    "settings.saving": "Saving...",
+    "settings.saved": "Details updated successfully!",
+    "settings.password": "Password settings",
+    "settings.pwd.new": "New Password",
+    "settings.pwd.confirm": "Confirm New Password",
+    "settings.pwd.change": "Change Password",
+    "settings.pwd.changing": "Changing...",
+    "settings.pwd.changed": "Password updated successfully!",
+    "settings.threads": "Linked Threads Account",
+    "settings.threads.desc": "Connect your Threads account to publish directly from the app.",
+    "settings.threads.connected": "Connected",
+    "settings.threads.expires": "Token active · Expires on",
+    "settings.threads.disconnect": "Disconnect Account",
+    "settings.threads.disconnecting": "Processing...",
+    "settings.threads.connect": "Link Threads Account",
+    "settings.threads.modal.title": "Unlink Threads Account?",
+    "settings.threads.modal.desc": "Unlinking your Threads account will delete all generated posts, historical analytics, custom writing rules, and persona attributes permanently.",
+    "settings.threads.modal.warning": "CRITICAL WARNING: This will permanently wipe your accumulated AI-generated data. This action is irreversible.",
+    "settings.threads.modal.cancel": "Cancel",
+    "settings.threads.modal.confirm": "Delete & Unlink"
+  },
+  jp: {
+    // Nav / Global
+    "nav.profile": "ペルソナ",
+    "nav.generate": "ジェネレーター",
+    "nav.analytics": "分析",
+    "nav.account": "設定",
+    "nav.signout": "サインアウト",
+    "global.theme.dark": "ダークモード",
+    "global.theme.light": "ライトモード",
+
+    // Auth
+    "auth.title": "ThreadCraft Pocket",
+    "auth.subtitle": "自動ペルソナ参照・リライトループ",
+    "auth.email": "メールアドレス",
+    "auth.password": "パスワード",
+    "auth.confirmPassword": "パスワードの確認",
+    "auth.signin": "サインイン",
+    "auth.signup": "アカウント作成",
+    "auth.authenticating": "認証中...",
+    "auth.or": "または",
+    "auth.oauth": "Threadsでログイン",
+    "auth.toSignup": "アカウントをお持ちでないですか？ 新規登録",
+    "auth.toSignin": "すでにアカウントをお持ちですか？ ログイン",
+
+    // Generator Workspace
+    "gen.title": "スレッド新規作成",
+    "gen.subtitle": "テーマと伝えたい内容を入力してください。AIがThreadsの構造分析に基づいて投稿を作成します。",
+    "gen.theme": "テーマ",
+    "gen.theme.placeholder": "例: リモートワーカー向けの生産性向上ハック",
+    "gen.message": "キーメッセージ / 伝えたい価値",
+    "gen.message.placeholder": "例: 14時間ダラダラ働くより、睡眠と深い集中が効果的。",
+    "gen.reference": "参考にする投稿 (任意)",
+    "gen.reference.placeholder": "構造分析したい参考投稿をペーストしてください (1行につき1件)...",
+    "gen.activePocket": "有効なペルソナ",
+    "gen.audience": "ターゲット層",
+    "gen.loaded": "読み込み済み",
+    "gen.autofill": "自動入力",
+    "gen.loop": "スレッド作成ループ開始",
+    "gen.loop.generating": "分析・生成中...",
+    "gen.editor.title": "Threads 下書きプレビュー",
+    "gen.editor.subtitle": "投稿または保存する前に、内容を確認してください。",
+    "gen.editor.charLimit": "文字残り",
+    "gen.editor.saving": "下書き保存中...",
+    "gen.editor.saveSuccess": "履歴に保存されました！",
+    "gen.editor.save": "履歴に保存",
+    "gen.editor.publish": "Threadsに投稿",
+    "gen.editor.publishing": "投稿中...",
+    "gen.editor.publishSuccess": "Threadsへ投稿しました！",
+    "gen.editor.connectedAs": "接続中:",
+
+    // Analytics
+    "analytics.title": "Threads パフォーマンスループ",
+    "analytics.subtitle": "投稿のパフォーマンスを確認し、自動最適化をトリガーします。",
+    "analytics.sync": "実績データを同期",
+    "analytics.syncing": "同期中...",
+    "analytics.postsCount": "総トラッキング投稿数",
+    "analytics.avgLikes": "平均いいね数",
+    "analytics.avgReplies": "平均返信数",
+    "analytics.empty": "まだ投稿がありません。スレッドを生成・公開してパフォーマンス分析を開始しましょう。",
+    "analytics.card.connected": "公開済み",
+    "analytics.card.failed": "エラー",
+    "analytics.card.draft": "下書き",
+    "analytics.card.pending": "公開保留中",
+    "analytics.card.restart": "再構築マーク",
+
+    // Pocket (Profile)
+    "profile.title": "ペルソナ ＆ ターゲットハブ",
+    "profile.subtitle": "あなたのペルソナ情報 (Pocket) とターゲット属性を設定します。",
+    "profile.tab.pocket": "① The \"Pocket\" (あなたのペルソナ)",
+    "profile.tab.audience": "② \"To Whom\" (ターゲット属性)",
+    "profile.bio": "自己紹介 / バイオ",
+    "profile.bio.placeholder": "あなたの専門分野や略歴を紹介してください",
+    "profile.traits": "性格の特徴",
+    "profile.traits.placeholder": "例: 熱心、几帳面、少し反対意見、親切で温かい",
+    "profile.likes": "好きなこと・嫌いなこと",
+    "profile.likes.placeholder": "好き: クリーンコード、深いコーヒー。嫌い: 長引く会議。",
+    "profile.dreams": "将来の夢・長期目標",
+    "profile.dreams.placeholder": "例: SaaSを月100万円規模にして旅行しながら働くこと。",
+    "profile.lifestyle": "価値観とライフスタイル",
+    "profile.lifestyle.placeholder": "例: 非同期コミュニケーション、朝型生活、開発者ライフスタイル",
+    "profile.outlook": "人生観・考え方",
+    "profile.outlook.placeholder": "例: 自動化を活用して自由時間を獲得する",
+    "profile.audience": "ターゲット読者層",
+    "profile.audience.placeholder": "あなたのターゲット層を説明してください...",
+    "profile.tone": "トーン＆マナー",
+    "profile.tone.placeholder": "例: フレンドリー、プロフェッショナル、ユーモラス",
+    "profile.constraints": "フォーマットの制約ルール",
+    "profile.constraints.placeholder": "例: 1文は12文字以内にする、ハッシュタグ禁止",
+    "profile.saved": "設定を保存し適用しました！",
+    "profile.save": "変更を保存",
+
+    // Settings (Account)
+    "settings.title": "アカウント認証情報",
+    "settings.subtitle": "表示名、プロフィール画像、パスワードの変更管理を行います。",
+    "settings.public": "公開情報",
+    "settings.photo": "プロフィール写真",
+    "settings.photo.subtitle": "接続中のThreadsアカウントと同期しています。",
+    "settings.displayName": "表示名",
+    "settings.username": "Threadsアカウント (読み取り専用)",
+    "settings.email": "登録用メールアドレス (読み取り専用)",
+    "settings.save": "詳細を更新",
+    "settings.saving": "保存中...",
+    "settings.saved": "更新に成功しました！",
+    "settings.password": "パスワードの設定",
+    "settings.pwd.new": "新しいパスワード",
+    "settings.pwd.confirm": "新しいパスワード (再入力)",
+    "settings.pwd.change": "パスワードを変更",
+    "settings.pwd.changing": "変更中...",
+    "settings.pwd.changed": "パスワードの変更に成功しました！",
+    "settings.threads": "連携済みのThreadsアカウント",
+    "settings.threads.desc": "直接投稿するために、Threadsアカウントと接続します。",
+    "settings.threads.connected": "連携中",
+    "settings.threads.expires": "トークン有効 · 有効期限:",
+    "settings.threads.disconnect": "連携解除する",
+    "settings.threads.disconnecting": "処理中...",
+    "settings.threads.connect": "Threadsアカウントと連携",
+    "settings.threads.modal.title": "Threadsアカウントの連携を解除しますか？",
+    "settings.threads.modal.desc": "連携を解除すると、作成した投稿、蓄積されたデータ、ペルソナ設定などが完全に削除されます。",
+    "settings.threads.modal.warning": "注意: この操作を行うと永久にデータが消去されます。元に戻すことはできません。",
+    "settings.threads.modal.cancel": "キャンセル",
+    "settings.threads.modal.confirm": "消去して連携解除"
+  }
+}
+
+const LanguageContext = createContext<LanguageContextProps | undefined>(undefined)
+
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [language, setLanguageState] = useState<Language>('en')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const cached = localStorage.getItem('language') as Language
+    if (cached === 'en' || cached === 'jp') {
+      setLanguageState(cached)
+      document.documentElement.setAttribute('lang', cached)
+    } else {
+      // Browser auto detect
+      const lang = navigator.language.startsWith('ja') ? 'jp' : 'en'
+      setLanguageState(lang)
+      document.documentElement.setAttribute('lang', lang)
+    }
+    setMounted(true)
+  }, [])
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang)
+    localStorage.setItem('language', lang)
+    document.documentElement.setAttribute('lang', lang)
+  }
+
+  const t = (key: string): string => {
+    return translations[language][key] || translations['en'][key] || key
+  }
+
+  // Render children normally but wait for load if reading language
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  )
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext)
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider')
+  }
+  return context
+}

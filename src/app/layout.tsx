@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeContext";
+import { LanguageProvider } from "@/components/LanguageContext";
 
 export const metadata: Metadata = {
   title: "ThreadCraft AI • Threads Content Generator & Analytics Engine",
@@ -24,13 +25,22 @@ export default function RootLayout({
             } else {
               document.documentElement.classList.remove('dark');
             }
+
+            const savedLang = localStorage.getItem('language');
+            if (savedLang === 'en' || savedLang === 'jp') {
+              document.documentElement.setAttribute('lang', savedLang);
+            } else if (navigator.language.startsWith('ja')) {
+              document.documentElement.setAttribute('lang', 'jp');
+            }
           } catch (_) {}
         `}} />
       </head>
       <body className="min-h-full flex flex-col bg-[var(--bg-main)] text-[var(--text-primary)] font-sans-custom transition-colors duration-200" suppressHydrationWarning>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <LanguageProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

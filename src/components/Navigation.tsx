@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut, User, Sun, Moon } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 import { useTheme } from './ThemeContext'
+import { useLanguage } from './LanguageContext'
 
 export function Navigation() {
   const pathname = usePathname()
@@ -17,6 +18,7 @@ export function Navigation() {
     pathname.startsWith('/account') ? 'account' : 'workspace';
 
   const { theme, toggleTheme } = useTheme()
+  const { language, setLanguage, t } = useLanguage()
 
   const handleLogout = async () => {
     await logout()
@@ -49,7 +51,7 @@ export function Navigation() {
                 }`}
               >
                 <FolderHeart className="w-3.5 h-3.5" />
-                POCKET
+                {t('nav.profile')}
               </Link>
 
               <Link
@@ -61,7 +63,7 @@ export function Navigation() {
                 }`}
               >
                 <PenSquare className="w-3.5 h-3.5" />
-                Post Generation
+                {t('nav.generate')}
               </Link>
 
               <Link
@@ -73,7 +75,7 @@ export function Navigation() {
                 }`}
               >
                 <BarChart3 className="w-3.5 h-3.5" />
-                Analytics
+                {t('nav.analytics')}
               </Link>
 
               <Link
@@ -85,13 +87,21 @@ export function Navigation() {
                 }`}
               >
                 <User className="w-3.5 h-3.5" />
-                Account
+                {t('nav.account')}
               </Link>
             </nav>
 
             <button
+              onClick={() => setLanguage(language === 'en' ? 'jp' : 'en')}
+              title={language === 'en' ? '日本語に切り替え' : 'Switch to English'}
+              className="px-2.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition-all font-mono-custom text-xs font-bold cursor-pointer shrink-0"
+            >
+              {language === 'en' ? 'JP' : 'EN'}
+            </button>
+
+            <button
               onClick={toggleTheme}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              title={theme === 'dark' ? t('global.theme.light') : t('global.theme.dark')}
               className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shrink-0"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -99,7 +109,7 @@ export function Navigation() {
 
             <button
               onClick={handleLogout}
-              title="Sign Out"
+              title={t('nav.signout')}
               className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-zinc-500 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shrink-0"
             >
               <LogOut className="w-4 h-4" />
@@ -123,8 +133,16 @@ export function Navigation() {
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setLanguage(language === 'en' ? 'jp' : 'en')}
+              title={language === 'en' ? '日本語に切り替え' : 'Switch to English'}
+              className="px-2 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-650 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition-all font-mono-custom text-[10px] font-bold cursor-pointer"
+            >
+              {language === 'en' ? 'JP' : 'EN'}
+            </button>
+
+            <button
               onClick={toggleTheme}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              title={theme === 'dark' ? t('global.theme.light') : t('global.theme.dark')}
               className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -148,7 +166,7 @@ export function Navigation() {
           }`}
         >
           <FolderHeart className="w-5 h-5" />
-          <span className="text-[10px] font-medium">POCKET</span>
+          <span className="text-[10px] font-medium">{t('nav.profile')}</span>
         </Link>
 
         <Link
@@ -158,7 +176,7 @@ export function Navigation() {
           }`}
         >
           <PenSquare className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Post Generation</span>
+          <span className="text-[10px] font-medium">{t('nav.generate')}</span>
         </Link>
 
         <Link
@@ -168,7 +186,7 @@ export function Navigation() {
           }`}
         >
           <BarChart3 className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Analytics</span>
+          <span className="text-[10px] font-medium">{t('nav.analytics')}</span>
         </Link>
 
         <Link
@@ -178,7 +196,7 @@ export function Navigation() {
           }`}
         >
           <User className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Account</span>
+          <span className="text-[10px] font-medium">{t('nav.account')}</span>
         </Link>
       </nav>
     </>

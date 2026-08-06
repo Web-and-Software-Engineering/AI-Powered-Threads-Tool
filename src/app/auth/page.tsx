@@ -3,8 +3,10 @@
 import React, { useState } from 'react'
 import { login, signup, loginWithThreads } from '@/app/actions/auth'
 import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { useLanguage } from '@/components/LanguageContext'
 
 export default function AuthPage() {
+  const { t, language } = useLanguage()
   const [isRegister, setIsRegister] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -39,7 +41,7 @@ export default function AuthPage() {
         }
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.')
+      setError(err.message || (language === 'jp' ? '予期しないエラーが発生しました。' : 'An unexpected error occurred.'))
     } finally {
       setLoading(false)
     }
@@ -55,7 +57,7 @@ export default function AuthPage() {
         window.location.href = result.redirect
       }
     } catch (err: any) {
-      setError(err.message || 'OAuth initialization failed.')
+      setError(err.message || (language === 'jp' ? 'OAuthの初期化に失敗しました。' : 'OAuth initialization failed.'))
     }
   }
 
@@ -72,7 +74,7 @@ export default function AuthPage() {
           </div>
           <div>
             <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">ThreadCraft Pocket</h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">Automated Reference & Rewrite Loop</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">{language === 'jp' ? '参考投稿の自動取得・リライトループ' : 'Automated Reference & Rewrite Loop'}</p>
           </div>
         </div>
 
@@ -97,7 +99,7 @@ export default function AuthPage() {
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5 text-purple-600" />
-              Email Address
+              {language === 'jp' ? 'メールアドレス' : 'Email Address'}
             </label>
             <input
               type="email"
@@ -112,7 +114,7 @@ export default function AuthPage() {
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-purple-600" />
-              Password
+              {language === 'jp' ? 'パスワード' : 'Password'}
             </label>
             <div className="relative">
               <input
@@ -137,7 +139,7 @@ export default function AuthPage() {
             <div className="space-y-1.5 animate-fade-in">
               <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-purple-600" />
-                Confirm Password
+                {language === 'jp' ? 'パスワード（確認）' : 'Confirm Password'}
               </label>
               <div className="relative">
                 <input
@@ -164,7 +166,11 @@ export default function AuthPage() {
             disabled={loading}
             className="w-full py-3.5 mt-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
-            {loading ? 'Authenticating...' : isRegister ? 'Create Account' : 'Sign In'}
+            {loading 
+              ? (language === 'jp' ? '認証中...' : 'Authenticating...') 
+              : isRegister 
+                ? (language === 'jp' ? 'アカウント作成' : 'Create Account') 
+                : (language === 'jp' ? 'ログイン' : 'Sign In')}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
@@ -172,7 +178,7 @@ export default function AuthPage() {
         {/* Divider */}
         <div className="relative flex py-5 items-center">
           <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-          <span className="flex-shrink mx-4 text-zinc-400 dark:text-zinc-550 text-[10px] font-mono-custom uppercase tracking-wider">or</span>
+          <span className="flex-shrink mx-4 text-zinc-400 dark:text-zinc-550 text-[10px] font-mono-custom uppercase tracking-wider">{language === 'jp' ? 'または' : 'or'}</span>
           <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
         </div>
 
@@ -182,7 +188,7 @@ export default function AuthPage() {
           className="w-full py-3.5 bg-black dark:bg-white hover:bg-zinc-900 dark:hover:bg-zinc-100 text-white dark:text-black rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-md"
         >
           <Sparkles className="w-4.5 h-4.5 text-purple-400 animate-pulse" />
-          Continue with Threads
+          {language === 'jp' ? 'Threadsでサインイン' : 'Continue with Threads'}
         </button>
 
         {/* Toggle Mode */}
@@ -195,7 +201,9 @@ export default function AuthPage() {
             }}
             className="text-xs text-purple-600 hover:text-purple-700 font-semibold transition-colors cursor-pointer"
           >
-            {isRegister ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+            {isRegister 
+              ? (language === 'jp' ? 'すでにアカウントをお持ちですか？ログイン' : 'Already have an account? Sign In') 
+              : (language === 'jp' ? 'アカウントをお持ちでないですか？新規登録' : "Don't have an account? Sign Up")}
           </button>
         </div>
       </div>

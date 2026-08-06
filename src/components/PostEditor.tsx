@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Send, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react'
+import { useLanguage } from './LanguageContext'
 
 interface PostEditorProps {
   initialContent: string
@@ -20,6 +21,7 @@ export function PostEditor({
   onRegenerate,
   threadsAccount,
 }: PostEditorProps) {
+  const { t, language } = useLanguage()
   const [content, setContent] = useState(initialContent)
   const [publishing, setPublishing] = useState(false)
   const [published, setPublished] = useState(false)
@@ -53,10 +55,10 @@ export function PostEditor({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            Generated Single-Text Draft
+            {language === 'jp' ? '生成された下書き' : 'Generated Single-Text Draft'}
           </h3>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
-            Review and refine your post before publishing directly to Threads.
+            {language === 'jp' ? 'Threadsに直接投稿する前に、内容を確認・調整してください。' : 'Review and refine your post before publishing directly to Threads.'}
           </p>
         </div>
 
@@ -65,7 +67,7 @@ export function PostEditor({
             onClick={onRegenerate}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-xs font-mono-custom transition-all"
           >
-            <RefreshCw className="w-3.5 h-3.5" /> Re-roll
+            <RefreshCw className="w-3.5 h-3.5" /> {language === 'jp' ? '再作成' : 'Re-roll'}
           </button>
         )}
       </div>
@@ -73,7 +75,7 @@ export function PostEditor({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Editor Column */}
         <div className="space-y-3">
-          <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">Editable Content</label>
+          <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">{language === 'jp' ? '下書き編集' : 'Editable Content'}</label>
           <div className="relative">
             <textarea
               rows={8}
@@ -84,7 +86,7 @@ export function PostEditor({
 
             <div className="flex items-center justify-between mt-2 px-1">
               <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono-custom">
-                Target: {topic ? `"${topic}"` : 'Single post'}
+                {language === 'jp' ? 'ターゲット' : 'Target'}: {topic ? `"${topic}"` : 'Single post'}
               </span>
 
               <div className="flex items-center gap-2 font-mono-custom text-xs">
@@ -105,14 +107,14 @@ export function PostEditor({
 
           {isOverLimit && (
             <p className="text-xs text-rose-600 flex items-center gap-1.5 font-mono-custom font-medium">
-              <AlertCircle className="w-3.5 h-3.5" /> Exceeds Threads 500-character limit.
+              <AlertCircle className="w-3.5 h-3.5" /> {language === 'jp' ? 'Threadsの500文字制限を超えています。' : 'Exceeds Threads 500-character limit.'}
             </p>
           )}
         </div>
 
         {/* Live Preview Column */}
         <div className="space-y-3">
-          <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">Threads Live Preview</label>
+          <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">{language === 'jp' ? 'プレビュー' : 'Threads Live Preview'}</label>
           <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4 shadow-sm">
             <div className="flex items-start gap-3">
               {threadsAccount?.avatarUrl ? (
@@ -132,10 +134,10 @@ export function PostEditor({
                   <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
                     {threadsAccount?.username ? `@${threadsAccount.username}` : '@creator_brand'}
                   </span>
-                  <span className="text-[11px] text-zinc-400 dark:text-zinc-450 font-mono-custom shrink-0 ml-2">Now</span>
+                  <span className="text-[11px] text-zinc-400 dark:text-zinc-450 font-mono-custom shrink-0 ml-2">{language === 'jp' ? '今' : 'Now'}</span>
                 </div>
                 <div className="mt-2 text-xs text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap break-words leading-relaxed font-sans-custom">
-                  {content || <span className="text-zinc-400 dark:text-zinc-550 italic">Draft is empty...</span>}
+                  {content || <span className="text-zinc-400 dark:text-zinc-550 italic">{language === 'jp' ? '下書きが空です...' : 'Draft is empty...'}</span>}
                 </div>
               </div>
             </div>
@@ -154,25 +156,25 @@ export function PostEditor({
         <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
           {published ? (
             <span className="text-emerald-600 dark:text-emerald-450 flex items-center gap-1.5 font-semibold">
-              <CheckCircle2 className="w-4 h-4" /> Published to Threads successfully!
+              <CheckCircle2 className="w-4 h-4" /> {language === 'jp' ? 'Threadsへの投稿が完了しました！' : 'Published to Threads successfully!'}
             </span>
           ) : (
-            'Threads API Active'
+            language === 'jp' ? 'Threads API 有効' : 'Threads API Active'
           )}
         </div>
 
         <button
           onClick={handlePublish}
           disabled={publishing || isOverLimit || !content.trim()}
-          className="flex items-center gap-2 px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md"
+          className="flex items-center gap-2 px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md animate-fade-in"
         >
           {publishing ? (
             <>
-              <RefreshCw className="w-4 h-4 animate-spin" /> Publishing...
+              <RefreshCw className="w-4 h-4 animate-spin" /> {language === 'jp' ? '投稿中...' : 'Publishing...'}
             </>
           ) : (
             <>
-              <Send className="w-4 h-4" /> Publish to Threads
+              <Send className="w-4 h-4" /> {language === 'jp' ? 'Threadsに投稿' : 'Publish to Threads'}
             </>
           )}
         </button>

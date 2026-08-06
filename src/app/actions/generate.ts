@@ -16,6 +16,7 @@ interface GenerateParams {
   targetAudience?: string
   preferredTone?: string
   writingStyleRules?: string
+  language?: 'en' | 'jp'
 }
 
 export async function generateThreadsPost(params: GenerateParams) {
@@ -23,6 +24,18 @@ export async function generateThreadsPost(params: GenerateParams) {
 
   if (!apiKey || apiKey === 'your-openai-api-key-here' || apiKey === 'your-openrouter-api-key-here') {
     // Fallback template when API key is not configured yet
+    if (params.language === 'jp') {
+      return `${params.topic.toUpperCase()} 🚀
+
+${params.coreMessage ? params.coreMessage : '今日知っておくべき重要なインサイトはこちらです：'}
+
+1. ノイズを排し、シグナルを最大化する。
+2. 実証済みのパターンを自分自身の声に適応させる。
+3. エンゲージメントを追跡して今後の投稿を改善する。
+
+あなたの最大の学びは何ですか？ぜひ以下で教えてください。👇`
+    }
+
     return `${params.topic.toUpperCase()} 🚀
 
 ${params.coreMessage ? params.coreMessage : 'Here is the key insight you need to know today:'}
@@ -62,6 +75,7 @@ CRITICAL CONSTRAINTS:
 - Must deliver the specified core message clearly.
 - No spammy hashtags or cheesy engagement bait.
 - Strictly write in PLAIN TEXT. Never use Markdown formatting (do NOT use **bold**, *italics*, _italics_, or headings). Threads does not support rich text or markdown formatting and will display them as raw characters.
+${params.language === 'jp' ? '- Write the final output post in Japanese (日本語).' : '- Write the final output post in English.'}
 `
 
   const userPrompt = `

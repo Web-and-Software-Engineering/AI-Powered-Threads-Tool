@@ -6,6 +6,7 @@ import { ProfileData } from './ProfileWorkspace'
 import { PostEditor } from './PostEditor'
 import { generateThreadsPost } from '@/app/actions/generate'
 import { publishToThreadsApi, checkThreadsConnection } from '@/app/actions/threads'
+import { useLanguage } from './LanguageContext'
 
 interface GenerationWorkspaceProps {
   profile: ProfileData
@@ -21,6 +22,7 @@ interface GenerationWorkspaceProps {
 type StepState = 'idle' | 'searching' | 'analyzing' | 'synthesizing' | 'drafting' | 'completed'
 
 export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorkspaceProps) {
+  const { t, language } = useLanguage()
   const [topic, setTopic] = useState('')
   const [coreMessage, setCoreMessage] = useState('')
   const [generationStep, setGenerationStep] = useState<StepState>('idle')
@@ -41,8 +43,13 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   }, [])
 
   const handleAutoFill = () => {
-    setTopic('Productivity frameworks for remote solopreneurs')
-    setCoreMessage('Doing deep focus blocks of 4 hours yields more results than working 14 hours fragmented.')
+    if (language === 'jp') {
+      setTopic('リモート個人開発者の生産性フレームワーク')
+      setCoreMessage('断片的な14時間作業より、4時間のディープフォーカスブロックを作る方が成果が上がる。')
+    } else {
+      setTopic('Productivity frameworks for remote solopreneurs')
+      setCoreMessage('Doing deep focus blocks of 4 hours yields more results than working 14 hours fragmented.')
+    }
   }
 
   const handleGenerate = async (e: React.FormEvent) => {
@@ -80,6 +87,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         targetAudience: profile.targetAudience,
         preferredTone: profile.preferredTone,
         writingStyleRules: profile.writingStyleRules,
+        language,
       })
       setGeneratedDraft(draft)
       setGenerationStep('completed')
@@ -115,9 +123,9 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Create New Threads Post</h2>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{t('gen.title')}</h2>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
-                Enter your theme and target message. The AI handles Threads scraping and structure analysis.
+                {t('gen.subtitle')}
               </p>
             </div>
           </div>
@@ -128,14 +136,14 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1.5">
                   <Lightbulb className="w-3.5 h-3.5" />
-                  Desired Theme
+                  {t('gen.theme')}
                 </label>
                 <input
                   type="text"
                   required
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  placeholder="e.g. Productivity habits for remote builders"
+                  placeholder={t('gen.theme.placeholder')}
                   className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
                 />
               </div>
@@ -144,13 +152,13 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1.5">
                   <MessageSquare className="w-3.5 h-3.5" />
-                  Key Message / Value to Deliver
+                  {t('gen.message')}
                 </label>
                 <textarea
                   rows={3}
                   value={coreMessage}
                   onChange={(e) => setCoreMessage(e.target.value)}
-                  placeholder="e.g. Sleep & deep work blocks beat grinding 14-hour days."
+                  placeholder={t('gen.message.placeholder')}
                   className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-sans-custom leading-relaxed"
                 />
               </div>
@@ -159,10 +167,10 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
             {/* Persona Summary Status */}
             <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs font-mono-custom text-zinc-600 dark:text-zinc-400 flex flex-col md:flex-row justify-between gap-2">
               <span>
-                Active Pocket: <strong className="text-purple-600 dark:text-purple-400">Bio, Traits, Dreams Loaded</strong>
+                {t('gen.activePocket')}: <strong className="text-purple-600 dark:text-purple-400">{t('gen.loaded')}</strong>
               </span>
               <span>
-                Audience: <strong className="text-purple-600 dark:text-purple-400">{profile.targetAudience ? profile.targetAudience.slice(0, 30) + '...' : 'General'}</strong>
+                {t('gen.audience')}: <strong className="text-purple-600 dark:text-purple-400">{profile.targetAudience ? profile.targetAudience.slice(0, 30) + '...' : 'General'}</strong>
               </span>
             </div>
 
@@ -173,7 +181,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                   onClick={handleAutoFill}
                   className="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-100 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
                 >
-                  ⚡ Auto-fill
+                  ⚡ {t('gen.autofill')}
                 </button>
               )}
               <button
@@ -181,7 +189,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                 disabled={!topic.trim()}
                 className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/25 transition-all active:scale-95 cursor-pointer"
               >
-                <Sparkles className="w-4 h-4" /> Start Generation Loop
+                <Sparkles className="w-4 h-4" /> {t('gen.loop')}
               </button>
             </div>
           </form>
@@ -190,8 +198,12 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         /* Multi-Stage Loading Pipeline Screen */
         <div className="glass-panel p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center space-y-8 animate-fade-in max-w-lg mx-auto">
           <div className="space-y-2">
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">AI Scrape & Rewrite Engine</h3>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">Executing automated Threads analysis pipeline...</p>
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              {language === 'jp' ? 'AIデータ収集・リライトエンジン' : 'AI Scrape & Rewrite Engine'}
+            </h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
+              {language === 'jp' ? '自動Threads投稿分析パイプライン実行中...' : 'Executing automated Threads analysis pipeline...'}
+            </p>
           </div>
 
           <div className="space-y-4 max-w-sm mx-auto text-left">
@@ -203,7 +215,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               )}
               <span className={`text-xs font-mono-custom ${generationStep === 'searching' ? 'text-purple-600 font-bold' : 'text-zinc-500 dark:text-zinc-400'}`}>
-                1. Searching Threads for similar posts...
+                {language === 'jp' ? '1. Threadsで類似の投稿を検索中...' : '1. Searching Threads for similar posts...'}
               </span>
             </div>
 
@@ -217,7 +229,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               )}
               <span className={`text-xs font-mono-custom ${generationStep === 'analyzing' ? 'text-purple-600 font-bold' : 'text-zinc-500 dark:text-zinc-400'}`}>
-                2. Analyzing top engagement structures...
+                {language === 'jp' ? '2. エンゲージメントの高い投稿構造を分析中...' : '2. Analyzing top engagement structures...'}
               </span>
             </div>
 
@@ -231,7 +243,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               )}
               <span className={`text-xs font-mono-custom ${generationStep === 'synthesizing' ? 'text-purple-600 font-bold' : 'text-zinc-500 dark:text-zinc-400'}`}>
-                3. Injecting Pocket Persona & Audience...
+                {language === 'jp' ? '3. ペルソナとターゲット属性をインプット中...' : '3. Injecting Pocket Persona & Audience...'}
               </span>
             </div>
 
@@ -245,7 +257,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               )}
               <span className={`text-xs font-mono-custom ${generationStep === 'drafting' ? 'text-purple-600 font-bold' : 'text-zinc-500 dark:text-zinc-400'}`}>
-                4. Generating personalized draft...
+                {language === 'jp' ? '4. パーソナライズされた下書きを作成中...' : '4. Generating personalized draft...'}
               </span>
             </div>
           </div>
@@ -261,13 +273,13 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         <div className="space-y-4">
           <div className="flex justify-between items-center px-1">
             <span className="text-xs text-emerald-600 font-mono-custom font-semibold flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" /> AI Generation Pipeline Complete
+              <CheckCircle2 className="w-4 h-4" /> {language === 'jp' ? 'AI生成パイプライン完了' : 'AI Generation Pipeline Complete'}
             </span>
             <button
               onClick={() => setGenerationStep('idle')}
               className="text-xs text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 font-mono-custom flex items-center gap-1 cursor-pointer"
             >
-              Start New Post <ArrowRight className="w-3.5 h-3.5" />
+              {language === 'jp' ? '新しく作成する' : 'Start New Post'} <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
           <PostEditor

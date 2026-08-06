@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { User, Key, AlertCircle, CheckCircle, Camera, Check, Eye, EyeOff, Sparkles, ExternalLink } from 'lucide-react'
 import { updateAccountProfile, changeUserPassword } from '@/app/actions/profile'
 import { getThreadsAuthUrl, disconnectThreads } from '@/app/actions/threads'
+import { useLanguage } from './LanguageContext'
 
 // Default fallback avatar
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
@@ -33,6 +34,7 @@ export function AccountSettings({
   threadsLoading = false,
   threadsExpiresAt = '',
 }: AccountSettingsProps) {
+  const { t, language } = useLanguage()
   const [displayName, setDisplayName] = useState(initialDisplayName)
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
   const [profileError, setProfileError] = useState<string | null>(null)
@@ -73,7 +75,7 @@ export function AccountSettings({
       if (result?.error) {
         setProfileError(result.error)
       } else {
-        setProfileSuccess('Profile updated successfully!')
+        setProfileSuccess(t('settings.saved'))
       }
     } catch (err: any) {
       setProfileError(err.message || 'An unexpected error occurred.')
@@ -97,7 +99,7 @@ export function AccountSettings({
       if (result?.error) {
         setPwdError(result.error)
       } else {
-        setPwdSuccess('Password changed successfully!')
+        setPwdSuccess(t('settings.pwd.changed'))
         setPassword('')
         setConfirmPassword('')
       }
@@ -129,7 +131,7 @@ export function AccountSettings({
           setConnUsername('')
           setConnDisplayName('')
           setConnAvatarUrl('')
-          setThreadsSuccess('Threads account unlinked successfully! All AI profile data has been deleted.')
+          setThreadsSuccess(language === 'jp' ? 'Threadsアカウントの連携を解除しました！蓄積されたAIペルソナデータはすべて削除されました。' : 'Threads account unlinked successfully! All AI profile data has been deleted.')
           
           setTimeout(() => {
             window.location.reload()
@@ -164,9 +166,9 @@ export function AccountSettings({
         <div className="flex items-center gap-2">
           <User className="w-5 h-5 text-purple-600" />
           <div>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Account Credentials</h2>
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{t('settings.title')}</h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom font-medium">
-              Manage your personal display name, profile avatar, and secure password updates.
+              {t('settings.subtitle')}
             </p>
           </div>
         </div>
@@ -177,7 +179,7 @@ export function AccountSettings({
         <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <Camera className="w-4 h-4 text-purple-600" /> Public Details
+              <Camera className="w-4 h-4 text-purple-600" /> {t('settings.public')}
             </h3>
 
             {profileError && (
@@ -202,15 +204,15 @@ export function AccountSettings({
                 className="w-16 h-16 rounded-full object-cover border-2 border-purple-600 shadow-md shrink-0 bg-zinc-100"
               />
               <div>
-                <span className="text-[11px] font-bold text-zinc-500 block uppercase tracking-wider">Profile Photo</span>
-                <p className="text-xs text-zinc-400">Synced via your linked Threads profile.</p>
+                <span className="text-[11px] font-bold text-zinc-500 block uppercase tracking-wider">{t('settings.photo')}</span>
+                <p className="text-xs text-zinc-400">{t('settings.photo.subtitle')}</p>
               </div>
             </div>
 
             <form onSubmit={handleUpdateProfile} className="space-y-4 pt-2">
               {/* Display Name Input */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">Display Name</label>
+                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">{t('settings.displayName')}</label>
                 <input
                   type="text"
                   required
@@ -223,13 +225,13 @@ export function AccountSettings({
               {/* Read Only Email / Username */}
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 block">
-                  {isThreadsUser ? 'Threads Account (Read Only)' : 'Registered Email (Read Only)'}
+                  {isThreadsUser ? t('settings.username') : t('settings.email')}
                 </label>
                 <input
                   type={isThreadsUser ? 'text' : 'email'}
                   disabled
                   value={initialEmail}
-                  className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-400 dark:text-zinc-500 font-mono-custom select-none cursor-not-allowed"
+                  className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-400 dark:text-zinc-505 font-mono-custom select-none cursor-not-allowed"
                 />
               </div>
 
@@ -237,9 +239,9 @@ export function AccountSettings({
                 <button
                   type="submit"
                   disabled={profileSaving || !displayName.trim()}
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 cursor-pointer"
+                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 cursor-pointer font-sans-custom"
                 >
-                  {profileSaving ? 'Saving...' : 'Update Details'}
+                  {profileSaving ? t('settings.saving') : t('settings.save')}
                 </button>
               </div>
             </form>
@@ -250,7 +252,7 @@ export function AccountSettings({
         <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <Key className="w-4 h-4 text-purple-600" /> Password settings
+              <Key className="w-4 h-4 text-purple-600" /> {t('settings.password')}
             </h3>
 
             {pwdError && (
@@ -270,7 +272,7 @@ export function AccountSettings({
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               {/* New Password */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">New Password</label>
+                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">{t('settings.pwd.new')}</label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -292,7 +294,7 @@ export function AccountSettings({
 
               {/* Confirm Password */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">Confirm New Password</label>
+                <label className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 block">{t('settings.pwd.confirm')}</label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -316,9 +318,9 @@ export function AccountSettings({
                 <button
                   type="submit"
                   disabled={pwdSaving || password.length < 6 || password !== confirmPassword}
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 cursor-pointer"
+                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 cursor-pointer font-sans-custom"
                 >
-                  {pwdSaving ? 'Changing...' : 'Change Password'}
+                  {pwdSaving ? t('settings.pwd.changing') : t('settings.pwd.change')}
                 </button>
               </div>
             </form>
@@ -329,7 +331,7 @@ export function AccountSettings({
       {/* Threads Connection Panel */}
       <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-4">
         <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" /> Linked Threads Account
+          <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" /> {t('settings.threads')}
         </h3>
 
         {threadsError && (
@@ -373,13 +375,13 @@ export function AccountSettings({
               )}
               <div className="space-y-0.5">
               <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 block">
-                {isConnected ? (connDisplayName || `@${connUsername}`) : 'Threads Account'}
+                {isConnected ? (connDisplayName || `@${connUsername}`) : t('settings.threads')}
               </span>
               <div className="flex items-center gap-2 flex-wrap text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
                 <span>
                   {isConnected 
-                    ? `@${connUsername} · Connected`
-                    : 'Connect your Threads account to publish directly from the app.'}
+                    ? (language === 'jp' ? `@${connUsername} · 連携中` : `@${connUsername} · Connected`)
+                    : t('settings.threads.desc')}
                 </span>
                 {isConnected && (
                   <>
@@ -391,14 +393,14 @@ export function AccountSettings({
                       className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors inline-flex items-center gap-0.5 text-[10px] font-bold"
                       title="View profile on Threads"
                     >
-                      <ExternalLink className="w-3 h-3" /> View Profile
+                      <ExternalLink className="w-3.5 h-3.5" /> {language === 'jp' ? 'プロフィールを表示' : 'View Profile'}
                     </a>
                   </>
                 )}
               </div>
               {isConnected && threadsExpiresAt && (
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono-custom block mt-0.5">
-                  Token active · Expires on {threadsExpiresAt}
+                <span className="text-[10px] text-zinc-400 dark:text-zinc-505 font-mono-custom block mt-0.5">
+                  {t('settings.threads.expires')} {threadsExpiresAt}
                 </span>
               )}
             </div>
@@ -408,17 +410,17 @@ export function AccountSettings({
               type="button"
               onClick={isConnected ? () => setShowDisconnectModal(true) : handleConnectThreads}
               disabled={threadsConnecting}
-              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-md whitespace-nowrap ${
+              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-md whitespace-nowrap font-sans-custom ${
                 isConnected 
                   ? 'bg-zinc-200 dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-zinc-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-450 border border-transparent dark:border-zinc-700' 
                   : 'bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-zinc-950/20'
               }`}
             >
               {threadsConnecting 
-                ? 'Processing...' 
+                ? t('settings.threads.disconnecting') 
                 : isConnected 
-                  ? 'Disconnect Account' 
-                  : 'Link Threads Account'}
+                  ? t('settings.threads.disconnect') 
+                  : t('settings.threads.connect')}
             </button>
           </div>
         )}
@@ -429,17 +431,17 @@ export function AccountSettings({
           <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-scale-in">
             <div className="flex items-center gap-3 text-rose-600">
               <AlertCircle className="w-6 h-6 shrink-0" />
-              <h4 className="text-base font-bold">Unlink Threads Account?</h4>
+              <h4 className="text-base font-bold">{t('settings.threads.modal.title')}</h4>
             </div>
             
             <p className="text-xs text-zinc-600 dark:text-zinc-350 leading-relaxed font-mono-custom">
-              Unlinking your Threads account will delete all generated posts, historical analytics, custom writing rules, and persona attributes permanently.
+              {t('settings.threads.modal.desc')}
             </p>
 
             <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 rounded-xl p-3.5 flex gap-2.5 items-start">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span className="text-[10px] text-rose-800 dark:text-rose-300 font-bold leading-normal">
-                CRITICAL WARNING: This will permanently wipe your accumulated AI-generated data. This action is irreversible.
+                {t('settings.threads.modal.warning')}
               </span>
             </div>
 
@@ -447,9 +449,9 @@ export function AccountSettings({
               <button
                 type="button"
                 onClick={() => setShowDisconnectModal(false)}
-                className="px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-transparent dark:border-zinc-700"
+                className="px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-transparent dark:border-zinc-700 font-sans-custom"
               >
-                Cancel
+                {t('settings.threads.modal.cancel')}
               </button>
               <button
                 type="button"
@@ -457,9 +459,9 @@ export function AccountSettings({
                   setShowDisconnectModal(false)
                   handleConnectThreads()
                 }}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-rose-600/25 transition-all active:scale-95 cursor-pointer"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-rose-600/25 transition-all active:scale-95 cursor-pointer font-sans-custom"
               >
-                Delete & Unlink
+                {t('settings.threads.modal.confirm')}
               </button>
             </div>
           </div>

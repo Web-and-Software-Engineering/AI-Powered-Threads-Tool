@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { BarChart3, RefreshCw, Sparkles, ThumbsUp, MessageCircle, Eye, Repeat, CheckCircle, Lightbulb, RefreshCw as RestartIcon, Copy } from 'lucide-react'
+import { useLanguage } from './LanguageContext'
 
 export interface PostItem {
   id: string
@@ -28,6 +29,7 @@ interface AnalyticsDashboardProps {
 }
 
 export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboardProps) {
+  const { t, language } = useLanguage()
   const [syncing, setSyncing] = useState(false)
   const [syncedLogs, setSyncedLogs] = useState<string[]>([])
 
@@ -39,12 +41,33 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
     await new Promise((resolve) => setTimeout(resolve, 1500))
     onSyncAnalytics()
 
-    setSyncedLogs([
-      'Fetched engagement metrics for posts published >= 24h ago.',
-      'Analyzing performance vs baseline standards...',
-      'Completed loop logic: High-engagement structures cloned, low-engagement queued for fresh scrapes.',
-    ])
+    if (language === 'jp') {
+      setSyncedLogs([
+        '24時間以上前に公開された投稿のエンゲージメント統計を取得しました。',
+        '基準値とのパフォーマンス差を比較分析中...',
+        'ループ処理完了: エンゲージメントの高い投稿構造をコピーし、低パフォーマンス投稿を再作成用に再登録しました。'
+      ])
+    } else {
+      setSyncedLogs([
+        'Fetched engagement metrics for posts published >= 24h ago.',
+        'Analyzing performance vs baseline standards...',
+        'Completed loop logic: High-engagement structures cloned, low-engagement queued for fresh scrapes.',
+      ])
+    }
     setSyncing(false)
+  }
+
+  const getStatusLabel = (status: string) => {
+    if (language === 'jp') {
+      switch (status) {
+        case 'published': return '公開済み'
+        case 'failed': return 'エラー'
+        case 'draft': return '下書き'
+        case 'pending': return '公開保留中'
+        default: return status
+      }
+    }
+    return status.toUpperCase()
   }
 
   return (
@@ -54,10 +77,10 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
         <div>
           <div className="flex items-center gap-2 mb-1">
             <BarChart3 className="w-5 h-5 text-purple-600" />
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Analysis & Restart Loop</h2>
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{language === 'jp' ? '分析 ＆ 再構築ループ' : 'Analysis & Restart Loop'}</h2>
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom font-medium">
-            Monitor post engagement and trigger automated structure clone/restart routines.
+            {language === 'jp' ? '投稿のエンゲージメントを追跡し、構成の複製や再作成ルーチンを自動で実行します。' : 'Monitor post engagement and trigger automated structure clone/restart routines.'}
           </p>
         </div>
 
@@ -67,7 +90,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
           className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/30 transition-all active:scale-95 cursor-pointer"
         >
           <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-          {syncing ? 'Analyzing Loop...' : 'Sync Loop Metrics'}
+          {syncing ? (language === 'jp' ? 'ループ分析中...' : 'Analyzing Loop...') : (language === 'jp' ? 'ループレポート同期' : 'Sync Loop Metrics')}
         </button>
       </div>
 
@@ -75,7 +98,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
       {syncedLogs.length > 0 && (
         <div className="glass-panel p-5 rounded-2xl border border-purple-200 dark:border-purple-900/50 bg-purple-50/60 dark:bg-purple-950/20 space-y-2 animate-fade-in">
           <h3 className="text-xs font-bold text-purple-800 dark:text-purple-300 flex items-center gap-2 uppercase tracking-wider font-mono-custom">
-            <Sparkles className="w-4 h-4 text-purple-600" /> Loop Actions Log
+            <Sparkles className="w-4 h-4 text-purple-600" /> {language === 'jp' ? 'ループ処理ログ' : 'Loop Actions Log'}
           </h3>
           <ul className="space-y-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-mono-custom">
             {syncedLogs.map((log, idx) => (
@@ -90,12 +113,14 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
 
       {/* Posts List */}
       <div className="space-y-4">
-        <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Loop Tracking Posts ({posts.length})</h3>
+        <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+          {language === 'jp' ? `ループ追跡対象の投稿 (${posts.length}件)` : `Loop Tracking Posts (${posts.length})`}
+        </h3>
 
         {posts.length === 0 ? (
           <div className="glass-panel p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center space-y-2">
             <Lightbulb className="w-8 h-8 text-zinc-400 dark:text-zinc-500 mx-auto" />
-            <p className="text-xs text-zinc-500 dark:text-zinc-450">No posts in tracking loop. Publish a draft to start.</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-450">{language === 'jp' ? '追跡中の投稿がありません。新しく投稿して開始してください。' : 'No posts in tracking loop. Publish a draft to start.'}</p>
           </div>
         ) : (
           posts.map((post) => (
@@ -122,18 +147,18 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                 {/* Visual loop state badges */}
                 <div className="flex flex-col items-end gap-1.5 shrink-0">
                   <span className="text-[10px] px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 font-mono-custom font-semibold">
-                    {post.status}
+                    {getStatusLabel(post.status)}
                   </span>
 
                   {post.structureCloned && (
                     <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 font-mono-custom font-bold flex items-center gap-1 animate-fade-in">
-                      <Copy className="w-2.5 h-2.5" /> Cloned Structure
+                      <Copy className="w-2.5 h-2.5" /> {language === 'jp' ? '構造コピー済み' : 'Cloned Structure'}
                     </span>
                   )}
 
                   {post.markedForRestart && (
                     <span className="text-[9px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 font-mono-custom font-bold flex items-center gap-1 animate-fade-in">
-                      <RestartIcon className="w-2.5 h-2.5 animate-spin-slow" /> Marked for Restart
+                      <RestartIcon className="w-2.5 h-2.5 animate-spin-slow" /> {language === 'jp' ? '再作成用にマーク' : 'Marked for Restart'}
                     </span>
                   )}
                 </div>
@@ -161,7 +186,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                 </div>
 
                 <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
-                  Pub: {post.publishedAt}
+                  {language === 'jp' ? '公開日' : 'Pub'}: {post.publishedAt}
                 </span>
               </div>
 
