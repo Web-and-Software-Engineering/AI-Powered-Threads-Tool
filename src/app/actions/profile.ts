@@ -33,6 +33,12 @@ export async function getAccountDetails() {
     user.user_metadata?.avatar_url ||
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
 
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('role, is_approved')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   const isThreadsUser = user.email?.endsWith('@threads-auth.internal') ?? false
 
   return {
@@ -40,6 +46,8 @@ export async function getAccountDetails() {
     displayName,
     avatarUrl,
     isThreadsUser,
+    role: profile?.role || 'user',
+    isApproved: profile?.is_approved || false,
   }
 }
 

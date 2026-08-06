@@ -3,8 +3,9 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut, User, Sun, Moon } from 'lucide-react'
+import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut, User, Sun, Moon, Shield } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
+import { getAccountDetails } from '@/app/actions/profile'
 import { useTheme } from './ThemeContext'
 import { useLanguage } from './LanguageContext'
 
@@ -15,7 +16,20 @@ export function Navigation() {
     pathname === '/' ? 'workspace' :
     pathname.startsWith('/profile') ? 'profile' :
     pathname.startsWith('/analytics') ? 'analytics' :
+    pathname.startsWith('/admin') ? 'admin' :
     pathname.startsWith('/account') ? 'account' : 'workspace';
+
+  const [isAdmin, setIsAdmin] = React.useState(false)
+
+  React.useEffect(() => {
+    async function checkRole() {
+      const details = await getAccountDetails()
+      if (details?.role === 'admin') {
+        setIsAdmin(true)
+      }
+    }
+    checkRole()
+  }, [])
 
   const { theme, toggleTheme } = useTheme()
   const { language, setLanguage, t } = useLanguage()
@@ -83,12 +97,26 @@ export function Navigation() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'account'
                     ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
+                    : 'text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                 }`}
               >
                 <User className="w-3.5 h-3.5" />
                 {t('nav.account')}
               </Link>
+
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                    activeTab === 'admin'
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                      : 'text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  {language === 'jp' ? '管理設定' : 'Admin'}
+                </Link>
+              )}
             </nav>
 
             <button
@@ -192,12 +220,24 @@ export function Navigation() {
         <Link
           href="/account"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-            activeTab === 'account' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-500 dark:text-zinc-450'
+            activeTab === 'account' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-550 dark:text-zinc-450'
           }`}
         >
           <User className="w-5 h-5" />
           <span className="text-[10px] font-medium">{t('nav.account')}</span>
         </Link>
+
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+              activeTab === 'admin' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-550 dark:text-zinc-450'
+            }`}
+          >
+            <Shield className="w-5 h-5" />
+            <span className="text-[10px] font-medium">{language === 'jp' ? '管理' : 'Admin'}</span>
+          </Link>
+        )}
       </nav>
     </>
   )

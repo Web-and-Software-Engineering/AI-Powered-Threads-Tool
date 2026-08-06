@@ -34,6 +34,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
+  const isPendingPage = request.nextUrl.pathname === '/pending'
 
   // Let static files, favicon, etc. pass through
   if (
@@ -43,16 +44,40 @@ export async function proxy(request: NextRequest) {
     return response
   }
 
-  if (!user && !isAuthPage) {
-    return NextResponse.redirect(new URL('/auth', request.url))
-  }
-
   const isAuthCallback =
     request.nextUrl.pathname === '/auth/callback' ||
     request.nextUrl.pathname.startsWith('/auth/threads/')
 
-  if (user && isAuthPage && !isAuthCallback) {
-    return NextResponse.redirect(new URL('/', request.url))
+  if (!user && !isAuthPage && !isPendingPage && !isAuthCallback) {
+    return NextResponse.redirect(new URL('/auth', request.url))
+  }
+
+  if (user) {
+    // Query database for user profile details
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('is_approved, role')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    const isApproved = profile?.is_approved || false
+    const role = profile?.role || 'user'
+
+    if (!isApproved) {
+      if (!isPendingPage && !isAuthPage && !isAuthCallback) {
+        return NextResponse.redirect(new URL('/pending', request.url))
+      }
+    } else {
+      if (isPendingPage) {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+      if (isAuthPage && !isAuthCallback) {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+      if (request.nextUrl.pathname.startsWith('/admin') && role !== 'admin') {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+    }
   }
 
   return response
