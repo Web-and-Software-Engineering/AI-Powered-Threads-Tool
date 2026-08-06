@@ -14,6 +14,46 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  const translateErrorMessage = (msg: string) => {
+    if (language !== 'jp') return msg
+
+    const lower = msg.toLowerCase()
+    if (lower.includes('invalid login credentials')) {
+      return 'メールアドレスまたはパスワードが正しくありません。'
+    }
+    if (lower.includes('user already registered')) {
+      return 'このメールアドレスは既に登録されています。'
+    }
+    if (lower.includes('password should be at least 6 characters') || lower.includes('must be at least 6 characters')) {
+      return 'パスワードは6文字以上で入力してください。'
+    }
+    if (lower.includes('email and password are required')) {
+      return 'メールアドレスとパスワードは必須です。'
+    }
+    if (lower.includes('all fields are required')) {
+      return 'すべてのフィールドを入力してください。'
+    }
+    if (lower.includes('passwords do not match')) {
+      return 'パスワードが一致しません。'
+    }
+    if (lower.includes('email not confirmed') || lower.includes('confirm your email')) {
+      return 'メールアドレスの確認が完了していません。受信トレイを確認してください。'
+    }
+    if (lower.includes('rate limit')) {
+      return 'リクエストの制限回数を超えました。しばらく時間をおいて再試行してください。'
+    }
+    return msg
+  }
+
+  const translateSuccessMessage = (msg: string) => {
+    if (language !== 'jp') return msg
+    const lower = msg.toLowerCase()
+    if (lower.includes('check your email')) {
+      return '確認メールを送信しました。メールボックスを確認してください。'
+    }
+    return msg
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
@@ -26,22 +66,22 @@ export default function AuthPage() {
       if (isRegister) {
         const result = await signup(formData)
         if (result?.error) {
-          setError(result.error)
+          setError(translateErrorMessage(result.error))
         } else if (result?.redirect) {
           window.location.href = result.redirect
         } else if (result?.success) {
-          setSuccess(result.success)
+          setSuccess(translateSuccessMessage(result.success))
         }
       } else {
         const result = await login(formData)
         if (result?.error) {
-          setError(result.error)
+          setError(translateErrorMessage(result.error))
         } else if (result?.redirect) {
           window.location.href = result.redirect
         }
       }
     } catch (err: any) {
-      setError(err.message || (language === 'jp' ? '予期しないエラーが発生しました。' : 'An unexpected error occurred.'))
+      setError(translateErrorMessage(err.message || (language === 'jp' ? '予期しないエラーが発生しました。' : 'An unexpected error occurred.')))
     } finally {
       setLoading(false)
     }
@@ -52,12 +92,12 @@ export default function AuthPage() {
     try {
       const result = await loginWithThreads()
       if (result?.error) {
-        setError(result.error)
+        setError(translateErrorMessage(result.error))
       } else if (result?.redirect) {
         window.location.href = result.redirect
       }
     } catch (err: any) {
-      setError(err.message || (language === 'jp' ? 'OAuthの初期化に失敗しました。' : 'OAuth initialization failed.'))
+      setError(translateErrorMessage(err.message || (language === 'jp' ? 'OAuthの初期化に失敗しました。' : 'OAuth initialization failed.')))
     }
   }
 
