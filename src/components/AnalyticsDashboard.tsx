@@ -1,8 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { BarChart3, RefreshCw, Sparkles, ThumbsUp, MessageCircle, Eye, Repeat, CheckCircle, Lightbulb, TrendingDown, Copy, ExternalLink, AlertTriangle } from 'lucide-react'
+import { BarChart3, RefreshCw, Sparkles, ThumbsUp, MessageCircle, Eye, Repeat, CheckCircle, Lightbulb, TrendingDown, Copy, ExternalLink, AlertTriangle, Clock } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
+
+const METRICS_ELIGIBLE_AFTER_HOURS = 24
 
 export interface PostItem {
   id: string
@@ -35,6 +37,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
   const [syncing, setSyncing] = useState(false)
   const [syncedLogs, setSyncedLogs] = useState<string[]>([])
   const [syncFailure, setSyncFailure] = useState<string | null>(null)
+  const [now] = useState(() => Date.now())
 
   const handleRunSync = async () => {
     setSyncing(true)
@@ -65,6 +68,25 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
       ])
     }
     setSyncing(false)
+  }
+
+  const getHoursSincePublish = (publishedAt?: string): number | null => {
+    if (!publishedAt) return null
+    const publishedMs = new Date(publishedAt).getTime()
+    if (Number.isNaN(publishedMs)) return null
+    return (now - publishedMs) / (1000 * 60 * 60)
+  }
+
+  const formatPublishedAt = (publishedAt: string): string => {
+    const publishedMs = new Date(publishedAt).getTime()
+    if (Number.isNaN(publishedMs)) return publishedAt
+    return new Date(publishedMs).toLocaleString(language === 'jp' ? 'ja-JP' : 'en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
   }
 
   const getStatusLabel = (status: string) => {
@@ -143,13 +165,18 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
             <p className="text-xs text-zinc-500 dark:text-zinc-450">{language === 'jp' ? '追跡中の投稿がありません。新しく投稿して開始してください。' : 'No posts in tracking loop. Publish a draft to start.'}</p>
           </div>
         ) : (
-          posts.map((post) => (
+          posts.map((post) => {
+            const hoursSincePublish = getHoursSincePublish(post.publishedAt)
+            const metricsEligible = hoursSincePublish === null || hoursSincePublish >= METRICS_ELIGIBLE_AFTER_HOURS
+            const hoursRemaining = hoursSincePublish === null ? null : Math.max(0, Math.ceil(METRICS_ELIGIBLE_AFTER_HOURS - hoursSincePublish))
+
+            return (
             <div
               key={post.id}
               className={`glass-panel p-5 rounded-2xl border transition-all space-y-4 ${
-                post.structureCloned 
+                metricsEligible && post.structureCloned
                   ? 'border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/10 dark:bg-emerald-950/5'
-                  : post.markedForRestart 
+                  : metricsEligible && post.markedForRestart
                     ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50/10 dark:bg-rose-950/5'
                     : 'border-zinc-200 dark:border-zinc-800'
               }`}
@@ -182,13 +209,13 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                     {getStatusLabel(post.status)}
                   </span>
 
-                  {post.structureCloned && (
+                  {metricsEligible && post.structureCloned && (
                     <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 font-mono-custom font-bold flex items-center gap-1 animate-fade-in">
                       <Copy className="w-2.5 h-2.5" /> {language === 'jp' ? '構造コピー済み' : 'Cloned Structure'}
                     </span>
                   )}
 
-                  {post.markedForRestart && (
+                  {metricsEligible && post.markedForRestart && (
                     <span className="text-[9px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 font-mono-custom font-bold flex items-center gap-1 animate-fade-in">
                       <TrendingDown className="w-2.5 h-2.5" /> {language === 'jp' ? 'エンゲージメント低調' : 'Low Engagement'}
                     </span>
@@ -196,61 +223,78 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                 </div>
               </div>
 
-              {/* Metrics row */}
-              <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800 text-xs font-mono-custom">
-                <div className="flex items-center gap-4 md:gap-6 text-zinc-500 dark:text-zinc-400">
-                  <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                    <ThumbsUp className="w-3.5 h-3.5 text-purple-600" />
-                    {post.metrics?.likes || 0}
-                  </span>
-                  <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                    <MessageCircle className="w-3.5 h-3.5 text-indigo-600" />
-                    {post.metrics?.replies || 0}
-                  </span>
-                  <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                    <Eye className="w-3.5 h-3.5 text-cyan-600" />
-                    {post.metrics?.views || 0}
-                  </span>
-                  <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                    <Repeat className="w-3.5 h-3.5 text-emerald-600" />
-                    {post.metrics?.reposts || 0}
-                  </span>
-                </div>
+              {metricsEligible ? (
+                <>
+                  {/* Metrics row */}
+                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800 text-xs font-mono-custom">
+                    <div className="flex items-center gap-4 md:gap-6 text-zinc-500 dark:text-zinc-400">
+                      <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                        <ThumbsUp className="w-3.5 h-3.5 text-purple-600" />
+                        {post.metrics?.likes || 0}
+                      </span>
+                      <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                        <MessageCircle className="w-3.5 h-3.5 text-indigo-600" />
+                        {post.metrics?.replies || 0}
+                      </span>
+                      <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                        <Eye className="w-3.5 h-3.5 text-cyan-600" />
+                        {post.metrics?.views || 0}
+                      </span>
+                      <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                        <Repeat className="w-3.5 h-3.5 text-emerald-600" />
+                        {post.metrics?.reposts || 0}
+                      </span>
+                    </div>
 
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
-                  {language === 'jp' ? '公開日' : 'Pub'}: {post.publishedAt}
-                </span>
-              </div>
+                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                      {language === 'jp' ? '公開日' : 'Pub'}: {formatPublishedAt(post.publishedAt)}
+                    </span>
+                  </div>
 
-              {post.aiInsight && (
-                <div className={`p-3 rounded-xl border text-xs font-mono-custom flex items-center gap-2 min-w-0 ${
-                  post.structureCloned 
-                    ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300'
-                    : post.markedForRestart 
-                      ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-300'
-                      : 'bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40 text-purple-900 dark:text-purple-300'
-                }`}>
-                  <Sparkles className={`w-3.5 h-3.5 shrink-0 ${
-                    post.structureCloned 
-                      ? 'text-emerald-600'
-                      : post.markedForRestart 
-                        ? 'text-rose-600'
-                        : 'text-purple-600'
-                  }`} />
-                  <span className="break-words flex-1">{post.aiInsight}</span>
-                </div>
-              )}
+                  {post.aiInsight && (
+                    <div className={`p-3 rounded-xl border text-xs font-mono-custom flex items-center gap-2 min-w-0 ${
+                      post.structureCloned
+                        ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300'
+                        : post.markedForRestart
+                          ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-300'
+                          : 'bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40 text-purple-900 dark:text-purple-300'
+                    }`}>
+                      <Sparkles className={`w-3.5 h-3.5 shrink-0 ${
+                        post.structureCloned
+                          ? 'text-emerald-600'
+                          : post.markedForRestart
+                            ? 'text-rose-600'
+                            : 'text-purple-600'
+                      }`} />
+                      <span className="break-words flex-1">{post.aiInsight}</span>
+                    </div>
+                  )}
 
-              {post.syncError && (
-                <div className="p-3 rounded-xl border text-xs font-mono-custom flex items-center gap-2 min-w-0 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-300">
-                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-600" />
-                  <span className="break-words flex-1">
-                    {language === 'jp' ? '同期エラー' : 'Sync failed'}: {post.syncError}
+                  {post.syncError && (
+                    <div className="p-3 rounded-xl border text-xs font-mono-custom flex items-center gap-2 min-w-0 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-300">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-600" />
+                      <span className="break-words flex-1">
+                        {language === 'jp' ? '同期エラー' : 'Sync failed'}: {post.syncError}
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800 text-xs font-mono-custom">
+                  <span className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500">
+                    <Clock className="w-3.5 h-3.5" />
+                    {language === 'jp'
+                      ? `計測開始まであと約${hoursRemaining}時間`
+                      : `Metrics available in ~${hoursRemaining}h`}
+                  </span>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                    {language === 'jp' ? '公開日' : 'Pub'}: {formatPublishedAt(post.publishedAt)}
                   </span>
                 </div>
               )}
             </div>
-          ))
+            )
+          })
         )}
       </div>
     </div>

@@ -18,7 +18,7 @@ export default function AnalyticsPage() {
           generatedContent: p.generatedContent,
           platformPostUrl: p.platformPostUrl || undefined,
           status: p.status,
-          publishedAt: p.publishedAt ? p.publishedAt.split('T')[0] : '',
+          publishedAt: p.publishedAt || '',
           analyticsSynced: p.analyticsSynced,
           structureCloned: p.structureCloned,
           markedForRestart: p.markedForRestart,
