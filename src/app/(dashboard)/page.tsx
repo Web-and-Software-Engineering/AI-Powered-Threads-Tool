@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { GenerationWorkspace } from '@/components/GenerationWorkspace'
 import { ProfileData } from '@/components/ProfileWorkspace'
-import { PostItem } from '@/components/AnalyticsDashboard'
-import { loadProfile, loadPosts, savePosts } from '@/lib/state'
+import { loadProfile } from '@/lib/state'
+import { recordPublishedPost } from '@/app/actions/posts'
 
 export default function Home() {
   const router = useRouter()
@@ -16,29 +16,20 @@ export default function Home() {
     setProfile(loadProfile())
   }, [])
 
-  const handlePostCreated = (newPostData: {
+  const handlePostCreated = async (newPostData: {
     topic: string
     coreMessage: string
     referencePosts: string
     generatedContent: string
     status: string
   }) => {
-    const newPostItem: PostItem = {
-      id: Date.now().toString(),
+    await recordPublishedPost({
       topic: newPostData.topic,
       coreMessage: newPostData.coreMessage,
+      referencePosts: newPostData.referencePosts,
       generatedContent: newPostData.generatedContent,
-      status: 'published',
-      publishedAt: new Date().toISOString().split('T')[0],
-      analyticsSynced: false,
-      structureCloned: false,
-      markedForRestart: false,
-      metrics: { likes: 0, replies: 0, views: 0, reposts: 0 },
-    }
+    })
 
-    const currentPosts = loadPosts()
-    savePosts([newPostItem, ...currentPosts])
-    
     // Route page to analytics
     router.push('/analytics')
   }

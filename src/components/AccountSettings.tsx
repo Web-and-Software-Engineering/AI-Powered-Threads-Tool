@@ -124,7 +124,6 @@ export function AccountSettings({
         } else {
           // Clear local storage AI data
           localStorage.removeItem('threadcraft_profile')
-          localStorage.removeItem('threadcraft_posts')
           localStorage.removeItem('threadcraft_setup_complete')
 
           setIsConnected(false)

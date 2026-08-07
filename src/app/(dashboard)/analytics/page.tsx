@@ -2,25 +2,49 @@
 
 import React, { useState, useEffect } from 'react'
 import { AnalyticsDashboard, PostItem } from '@/components/AnalyticsDashboard'
-import { loadPosts, savePosts } from '@/lib/state'
+import { listPublishedPosts, syncAnalyticsMetrics } from '@/app/actions/posts'
 
 export default function AnalyticsPage() {
   const [posts, setPosts] = useState<PostItem[] | null>(null)
 
+  const refreshPosts = async () => {
+    const result = await listPublishedPosts()
+    if ('posts' in result) {
+      setPosts(
+        result.posts.map((p) => ({
+          id: p.id,
+          topic: p.topic,
+          coreMessage: p.coreMessage,
+          generatedContent: p.generatedContent,
+          status: p.status,
+          publishedAt: p.publishedAt ? p.publishedAt.split('T')[0] : '',
+          analyticsSynced: p.analyticsSynced,
+          structureCloned: p.structureCloned,
+          markedForRestart: p.markedForRestart,
+          metrics: p.metrics,
+          aiInsight: p.aiInsight || undefined,
+        }))
+      )
+    } else {
+      console.error('[Analytics Page] Failed to load posts:', result.error)
+      setPosts([])
+    }
+  }
+
   // Load posts on client mount to prevent server hydration mismatches
   useEffect(() => {
-    setPosts(loadPosts())
+    refreshPosts()
   }, [])
 
-  const handleSyncAnalytics = () => {
+  const handleSyncAnalytics = async () => {
     if (!posts) return
 
-    const updated = posts.map((post, index) => {
-      if (!post.analyticsSynced || post.metrics?.likes === 0) {
+    const updates = posts
+      .filter((post) => !post.analyticsSynced || post.metrics?.likes === 0)
+      .map((post, index) => {
         const isHighEngagement = index % 2 === 0
         return {
-          ...post,
-          analyticsSynced: true,
+          id: post.id,
           structureCloned: isHighEngagement,
           markedForRestart: !isHighEngagement,
           metrics: {
@@ -33,12 +57,12 @@ export default function AnalyticsPage() {
             ? 'Excellent engagement metrics. Structure cloned into your writing guidelines.'
             : 'Engagement below target baseline. Marked for structure restart (scraping fresh references next run).',
         }
-      }
-      return post
-    })
+      })
 
-    setPosts(updated)
-    savePosts(updated)
+    if (updates.length > 0) {
+      await syncAnalyticsMetrics(updates)
+      await refreshPosts()
+    }
   }
 
   if (!posts) {

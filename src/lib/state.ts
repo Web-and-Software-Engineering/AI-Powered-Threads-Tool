@@ -1,5 +1,4 @@
 import { ProfileData } from '@/components/ProfileWorkspace'
-import { PostItem } from '@/components/AnalyticsDashboard'
 
 export const DEFAULT_PROFILE: ProfileData = {
   authorPersona: 'ソフトウェアと自動化に関する実践的な洞察を共有する、AIアーキテクト兼テック個人起業家（ソロプレナー）。',
@@ -13,8 +12,6 @@ export const DEFAULT_PROFILE: ProfileData = {
   preferredTone: '説得力がある、簡潔、洞察に満ちた、パンチのある表現',
   writingStyleRules: '明確な番号付きリストを使用する。フック（書き出し）は10字以内に抑える。重要な洞察は改行で区切る。',
 }
-
-export const DEFAULT_POSTS: PostItem[] = []
 
 export function loadProfile(): ProfileData {
   if (typeof window === 'undefined') return DEFAULT_PROFILE
@@ -32,22 +29,4 @@ export function loadProfile(): ProfileData {
 export function saveProfile(profile: ProfileData) {
   if (typeof window === 'undefined') return
   localStorage.setItem('threadcraft_profile', JSON.stringify(profile))
-}
-
-export function loadPosts(): PostItem[] {
-  if (typeof window === 'undefined') return DEFAULT_POSTS
-  const saved = localStorage.getItem('threadcraft_posts')
-  if (saved) {
-    try {
-      return JSON.parse(saved)
-    } catch {
-      // Ignore parse errors
-    }
-  }
-  return DEFAULT_POSTS
-}
-
-export function savePosts(posts: PostItem[]) {
-  if (typeof window === 'undefined') return
-  localStorage.setItem('threadcraft_posts', JSON.stringify(posts))
 }

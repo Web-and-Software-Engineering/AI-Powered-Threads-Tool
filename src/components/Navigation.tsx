@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut, User, Sun, Moon, Shield } from 'lucide-react'
+import { PenSquare, FolderHeart, BarChart3, Sparkles, LogOut, User, Sun, Moon, Shield, Bookmark } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 import { getAccountDetails } from '@/app/actions/profile'
 import { useTheme } from './ThemeContext'
@@ -12,9 +12,10 @@ import { useLanguage } from './LanguageContext'
 export function Navigation() {
   const pathname = usePathname()
   
-  const activeTab = 
+  const activeTab =
     pathname === '/' ? 'workspace' :
     pathname.startsWith('/profile') ? 'profile' :
+    pathname.startsWith('/saved') ? 'saved' :
     pathname.startsWith('/analytics') ? 'analytics' :
     pathname.startsWith('/admin') ? 'admin' :
     pathname.startsWith('/account') ? 'account' : 'workspace';
@@ -78,6 +79,18 @@ export function Navigation() {
               >
                 <PenSquare className="w-3.5 h-3.5" />
                 {t('nav.generate')}
+              </Link>
+
+              <Link
+                href="/saved"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                  activeTab === 'saved'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
+                }`}
+              >
+                <Bookmark className="w-3.5 h-3.5" />
+                {t('nav.saved')}
               </Link>
 
               <Link
@@ -205,6 +218,16 @@ export function Navigation() {
         >
           <PenSquare className="w-5 h-5" />
           <span className="text-[10px] font-medium">{t('nav.generate')}</span>
+        </Link>
+
+        <Link
+          href="/saved"
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+            activeTab === 'saved' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-500 dark:text-zinc-450'
+          }`}
+        >
+          <Bookmark className="w-5 h-5" />
+          <span className="text-[10px] font-medium">{t('nav.saved')}</span>
         </Link>
 
         <Link

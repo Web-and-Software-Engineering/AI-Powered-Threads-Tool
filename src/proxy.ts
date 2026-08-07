@@ -48,10 +48,12 @@ export async function proxy(request: NextRequest) {
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
   const isPendingPage = request.nextUrl.pathname === '/pending'
 
-  // Let static files, favicon, etc. pass through
+  // Let static files, favicon, etc. pass through. API routes (e.g. the
+  // cron worker) authenticate themselves and have no browser session/cookies.
   if (
     request.nextUrl.pathname.startsWith('/_next') ||
-    request.nextUrl.pathname === '/favicon.ico'
+    request.nextUrl.pathname === '/favicon.ico' ||
+    request.nextUrl.pathname.startsWith('/api/')
   ) {
     return response
   }

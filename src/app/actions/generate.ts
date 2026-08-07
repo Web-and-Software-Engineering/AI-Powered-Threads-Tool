@@ -19,7 +19,55 @@ interface GenerateParams {
   language?: 'en' | 'jp'
 }
 
-export async function generateThreadsPost(params: GenerateParams) {
+function fallbackVariations(params: GenerateParams): string[] {
+  if (params.language === 'jp') {
+    return [
+      `${params.topic.toUpperCase()} 🚀
+
+${params.coreMessage ? params.coreMessage : '今日知っておくべき重要なインサイトはこちらです：'}
+
+1. ノイズを排し、シグナルを最大化する。
+2. 実証済みのパターンを自分自身の声に適応させる。
+3. エンゲージメントを追跡して今後の投稿を改善する。
+
+あなたの最大の学びは何ですか？ぜひ以下で教えてください。👇`,
+      `知っていましたか？${params.topic}について、多くの人が見落としているポイントがあります。
+
+${params.coreMessage ? params.coreMessage : ''}
+
+これを実践するだけで、結果は大きく変わります。`,
+      `${params.topic}について、率直に話しましょう。
+
+${params.coreMessage ? params.coreMessage : ''}
+
+あなたはどう思いますか？コメントで教えてください。`,
+    ]
+  }
+
+  return [
+    `${params.topic.toUpperCase()} 🚀
+
+${params.coreMessage ? params.coreMessage : 'Here is the key insight you need to know today:'}
+
+1. High signal over noise.
+2. Adapt proven patterns to your authentic voice.
+3. Track engagement to refine future posts.
+
+What is your main takeaway? Let me know below. 👇`,
+    `Unpopular opinion about ${params.topic}:
+
+${params.coreMessage ? params.coreMessage : ''}
+
+Most people get this wrong. Here's the fix.`,
+    `Let's talk about ${params.topic}.
+
+${params.coreMessage ? params.coreMessage : ''}
+
+What's your take? Drop it below. 👇`,
+  ]
+}
+
+export async function generateThreadsPost(params: GenerateParams): Promise<{ variations: string[] } | { error: string }> {
   let resolvedReferences = params.referencePosts
   if (params.referencePosts) {
     resolvedReferences = await resolveReferenceUrls(params.referencePosts)
@@ -28,28 +76,7 @@ export async function generateThreadsPost(params: GenerateParams) {
   const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY
 
   if (!apiKey || apiKey === 'your-openai-api-key-here' || apiKey === 'your-openrouter-api-key-here') {
-    // Fallback template when API key is not configured yet
-    if (params.language === 'jp') {
-      return `${params.topic.toUpperCase()} 🚀
-
-${params.coreMessage ? params.coreMessage : '今日知っておくべき重要なインサイトはこちらです：'}
-
-1. ノイズを排し、シグナルを最大化する。
-2. 実証済みのパターンを自分自身の声に適応させる。
-3. エンゲージメントを追跡して今後の投稿を改善する。
-
-あなたの最大の学びは何ですか？ぜひ以下で教えてください。👇`
-    }
-
-    return `${params.topic.toUpperCase()} 🚀
-
-${params.coreMessage ? params.coreMessage : 'Here is the key insight you need to know today:'}
-
-1. High signal over noise.
-2. Adapt proven patterns to your authentic voice.
-3. Track engagement to refine future posts.
-
-What is your main takeaway? Let me know below. 👇`
+    return { variations: fallbackVariations(params) }
   }
 
   const openai = new OpenAI({
@@ -62,7 +89,9 @@ What is your main takeaway? Let me know below. 👇`
   })
 
   const systemPrompt = `You are a high-performing social media content creator specializing in Threads posts.
-Your goal is to write a single-text Threads post (under 500 characters) that achieves maximum engagement.
+Your goal is to write THREE single-text Threads posts (each under 500 characters) that achieve maximum engagement.
+
+The three posts MUST take genuinely different angles or hooks on the same topic and core message (e.g. a bold claim, a personal story/anecdote, a listicle/framework breakdown, a contrarian take, a question hook) — do not just reword the same post three times.
 
 FRAMEWORK RULES TO FOLLOW:
 - POCKET PERSONA & BACKGROUND (Casual background, personality notes, values, lifestyle, dreams, or life views):
@@ -82,11 +111,13 @@ ${
 - WRITING STYLE RULES: ${params.writingStyleRules || 'Use clear line breaks, punchy hooks, and keep sentences short.'}
 
 CRITICAL CONSTRAINTS:
-- Single text post strictly under 500 characters.
-- Must deliver the specified core message clearly.
+- Each post strictly under 500 characters.
+- Each must deliver the specified core message clearly, from its own distinct angle.
 - No spammy hashtags or cheesy engagement bait.
 - Strictly write in PLAIN TEXT. Never use Markdown formatting (do NOT use **bold**, *italics*, _italics_, or headings). Threads does not support rich text or markdown formatting and will display them as raw characters.
-${params.language === 'jp' ? '- Write the final output post in Japanese (日本語).' : '- Write the final output post in English.'}
+${params.language === 'jp' ? '- Write the final output posts in Japanese (日本語).' : '- Write the final output posts in English.'}
+
+RESPONSE FORMAT: Respond with ONLY a JSON object of the exact shape {"variations": ["post one text", "post two text", "post three text"]}. No other text, no markdown code fences.
 `
 
   const userPrompt = `
@@ -94,7 +125,7 @@ Topic: ${params.topic}
 Key Message/Value to Deliver: ${params.coreMessage || 'N/A'}
 ${resolvedReferences ? `Reference Posts for Pattern Matching:\n${resolvedReferences}` : ''}
 
-Generate an authentic, high-converting Threads single-text post now:
+Generate three authentic, high-converting Threads single-text post variations now:
 `
 
   try {
@@ -104,15 +135,55 @@ Generate an authentic, high-converting Threads single-text post now:
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      temperature: 0.7,
-      max_tokens: 300,
+      temperature: 0.8,
+      max_tokens: 900,
+      response_format: { type: 'json_object' },
     })
 
-    return response.choices[0]?.message?.content?.trim() || 'Failed to generate content.'
+    const raw = response.choices[0]?.message?.content?.trim() || ''
+    const variations = parseVariations(raw)
+
+    if (variations.length === 0) {
+      console.error('[Generate Action] Could not parse variations from model response:', raw)
+      return { error: 'Failed to parse AI-generated variations. Please try again.' }
+    }
+
+    // Always surface exactly 3 (pad with fallback templates if the model returned fewer)
+    while (variations.length < 3) {
+      variations.push(fallbackVariations(params)[variations.length] || fallbackVariations(params)[0])
+    }
+
+    return { variations: variations.slice(0, 3) }
   } catch (error: any) {
     console.error('OpenAI Generation Error:', error)
-    return `[OpenAI Error: ${error.message || 'API error'}]. Falling back to template:\n\n${params.topic.toUpperCase()}\n\n${params.coreMessage}`
+    return { error: error.message || 'AI generation failed. Please try again.' }
   }
+}
+
+function parseVariations(raw: string): string[] {
+  try {
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed?.variations)) {
+      return parsed.variations.filter((v: unknown): v is string => typeof v === 'string' && v.trim().length > 0)
+    }
+  } catch {
+    // Fall through to regex extraction below
+  }
+
+  // Fallback: try to extract a JSON object embedded in extra prose/markdown fences
+  const match = raw.match(/\{[\s\S]*\}/)
+  if (match) {
+    try {
+      const parsed = JSON.parse(match[0])
+      if (Array.isArray(parsed?.variations)) {
+        return parsed.variations.filter((v: unknown): v is string => typeof v === 'string' && v.trim().length > 0)
+      }
+    } catch {
+      // Give up on structured parsing
+    }
+  }
+
+  return []
 }
 
 async function resolveReferenceUrls(referencePosts: string): Promise<string> {

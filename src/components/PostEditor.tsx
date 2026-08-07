@@ -1,14 +1,19 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Send, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Send, CheckCircle2, AlertCircle, RefreshCw, Save, CalendarClock } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
+
+type ActionResult = { error?: string; success?: boolean } | void
 
 interface PostEditorProps {
   initialContent: string
   topic: string
   coreMessage: string
-  onPublish: (content: string) => Promise<{ error?: string; success?: boolean } | void>
+  onPublish: (content: string) => Promise<ActionResult>
+  onSave?: (content: string) => Promise<ActionResult>
+  onSchedule?: (content: string, scheduledAt: string) => Promise<ActionResult>
+  initialScheduledAt?: string
   onRegenerate?: () => void
   threadsAccount?: { username: string; avatarUrl: string } | null
 }
@@ -18,6 +23,9 @@ export function PostEditor({
   topic,
   coreMessage,
   onPublish,
+  onSave,
+  onSchedule,
+  initialScheduledAt,
   onRegenerate,
   threadsAccount,
 }: PostEditorProps) {
@@ -25,11 +33,21 @@ export function PostEditor({
   const [content, setContent] = useState(initialContent)
   const [publishing, setPublishing] = useState(false)
   const [published, setPublished] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [scheduling, setScheduling] = useState(false)
+  const [scheduled, setScheduled] = useState(false)
+  const [scheduledAt, setScheduledAt] = useState(initialScheduledAt || '')
   const [error, setError] = useState<string | null>(null)
 
   const charCount = content.length
   const maxChars = 500
   const isOverLimit = charCount > maxChars
+
+  const [minScheduleValue, setMinScheduleValue] = useState('')
+  useEffect(() => {
+    setMinScheduleValue(new Date(Date.now() + 60 * 1000).toISOString().slice(0, 16))
+  }, [])
 
   const handlePublish = async () => {
     if (isOverLimit || !content.trim()) return
@@ -47,6 +65,45 @@ export function PostEditor({
       setError(err.message || 'An unexpected error occurred during publishing.')
     } finally {
       setPublishing(false)
+    }
+  }
+
+  const handleSave = async () => {
+    if (!onSave || !content.trim()) return
+    setSaving(true)
+    setError(null)
+
+    try {
+      const result = await onSave(content)
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        setSaved(true)
+      }
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred while saving.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleSchedule = async () => {
+    if (!onSchedule || isOverLimit || !content.trim() || !scheduledAt) return
+    setScheduling(true)
+    setError(null)
+
+    try {
+      const isoScheduledAt = new Date(scheduledAt).toISOString()
+      const result = await onSchedule(content, isoScheduledAt)
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        setScheduled(true)
+      }
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred while scheduling.')
+    } finally {
+      setScheduling(false)
     }
   }
 
@@ -152,32 +209,93 @@ export function PostEditor({
         </div>
       )}
 
+      {onSchedule && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
+          <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 shrink-0">
+            <CalendarClock className="w-3.5 h-3.5" /> {t('gen.editor.scheduleLabel')}
+          </label>
+          <input
+            type="datetime-local"
+            value={scheduledAt}
+            min={minScheduleValue}
+            onChange={(e) => {
+              setScheduledAt(e.target.value)
+              setScheduled(false)
+            }}
+            className="flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+          />
+          <button
+            onClick={handleSchedule}
+            disabled={scheduling || isOverLimit || !content.trim() || !scheduledAt}
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all active:scale-95 shrink-0"
+          >
+            {scheduling ? (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" /> {t('gen.editor.scheduling')}
+              </>
+            ) : scheduled ? (
+              <>
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t('gen.editor.scheduleSuccess')}
+              </>
+            ) : (
+              <>
+                <CalendarClock className="w-3.5 h-3.5" /> {t('gen.editor.scheduleButton')}
+              </>
+            )}
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between pt-4 border-t border-zinc-100 dark:border-zinc-800">
         <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
           {published ? (
             <span className="text-emerald-600 dark:text-emerald-450 flex items-center gap-1.5 font-semibold">
               <CheckCircle2 className="w-4 h-4" /> {language === 'jp' ? 'Threadsへの投稿が完了しました！' : 'Published to Threads successfully!'}
             </span>
+          ) : saved ? (
+            <span className="text-emerald-600 dark:text-emerald-450 flex items-center gap-1.5 font-semibold">
+              <CheckCircle2 className="w-4 h-4" /> {t('gen.editor.saveSuccess')}
+            </span>
           ) : (
             language === 'jp' ? 'Threads API 有効' : 'Threads API Active'
           )}
         </div>
 
-        <button
-          onClick={handlePublish}
-          disabled={publishing || isOverLimit || !content.trim()}
-          className="flex items-center gap-2 px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md animate-fade-in"
-        >
-          {publishing ? (
-            <>
-              <RefreshCw className="w-4 h-4 animate-spin" /> {language === 'jp' ? '投稿中...' : 'Publishing...'}
-            </>
-          ) : (
-            <>
-              <Send className="w-4 h-4" /> {language === 'jp' ? 'Threadsに投稿' : 'Publish to Threads'}
-            </>
+        <div className="flex items-center gap-2.5">
+          {onSave && (
+            <button
+              onClick={handleSave}
+              disabled={saving || !content.trim()}
+              className="flex items-center gap-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all active:scale-95"
+            >
+              {saving ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" /> {t('gen.editor.saving')}
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" /> {t('gen.editor.save')}
+                </>
+              )}
+            </button>
           )}
-        </button>
+
+          <button
+            onClick={handlePublish}
+            disabled={publishing || isOverLimit || !content.trim()}
+            className="flex items-center gap-2 px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md animate-fade-in"
+          >
+            {publishing ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin" /> {language === 'jp' ? '投稿中...' : 'Publishing...'}
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" /> {language === 'jp' ? 'Threadsに投稿' : 'Publish to Threads'}
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   )

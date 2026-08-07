@@ -65,9 +65,8 @@ export default function AccountPage() {
     if (accountChanged === 'true') {
       // Clear local storage AI data
       localStorage.removeItem('threadcraft_profile')
-      localStorage.removeItem('threadcraft_posts')
       localStorage.removeItem('threadcraft_setup_complete')
-      
+
       alert('Threads account changed! All local and database AI profile data has been deleted.')
 
       params.delete('account_changed')

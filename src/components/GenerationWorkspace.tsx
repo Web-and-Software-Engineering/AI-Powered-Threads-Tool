@@ -6,6 +6,7 @@ import { ProfileData } from './ProfileWorkspace'
 import { PostEditor } from './PostEditor'
 import { generateThreadsPost } from '@/app/actions/generate'
 import { publishToThreadsApi, checkThreadsConnection } from '@/app/actions/threads'
+import { saveDraftPost, scheduleNewPost } from '@/app/actions/posts'
 import { useLanguage } from './LanguageContext'
 
 interface GenerationWorkspaceProps {
@@ -16,7 +17,7 @@ interface GenerationWorkspaceProps {
     referencePosts: string
     generatedContent: string
     status: string
-  }) => void
+  }) => void | Promise<void>
 }
 
 type StepState = 'idle' | 'searching' | 'analyzing' | 'synthesizing' | 'drafting' | 'completed'
@@ -137,7 +138,10 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   const [coreMessage, setCoreMessage] = useState('')
   const [referencePosts, setReferencePosts] = useState('')
   const [generationStep, setGenerationStep] = useState<StepState>('idle')
-  const [generatedDraft, setGeneratedDraft] = useState<string | null>(null)
+  const [variations, setVariations] = useState<string[] | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+  const [savedIndices, setSavedIndices] = useState<number[]>([])
+  const [savingIndex, setSavingIndex] = useState<number | null>(null)
   const [threadsAccount, setThreadsAccount] = useState<{ username: string; avatarUrl: string } | null>(null)
 
   useEffect(() => {
@@ -193,7 +197,9 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     e.preventDefault()
     if (!topic.trim()) return
 
-    setGeneratedDraft(null)
+    setVariations(null)
+    setSelectedIndex(null)
+    setSavedIndices([])
 
     // Step 1: Searching Threads
     setGenerationStep('searching')
@@ -211,7 +217,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     setGenerationStep('drafting')
 
     try {
-      const draft = await generateThreadsPost({
+      const result = await generateThreadsPost({
         topic,
         coreMessage,
         referencePosts: referencePosts.trim() || undefined,
@@ -227,11 +233,36 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         writingStyleRules: profile.writingStyleRules,
         language,
       })
-      setGeneratedDraft(draft)
+
+      if ('error' in result) {
+        console.error(result.error)
+        setGenerationStep('idle')
+        return
+      }
+
+      setVariations(result.variations)
       setGenerationStep('completed')
     } catch (err) {
       console.error(err)
       setGenerationStep('idle')
+    }
+  }
+
+  const handleSaveVariation = async (index: number) => {
+    if (!variations) return
+    setSavingIndex(index)
+    try {
+      const result = await saveDraftPost({
+        topic,
+        coreMessage,
+        referencePosts: referencePosts.trim() || '[Auto-scraped via AI Theme Search]',
+        generatedContent: variations[index],
+      })
+      if (!result?.error) {
+        setSavedIndices((prev) => [...prev, index])
+      }
+    } finally {
+      setSavingIndex(null)
     }
   }
 
@@ -241,13 +272,29 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
       return { error: result.error }
     }
 
-    onPostCreated({
+    await onPostCreated({
       topic,
       coreMessage,
       referencePosts: referencePosts.trim() || '[Auto-scraped via AI Theme Search]',
       generatedContent: finalContent,
       status: 'published',
     })
+    return { success: true }
+  }
+
+  const handleScheduleFromEditor = async (finalContent: string, scheduledAt: string) => {
+    const result = await scheduleNewPost(
+      {
+        topic,
+        coreMessage,
+        referencePosts: referencePosts.trim() || '[Auto-scraped via AI Theme Search]',
+        generatedContent: finalContent,
+      },
+      scheduledAt
+    )
+    if (result?.error) {
+      return { error: result.error }
+    }
     return { success: true }
   }
 
@@ -421,27 +468,87 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         </div>
       )}
 
-      {/* Editor & Preview once completed */}
-      {generationStep === 'completed' && generatedDraft && (
+      {/* Variation picker + Editor once completed */}
+      {generationStep === 'completed' && variations && (
         <div className="space-y-4">
           <div className="flex justify-between items-center px-1">
             <span className="text-xs text-emerald-600 font-mono-custom font-semibold flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4" /> {language === 'jp' ? 'AI生成パイプライン完了' : 'AI Generation Pipeline Complete'}
             </span>
             <button
-              onClick={() => setGenerationStep('idle')}
+              onClick={() => {
+                setGenerationStep('idle')
+                setVariations(null)
+                setSelectedIndex(null)
+                setSavedIndices([])
+              }}
               className="text-xs text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 font-mono-custom flex items-center gap-1 cursor-pointer"
             >
               {language === 'jp' ? '新しく作成する' : 'Start New Post'} <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <PostEditor
-            initialContent={generatedDraft}
-            topic={topic}
-            coreMessage={coreMessage}
-            onPublish={handlePublish}
-            threadsAccount={threadsAccount}
-          />
+
+          <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{t('gen.variations.title')}</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">{t('gen.variations.subtitle')}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {variations.map((variation, index) => {
+                const isSelected = selectedIndex === index
+                const isSaved = savedIndices.includes(index)
+                const isSaving = savingIndex === index
+                return (
+                  <div
+                    key={index}
+                    className={`rounded-xl border p-3.5 space-y-3 flex flex-col transition-all ${
+                      isSelected
+                        ? 'border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/40 dark:bg-purple-950/10'
+                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950'
+                    }`}
+                  >
+                    <p className="text-xs text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap break-words leading-relaxed font-sans-custom flex-1 min-h-[6rem]">
+                      {variation}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedIndex(index)}
+                        className={`flex-1 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                        }`}
+                      >
+                        {isSelected ? t('gen.variations.selected') : t('gen.variations.useThis')}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isSaved || isSaving}
+                        onClick={() => handleSaveVariation(index)}
+                        className="text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+                      >
+                        {isSaved ? t('gen.variations.saved') : isSaving ? t('gen.variations.saving') : t('gen.variations.save')}
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {selectedIndex !== null && (
+            <PostEditor
+              key={selectedIndex}
+              initialContent={variations[selectedIndex]}
+              topic={topic}
+              coreMessage={coreMessage}
+              onPublish={handlePublish}
+              onSchedule={handleScheduleFromEditor}
+              threadsAccount={threadsAccount}
+            />
+          )}
         </div>
       )}
     </div>

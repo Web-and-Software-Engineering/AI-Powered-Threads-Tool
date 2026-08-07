@@ -58,32 +58,10 @@ export async function checkThreadsConnection() {
   }
 }
 
-export async function publishToThreadsApi(content: string) {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-
-  if (userError || !user) {
-    return { error: 'User is not authenticated' }
-  }
-
-  const { data: account, error: accountError } = await supabase
-    .from('social_accounts')
-    .select('account_id, access_token')
-    .eq('user_id', user.id)
-    .eq('platform', 'threads')
-    .maybeSingle()
-
-  if (accountError || !account || !account.access_token) {
-    return { error: 'Threads account is not linked. Please go to the Account tab to connect your account first.' }
-  }
-
-  const threadsUserId = account.account_id
-  const accessToken = account.access_token
-
+// Pure Threads API call, reusable from both a logged-in-user request and the
+// cron worker (which has no session, just an access token looked up via a
+// service-role client).
+export async function publishThreadsContent(accessToken: string, threadsUserId: string, content: string) {
   try {
     // Step 1: Create media creation container using POST request body
     const containerRes = await fetch(
@@ -137,6 +115,32 @@ export async function publishToThreadsApi(content: string) {
     console.error('Threads API Request Failure:', err)
     return { error: err.message || 'Network error occurred during publishing.' }
   }
+}
+
+export async function publishToThreadsApi(content: string) {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
+
+  if (userError || !user) {
+    return { error: 'User is not authenticated' }
+  }
+
+  const { data: account, error: accountError } = await supabase
+    .from('social_accounts')
+    .select('account_id, access_token')
+    .eq('user_id', user.id)
+    .eq('platform', 'threads')
+    .maybeSingle()
+
+  if (accountError || !account || !account.access_token) {
+    return { error: 'Threads account is not linked. Please go to the Account tab to connect your account first.' }
+  }
+
+  return publishThreadsContent(account.access_token, account.account_id, content)
 }
 
 export async function disconnectThreads() {
