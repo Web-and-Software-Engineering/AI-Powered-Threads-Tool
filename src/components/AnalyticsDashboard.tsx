@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { BarChart3, RefreshCw, Sparkles, ThumbsUp, MessageCircle, Eye, Repeat, CheckCircle, Lightbulb, RefreshCw as RestartIcon, Copy } from 'lucide-react'
+import { BarChart3, RefreshCw, Sparkles, ThumbsUp, MessageCircle, Eye, Repeat, CheckCircle, Lightbulb, TrendingDown, Copy, ExternalLink, AlertTriangle } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 
 export interface PostItem {
@@ -9,6 +9,7 @@ export interface PostItem {
   topic: string
   coreMessage: string
   generatedContent: string
+  platformPostUrl?: string
   status: string
   publishedAt: string
   analyticsSynced: boolean
@@ -21,25 +22,34 @@ export interface PostItem {
     reposts: number
   }
   aiInsight?: string
+  syncError?: string
 }
 
 interface AnalyticsDashboardProps {
   posts: PostItem[]
-  onSyncAnalytics: () => void
+  onSyncAnalytics: () => void | string | undefined | Promise<void | string | undefined>
 }
 
 export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboardProps) {
   const { t, language } = useLanguage()
   const [syncing, setSyncing] = useState(false)
   const [syncedLogs, setSyncedLogs] = useState<string[]>([])
+  const [syncFailure, setSyncFailure] = useState<string | null>(null)
 
   const handleRunSync = async () => {
     setSyncing(true)
     setSyncedLogs([])
+    setSyncFailure(null)
 
     // Simulate 24-hour sync cron job execution
     await new Promise((resolve) => setTimeout(resolve, 1500))
-    onSyncAnalytics()
+    const error = await onSyncAnalytics()
+
+    if (error) {
+      setSyncFailure(error)
+      setSyncing(false)
+      return
+    }
 
     if (language === 'jp') {
       setSyncedLogs([
@@ -94,6 +104,16 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
         </button>
       </div>
 
+      {/* Sync Failure Banner */}
+      {syncFailure && (
+        <div className="glass-panel p-5 rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/20 space-y-1 animate-fade-in">
+          <h3 className="text-xs font-bold text-amber-800 dark:text-amber-300 flex items-center gap-2 uppercase tracking-wider font-mono-custom">
+            <AlertTriangle className="w-4 h-4 text-amber-600" /> {language === 'jp' ? '同期エラー' : 'Sync Failed'}
+          </h3>
+          <p className="text-xs text-amber-900 dark:text-amber-300 font-mono-custom">{syncFailure}</p>
+        </div>
+      )}
+
       {/* Synced AI Insights Banner */}
       {syncedLogs.length > 0 && (
         <div className="glass-panel p-5 rounded-2xl border border-purple-200 dark:border-purple-900/50 bg-purple-50/60 dark:bg-purple-950/20 space-y-2 animate-fade-in">
@@ -136,9 +156,21 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <span className="text-[11px] font-mono-custom text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">
-                    {post.topic || 'General Topic'}
-                  </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[11px] font-mono-custom text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">
+                      {post.topic || 'General Topic'}
+                    </span>
+                    {post.platformPostUrl && (
+                      <a
+                        href={post.platformPostUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] font-mono-custom font-semibold text-zinc-500 dark:text-zinc-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                      >
+                        <ExternalLink className="w-2.5 h-2.5" /> {language === 'jp' ? '投稿を見る' : 'View Post'}
+                      </a>
+                    )}
+                  </div>
                   <p className="text-xs text-zinc-800 dark:text-zinc-200 mt-1 whitespace-pre-wrap break-words font-sans-custom leading-relaxed">
                     {post.generatedContent}
                   </p>
@@ -158,7 +190,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
 
                   {post.markedForRestart && (
                     <span className="text-[9px] px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 font-mono-custom font-bold flex items-center gap-1 animate-fade-in">
-                      <RestartIcon className="w-2.5 h-2.5 animate-spin-slow" /> {language === 'jp' ? '再作成用にマーク' : 'Marked for Restart'}
+                      <TrendingDown className="w-2.5 h-2.5" /> {language === 'jp' ? 'エンゲージメント低調' : 'Low Engagement'}
                     </span>
                   )}
                 </div>
@@ -206,6 +238,15 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                         : 'text-purple-600'
                   }`} />
                   <span className="break-words flex-1">{post.aiInsight}</span>
+                </div>
+              )}
+
+              {post.syncError && (
+                <div className="p-3 rounded-xl border text-xs font-mono-custom flex items-center gap-2 min-w-0 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-300">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-600" />
+                  <span className="break-words flex-1">
+                    {language === 'jp' ? '同期エラー' : 'Sync failed'}: {post.syncError}
+                  </span>
                 </div>
               )}
             </div>

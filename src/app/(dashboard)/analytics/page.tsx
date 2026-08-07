@@ -16,6 +16,7 @@ export default function AnalyticsPage() {
           topic: p.topic,
           coreMessage: p.coreMessage,
           generatedContent: p.generatedContent,
+          platformPostUrl: p.platformPostUrl || undefined,
           status: p.status,
           publishedAt: p.publishedAt ? p.publishedAt.split('T')[0] : '',
           analyticsSynced: p.analyticsSynced,
@@ -23,6 +24,7 @@ export default function AnalyticsPage() {
           markedForRestart: p.markedForRestart,
           metrics: p.metrics,
           aiInsight: p.aiInsight || undefined,
+          syncError: p.syncError || undefined,
         }))
       )
     } else {
@@ -39,29 +41,18 @@ export default function AnalyticsPage() {
   const handleSyncAnalytics = async () => {
     if (!posts) return
 
-    const updates = posts
+    const idsToSync = posts
       .filter((post) => !post.analyticsSynced || post.metrics?.likes === 0)
-      .map((post, index) => {
-        const isHighEngagement = index % 2 === 0
-        return {
-          id: post.id,
-          structureCloned: isHighEngagement,
-          markedForRestart: !isHighEngagement,
-          metrics: {
-            likes: isHighEngagement ? Math.floor(Math.random() * 200) + 150 : Math.floor(Math.random() * 20) + 2,
-            replies: isHighEngagement ? Math.floor(Math.random() * 40) + 20 : Math.floor(Math.random() * 4) + 0,
-            views: isHighEngagement ? Math.floor(Math.random() * 5000) + 3000 : Math.floor(Math.random() * 400) + 50,
-            reposts: isHighEngagement ? Math.floor(Math.random() * 15) + 8 : 0,
-          },
-          aiInsight: isHighEngagement
-            ? 'Excellent engagement metrics. Structure cloned into your writing guidelines.'
-            : 'Engagement below target baseline. Marked for structure restart (scraping fresh references next run).',
-        }
-      })
+      .map((post) => post.id)
 
-    if (updates.length > 0) {
-      await syncAnalyticsMetrics(updates)
-      await refreshPosts()
+    if (idsToSync.length === 0) return
+
+    const result = await syncAnalyticsMetrics(idsToSync)
+    await refreshPosts()
+
+    if (result && 'error' in result) {
+      console.error('[Analytics Page] Failed to sync analytics:', result.error)
+      return result.error
     }
   }
 

@@ -102,7 +102,7 @@ const translations: Record<Language, Record<string, string>> = {
     "analytics.card.failed": "Failed",
     "analytics.card.draft": "Draft",
     "analytics.card.pending": "Pending Publish",
-    "analytics.card.restart": "Marked for Restart",
+    "analytics.card.restart": "Low Engagement",
 
     // Pocket (Profile)
     "profile.title": "Pocket & Audience Hub",
@@ -242,7 +242,7 @@ const translations: Record<Language, Record<string, string>> = {
     "analytics.card.failed": "エラー",
     "analytics.card.draft": "下書き",
     "analytics.card.pending": "公開保留中",
-    "analytics.card.restart": "再構築マーク",
+    "analytics.card.restart": "エンゲージメント低調",
 
     // Pocket (Profile)
     "profile.title": "ペルソナ＆ターゲット設定",

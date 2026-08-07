@@ -110,10 +110,61 @@ export async function publishThreadsContent(accessToken: string, threadsUserId: 
       return { error: publishData.error.message || 'Failed to publish Threads post.' }
     }
 
-    return { success: true, platformPostId: publishData.id }
+    // Step 3: Best-effort permalink lookup so the app can link back to the live post.
+    // A failure here shouldn't fail the publish — the post is already live.
+    let permalinkUrl: string | undefined
+    try {
+      const permalinkRes = await fetch(
+        `https://graph.threads.net/v1.0/${publishData.id}?fields=permalink&access_token=${encodeURIComponent(accessToken)}`
+      )
+      const permalinkData = await permalinkRes.json()
+      permalinkUrl = permalinkData.permalink || undefined
+    } catch (err) {
+      console.error('Threads Permalink Lookup Failure:', err)
+    }
+
+    return { success: true, platformPostId: publishData.id, permalinkUrl }
   } catch (err: any) {
     console.error('Threads API Request Failure:', err)
     return { error: err.message || 'Network error occurred during publishing.' }
+  }
+}
+
+// Fetches real per-post engagement metrics from the Threads Insights API.
+// Requires the threads_manage_insights scope granted during OAuth.
+export async function fetchThreadsInsights(accessToken: string, mediaId: string) {
+  try {
+    const url = new URL(`https://graph.threads.net/v1.0/${mediaId}/insights`)
+    url.searchParams.set('metric', 'views,likes,replies,reposts,quotes')
+    url.searchParams.set('access_token', accessToken)
+
+    const res = await fetch(url.toString())
+    const data = await res.json()
+
+    if (data.error) {
+      console.error('Threads Insights Error:', data.error)
+      return { error: data.error.message || 'Failed to fetch Threads insights.' }
+    }
+
+    // Metrics come back either as a "values" timeseries or a "total_value" object.
+    const valueByMetric = new Map<string, number>()
+    for (const metric of data.data || []) {
+      const value = metric.total_value?.value ?? metric.values?.[0]?.value ?? 0
+      valueByMetric.set(metric.name, value)
+    }
+
+    return {
+      success: true as const,
+      metrics: {
+        likes: valueByMetric.get('likes') || 0,
+        replies: valueByMetric.get('replies') || 0,
+        views: valueByMetric.get('views') || 0,
+        reposts: valueByMetric.get('reposts') || 0,
+      },
+    }
+  } catch (err: any) {
+    console.error('Threads Insights Request Failure:', err)
+    return { error: err.message || 'Network error occurred while fetching insights.' }
   }
 }
 

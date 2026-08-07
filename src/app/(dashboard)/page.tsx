@@ -22,12 +22,16 @@ export default function Home() {
     referencePosts: string
     generatedContent: string
     status: string
+    platformPostId?: string
+    platformPostUrl?: string
   }) => {
     await recordPublishedPost({
       topic: newPostData.topic,
       coreMessage: newPostData.coreMessage,
       referencePosts: newPostData.referencePosts,
       generatedContent: newPostData.generatedContent,
+      platformPostId: newPostData.platformPostId,
+      platformPostUrl: newPostData.platformPostUrl,
     })
 
     // Route page to analytics

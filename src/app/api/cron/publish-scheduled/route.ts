@@ -81,6 +81,7 @@ async function processPost(supabase: ReturnType<typeof getAdminClient>, post: Cl
       .update({
         status: 'published',
         platform_post_id: publishResult.platformPostId,
+        platform_post_url: publishResult.permalinkUrl || null,
         published_at: new Date().toISOString(),
         failure_reason: null,
       })

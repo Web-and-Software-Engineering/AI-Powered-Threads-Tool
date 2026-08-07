@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { publishThreadsContent } from './threads'
+import { publishThreadsContent, fetchThreadsInsights } from './threads'
 
 export interface PostRecord {
   id: string
@@ -10,6 +10,8 @@ export interface PostRecord {
   coreMessage: string
   referencePosts: string
   generatedContent: string
+  platformPostId: string | null
+  platformPostUrl: string | null
   status: string
   scheduledAt: string | null
   publishedAt: string | null
@@ -18,6 +20,7 @@ export interface PostRecord {
   structureCloned: boolean
   markedForRestart: boolean
   aiInsight: string | null
+  syncError: string | null
   metrics?: {
     likes: number
     replies: number
@@ -32,6 +35,8 @@ interface PostRow {
   core_message: string | null
   reference_posts: string | null
   generated_content: string | null
+  platform_post_id: string | null
+  platform_post_url: string | null
   status: string
   scheduled_at: string | null
   published_at: string | null
@@ -40,6 +45,7 @@ interface PostRow {
   structure_cloned: boolean | null
   marked_for_restart: boolean | null
   ai_insight: string | null
+  sync_error: string | null
 }
 
 function mapRow(row: PostRow): PostRecord {
@@ -49,6 +55,8 @@ function mapRow(row: PostRow): PostRecord {
     coreMessage: row.core_message || '',
     referencePosts: row.reference_posts || '',
     generatedContent: row.generated_content || '',
+    platformPostId: row.platform_post_id,
+    platformPostUrl: row.platform_post_url,
     status: row.status,
     scheduledAt: row.scheduled_at,
     publishedAt: row.published_at,
@@ -57,6 +65,7 @@ function mapRow(row: PostRow): PostRecord {
     structureCloned: !!row.structure_cloned,
     markedForRestart: !!row.marked_for_restart,
     aiInsight: row.ai_insight,
+    syncError: row.sync_error,
   }
 }
 
@@ -82,6 +91,7 @@ export async function recordPublishedPost(data: {
   referencePosts?: string
   generatedContent: string
   platformPostId?: string
+  platformPostUrl?: string
 }) {
   const auth = await getAuthedClientAndAccount()
   if (!auth) return { error: 'Not authenticated' }
@@ -103,6 +113,7 @@ export async function recordPublishedPost(data: {
     reference_posts: data.referencePosts || null,
     generated_content: data.generatedContent,
     platform_post_id: data.platformPostId || null,
+    platform_post_url: data.platformPostUrl || null,
     status: 'published',
     published_at: new Date().toISOString(),
   })
@@ -153,29 +164,74 @@ export async function listPublishedPosts(): Promise<{ posts: PostRecord[] } | { 
   return { posts: posts.map((p) => ({ ...p, metrics: metricsByPostId.get(p.id) })) }
 }
 
-export async function syncAnalyticsMetrics(
-  updates: {
-    id: string
-    structureCloned: boolean
-    markedForRestart: boolean
-    aiInsight: string
-    metrics: { likes: number; replies: number; views: number; reposts: number }
-  }[]
-) {
+// Posts with >= this many likes are treated as high-engagement structures worth cloning
+// into the writing guidelines; below it, they're queued for a fresh-reference restart.
+const HIGH_ENGAGEMENT_LIKES_THRESHOLD = 50
+
+export async function syncAnalyticsMetrics(postIds: string[]) {
   const auth = await getAuthedClientAndAccount()
   if (!auth) return { error: 'Not authenticated' }
   const { supabase, user } = auth
 
-  for (const update of updates) {
+  const { data: account } = await supabase
+    .from('social_accounts')
+    .select('access_token')
+    .eq('user_id', user.id)
+    .eq('platform', 'threads')
+    .maybeSingle()
+
+  if (!account?.access_token) {
+    return { error: 'Threads account is not linked. Please go to the Account tab to connect your account first.' }
+  }
+
+  const { data: posts, error: postsError } = await supabase
+    .from('posts')
+    .select('id, platform_post_id')
+    .in('id', postIds)
+    .eq('user_id', user.id)
+
+  if (postsError || !posts) {
+    return { error: postsError?.message || 'Failed to load posts for sync.' }
+  }
+
+  for (const post of posts) {
+    if (!post.platform_post_id) {
+      await supabase
+        .from('posts')
+        .update({ analytics_synced: true, ai_insight: 'Insights unavailable: this post has no linked Threads media ID.' })
+        .eq('id', post.id)
+        .eq('user_id', user.id)
+      continue
+    }
+
+    const insights = await fetchThreadsInsights(account.access_token, post.platform_post_id)
+
+    if ('error' in insights) {
+      console.error('[Posts Actions] Failed to fetch Threads insights:', insights.error)
+      await supabase
+        .from('posts')
+        .update({ sync_error: insights.error })
+        .eq('id', post.id)
+        .eq('user_id', user.id)
+      continue
+    }
+
+    const { likes, replies, views, reposts } = insights.metrics
+    const isHighEngagement = likes >= HIGH_ENGAGEMENT_LIKES_THRESHOLD
+    const aiInsight = isHighEngagement
+      ? 'Excellent engagement metrics. Structure cloned into your writing guidelines.'
+      : 'Engagement below target baseline. Marked for structure restart (scraping fresh references next run).'
+
     const { error: postError } = await supabase
       .from('posts')
       .update({
         analytics_synced: true,
-        structure_cloned: update.structureCloned,
-        marked_for_restart: update.markedForRestart,
-        ai_insight: update.aiInsight,
+        structure_cloned: isHighEngagement,
+        marked_for_restart: !isHighEngagement,
+        ai_insight: aiInsight,
+        sync_error: null,
       })
-      .eq('id', update.id)
+      .eq('id', post.id)
       .eq('user_id', user.id)
 
     if (postError) {
@@ -184,11 +240,11 @@ export async function syncAnalyticsMetrics(
     }
 
     const { error: analyticsError } = await supabase.from('post_analytics').insert({
-      post_id: update.id,
-      likes_count: update.metrics.likes,
-      replies_count: update.metrics.replies,
-      views_count: update.metrics.views,
-      reposts_count: update.metrics.reposts,
+      post_id: post.id,
+      likes_count: likes,
+      replies_count: replies,
+      views_count: views,
+      reposts_count: reposts,
     })
 
     if (analyticsError) {
@@ -333,6 +389,7 @@ export async function publishSavedPost(id: string) {
     .update({
       status: 'published',
       platform_post_id: result.platformPostId,
+      platform_post_url: result.permalinkUrl || null,
       published_at: new Date().toISOString(),
       scheduled_at: null,
     })

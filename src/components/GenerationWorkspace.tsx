@@ -17,6 +17,8 @@ interface GenerationWorkspaceProps {
     referencePosts: string
     generatedContent: string
     status: string
+    platformPostId?: string
+    platformPostUrl?: string
   }) => void | Promise<void>
 }
 
@@ -278,6 +280,8 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
       referencePosts: referencePosts.trim() || '[Auto-scraped via AI Theme Search]',
       generatedContent: finalContent,
       status: 'published',
+      platformPostId: result?.platformPostId,
+      platformPostUrl: result?.permalinkUrl,
     })
     return { success: true }
   }
