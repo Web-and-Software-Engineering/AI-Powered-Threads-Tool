@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { GenerationWorkspace } from '@/components/GenerationWorkspace'
 import { ProfileData } from '@/components/ProfileWorkspace'
-import { loadProfile } from '@/lib/state'
+import { getPersonaProfile } from '@/app/actions/profile'
 import { recordPublishedPost } from '@/app/actions/posts'
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
 
   // Load profile on client mount to prevent server hydration mismatches
   useEffect(() => {
-    setProfile(loadProfile())
+    getPersonaProfile().then(setProfile)
   }, [])
 
   const handlePostCreated = async (newPostData: {

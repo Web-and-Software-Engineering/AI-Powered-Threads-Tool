@@ -2,18 +2,27 @@
 
 import React, { useState, useEffect } from 'react'
 import { ProfileWorkspace, ProfileData } from '@/components/ProfileWorkspace'
-import { loadProfile, saveProfile } from '@/lib/state'
+import { getPersonaProfile, savePersonaProfile } from '@/app/actions/profile'
+import { useLanguage } from '@/components/LanguageContext'
 
 export default function ProfilePage() {
+  const { language } = useLanguage()
   const [profile, setProfile] = useState<ProfileData | null>(null)
 
   // Load profile on client mount to prevent server hydration mismatches
   useEffect(() => {
-    setProfile(loadProfile())
+    getPersonaProfile().then(setProfile)
   }, [])
 
-  const handleSaveProfile = (newProfile: ProfileData) => {
-    saveProfile(newProfile)
+  const handleSaveProfile = async (newProfile: ProfileData) => {
+    const result = await savePersonaProfile(newProfile, language)
+    if ('error' in result) {
+      console.error('[Profile Page] Failed to save persona profile:', result.error)
+      return
+    }
+    if (result.extractionFailed) {
+      console.warn('[Profile Page] Persona saved, but AI field extraction failed.')
+    }
     setProfile(newProfile)
   }
 

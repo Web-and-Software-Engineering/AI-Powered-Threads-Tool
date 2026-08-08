@@ -13,20 +13,3 @@ export const DEFAULT_PROFILE: ProfileData = {
   writingStyleRules: '明確な番号付きリストを使用する。フック（書き出し）は10字以内に抑える。重要な洞察は改行で区切る。',
 }
 
-export function loadProfile(): ProfileData {
-  if (typeof window === 'undefined') return DEFAULT_PROFILE
-  const saved = localStorage.getItem('threadcraft_profile')
-  if (saved) {
-    try {
-      return JSON.parse(saved)
-    } catch {
-      // Ignore parse errors
-    }
-  }
-  return DEFAULT_PROFILE
-}
-
-export function saveProfile(profile: ProfileData) {
-  if (typeof window === 'undefined') return
-  localStorage.setItem('threadcraft_profile', JSON.stringify(profile))
-}
