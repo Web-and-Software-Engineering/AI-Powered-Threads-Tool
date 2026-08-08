@@ -246,6 +246,106 @@ function parseVariations(raw: string): string[] {
   return []
 }
 
+interface SuggestPostIdeaParams {
+  authorPersona?: string
+  personalityTraits?: string
+  likesDislikes?: string
+  values?: string
+  lifestyle?: string
+  dreams?: string
+  outlookOnLife?: string
+  targetAudience?: string
+  language?: 'en' | 'jp'
+}
+
+// Persona-aware "surprise me" idea generator for the Autofill button.
+// Callers must fall back to their own static template on { error } (e.g. no API key) —
+// this action intentionally returns no filler content of its own.
+export async function suggestPostIdea(params: SuggestPostIdeaParams): Promise<{ topic: string; coreMessage: string } | { error: string }> {
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY
+
+  if (!apiKey || apiKey === 'your-openai-api-key-here' || apiKey === 'your-openrouter-api-key-here') {
+    return { error: 'AI not configured' }
+  }
+
+  const openai = new OpenAI({
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: apiKey,
+    defaultHeaders: {
+      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      'X-OpenRouter-Title': 'ThreadCraft AI',
+    },
+  })
+
+  const personaText = [
+    params.authorPersona,
+    params.personalityTraits,
+    params.likesDislikes,
+    params.values,
+    params.lifestyle,
+    params.dreams,
+    params.outlookOnLife,
+  ].filter((s): s is string => !!s).map(s => s.trim()).filter(s => s.length > 0).join('\n\n') || 'N/A'
+
+  const systemPrompt = `You are a brainstorming assistant that suggests ONE fresh Threads post idea for a specific author, to fill in a "surprise me" button they will click repeatedly.
+
+AUTHOR'S PERSONA & BACKGROUND:
+${personaText}
+
+TARGET AUDIENCE: ${params.targetAudience || 'General audience'}
+
+Suggest a topic and core message that authentically fits THIS specific person's background, values, and interests above — not a generic content-marketing topic. Since this action gets triggered repeatedly, pick a genuinely different angle, sub-topic, or life/work facet each time (do not default to the most obvious topic every time).
+
+${params.language === 'jp' ? 'Write the topic and coreMessage in Japanese (日本語).' : 'Write the topic and coreMessage in English.'}
+
+RESPONSE FORMAT: Respond with ONLY a JSON object of the exact shape {"topic": "short topic phrase", "coreMessage": "one or two sentence core message/value to deliver"}. No other text, no markdown code fences.`
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'google/gemini-2.5-flash',
+      messages: [{ role: 'system', content: systemPrompt }],
+      temperature: 1.0,
+      max_tokens: 300,
+      response_format: { type: 'json_object' },
+    })
+
+    const raw = response.choices[0]?.message?.content?.trim() || ''
+    const idea = parsePostIdea(raw)
+
+    if (!idea) {
+      console.error('[Generate Action] Could not parse post idea from model response:', raw)
+      return { error: 'Failed to parse AI-generated idea.' }
+    }
+
+    return idea
+  } catch (error: any) {
+    console.error('[Generate Action] suggestPostIdea failed:', error)
+    return { error: error.message || 'AI idea generation failed.' }
+  }
+}
+
+function parsePostIdea(raw: string): { topic: string; coreMessage: string } | null {
+  const tryParse = (text: string): { topic: string; coreMessage: string } | null => {
+    try {
+      const parsed = JSON.parse(text)
+      if (typeof parsed?.topic === 'string' && parsed.topic.trim() && typeof parsed?.coreMessage === 'string') {
+        return { topic: parsed.topic.trim(), coreMessage: parsed.coreMessage.trim() }
+      }
+    } catch {
+      // Fall through
+    }
+    return null
+  }
+
+  const direct = tryParse(raw)
+  if (direct) return direct
+
+  const match = raw.match(/\{[\s\S]*\}/)
+  if (match) return tryParse(match[0])
+
+  return null
+}
+
 async function resolveReferenceUrls(referencePosts: string): Promise<string> {
   const lines = referencePosts.split('\n')
   const resolvedLines: string[] = []

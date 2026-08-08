@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Sparkles, MessageSquare, Lightbulb, Search, Loader2, CheckCircle2, ArrowRight, FileText } from 'lucide-react'
 import { ProfileData } from './ProfileWorkspace'
 import { PostEditor } from './PostEditor'
-import { generateThreadsPost } from '@/app/actions/generate'
+import { generateThreadsPost, suggestPostIdea } from '@/app/actions/generate'
 import { publishToThreadsApi, checkThreadsConnection } from '@/app/actions/threads'
 import { saveDraftPost, scheduleNewPost } from '@/app/actions/posts'
 import { useLanguage } from './LanguageContext'
@@ -145,6 +145,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   const [savedIndices, setSavedIndices] = useState<number[]>([])
   const [savingIndex, setSavingIndex] = useState<number | null>(null)
   const [threadsAccount, setThreadsAccount] = useState<{ username: string; avatarUrl: string } | null>(null)
+  const [autofilling, setAutofilling] = useState(false)
 
   useEffect(() => {
     async function loadThreadsConnection() {
@@ -159,7 +160,9 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     loadThreadsConnection()
   }, [])
 
-  const handleAutoFill = () => {
+  // Safety-net fallback for when the AI idea generator has no API key configured
+  // or fails — keeps today's exact behavior rather than leaving the form empty.
+  const applyFallbackTemplate = () => {
     const textToAnalyze = `${profile?.authorPersona || ''} ${profile?.targetAudience || ''} ${profile?.writingStyleRules || ''} ${profile?.personalityTraits || ''}`.toLowerCase()
 
     let category: 'developer' | 'solopreneur' | 'productivity' | 'general' = 'general'
@@ -186,6 +189,33 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
 
     setTopic(selected.topic)
     setCoreMessage(selected.core)
+  }
+
+  const handleAutoFill = async () => {
+    setAutofilling(true)
+    try {
+      const result = await suggestPostIdea({
+        authorPersona: profile?.authorPersona,
+        personalityTraits: profile?.personalityTraits,
+        likesDislikes: profile?.likesDislikes,
+        values: profile?.values,
+        lifestyle: profile?.lifestyle,
+        dreams: profile?.dreams,
+        outlookOnLife: profile?.outlookOnLife,
+        targetAudience: profile?.targetAudience,
+        language,
+      })
+
+      if ('error' in result) {
+        applyFallbackTemplate()
+      } else {
+        setTopic(result.topic)
+        setCoreMessage(result.coreMessage)
+      }
+    } catch (err) {
+      console.error('[GenerationWorkspace] suggestPostIdea failed:', err)
+      applyFallbackTemplate()
+    }
 
     // Set mock reference pattern structures for pattern matching
     setReferencePosts(
@@ -193,6 +223,8 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         ? `【参考フック例】\n思わず目が留まる印象的な1行目のフック（書き出し）\n\n【構成のポイント】\n・具体的かつ実践的なメリットや事実を示す箇条書きポイント1\n・再現性の高い行動や数値を交えた箇条書きポイント2\n\n【結び】\n簡潔なまとめ、または読み手への問いかけやアクションの喚起。`
         : `[Engaging Hook Example]\nAn attention-grabbing first line to hook readers instantly.\n\n[Structural Points]\n- Actionable insight or concrete benefit point 1\n- Measurable metric or proof of concept point 2\n\n[Call to Action]\nSimple concluding takeaway or conversational question.`
     )
+
+    setAutofilling(false)
   }
 
   const handleGenerate = async (e: React.FormEvent) => {
@@ -383,9 +415,10 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                 <button
                   type="button"
                   onClick={handleAutoFill}
-                  className="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-100 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                  disabled={autofilling}
+                  className="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 disabled:opacity-50 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-100 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
                 >
-                  ⚡ {t('gen.autofill')}
+                  {autofilling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : '⚡'} {t('gen.autofill')}
                 </button>
               )}
               <button
