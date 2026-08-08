@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FolderHeart, Sparkles, User, Heart, Compass, ShieldAlert, CheckCircle2 } from 'lucide-react'
+import { FolderHeart, Sparkles, User, Heart, Compass, ShieldAlert, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 
 export interface ProfileData {
@@ -19,7 +19,7 @@ export interface ProfileData {
 
 interface ProfileWorkspaceProps {
   profile: ProfileData
-  onSave: (data: ProfileData) => void
+  onSave: (data: ProfileData) => Promise<{ error?: string }>
 }
 
 const SAMPLE_JP_PROFILE: ProfileData = {
@@ -78,18 +78,41 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
   const { t, language } = useLanguage()
   const [formData, setFormData] = useState<ProfileData>(profile)
   const [activeSubTab, setActiveSubTab] = useState<'pocket' | 'audience'>('pocket')
+  const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const handleAutofill = () => {
     const samples = language === 'jp' ? SAMPLE_JP_PROFILE : SAMPLE_EN_PROFILE
     setFormData(samples)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(formData)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    setSaving(true)
+    setSaved(false)
+    setSaveError(null)
+
+    try {
+      const result = await onSave(formData)
+
+      if (result.error) {
+        setSaveError(result.error)
+        return
+      }
+
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+      console.error('[ProfileWorkspace] Save request failed:', err)
+      setSaveError(
+        language === 'jp'
+          ? '保存に失敗しました。ネットワーク接続を確認して、もう一度お試しください。'
+          : 'Save failed. Check your network connection and try again.'
+      )
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -199,6 +222,11 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
 
           {/* Action Row */}
           <div className="flex justify-end items-center gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+            {saveError && (
+              <span className="text-xs text-rose-600 flex items-center gap-1.5 animate-fade-in font-mono-custom font-semibold">
+                <AlertTriangle className="w-4 h-4" /> {saveError}
+              </span>
+            )}
             {saved && (
               <span className="text-xs text-emerald-600 flex items-center gap-1.5 animate-fade-in font-mono-custom font-semibold">
                 <CheckCircle2 className="w-4 h-4" /> {t('profile.saved')}
@@ -214,8 +242,10 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center gap-2 cursor-pointer font-sans-custom"
+              disabled={saving}
+              className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center gap-2 cursor-pointer font-sans-custom"
             >
+              {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               {t('profile.save')}
             </button>
           </div>

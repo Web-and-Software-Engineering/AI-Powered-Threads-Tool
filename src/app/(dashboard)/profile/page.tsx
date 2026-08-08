@@ -14,16 +14,17 @@ export default function ProfilePage() {
     getPersonaProfile().then(setProfile)
   }, [])
 
-  const handleSaveProfile = async (newProfile: ProfileData) => {
+  const handleSaveProfile = async (newProfile: ProfileData): Promise<{ error?: string }> => {
     const result = await savePersonaProfile(newProfile, language)
     if ('error' in result) {
       console.error('[Profile Page] Failed to save persona profile:', result.error)
-      return
+      return { error: result.error }
     }
     if (result.extractionFailed) {
       console.warn('[Profile Page] Persona saved, but AI field extraction failed.')
     }
     setProfile(newProfile)
+    return {}
   }
 
   if (!profile) {
