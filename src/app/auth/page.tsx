@@ -57,11 +57,16 @@ export default function AuthPage() {
       const params = new URLSearchParams(window.location.search)
       const err = params.get('error')
       if (err) {
+        const details = params.get('details')
         let errorMsg = err
         if (err === 'threads_db_save_failed') {
           errorMsg = 'Threads connection database save failed.'
         } else if (err === 'threads_already_linked') {
           errorMsg = 'This Threads account is already connected to another email account. Please log in with that email account.'
+        } else if (details) {
+          // Surface the underlying error detail (e.g. the actual Supabase error message)
+          // instead of just the opaque error code, so failures are diagnosable from the UI.
+          errorMsg = `${err}: ${details}`
         }
         setError(translateErrorMessage(errorMsg))
         const newUrl = window.location.pathname
