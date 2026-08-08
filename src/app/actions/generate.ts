@@ -1,6 +1,7 @@
 'use server'
 
 import OpenAI from 'openai'
+import { createClient } from '@/lib/supabase/server'
 
 interface GenerateParams {
   topic: string
@@ -67,11 +68,62 @@ What's your take? Drop it below. 👇`,
   ]
 }
 
+interface PastPerformanceExample {
+  topic: string | null
+  generated_content: string | null
+}
+
+interface PastPerformanceExamples {
+  proven: PastPerformanceExample[]
+  avoid: PastPerformanceExample[]
+}
+
+// Pulls the user's own past posts already flagged by the real analytics sync
+// (syncAnalyticsMetrics in posts.ts) so the prompt can emulate what worked and
+// avoid repeating what didn't — no Threads API calls involved.
+async function getPastPerformanceExamples(userId: string): Promise<PastPerformanceExamples> {
+  try {
+    const supabase = await createClient()
+
+    const [provenResult, avoidResult] = await Promise.all([
+      supabase
+        .from('posts')
+        .select('topic, generated_content')
+        .eq('user_id', userId)
+        .eq('status', 'published')
+        .eq('structure_cloned', true)
+        .order('published_at', { ascending: false })
+        .limit(3),
+      supabase
+        .from('posts')
+        .select('topic, generated_content')
+        .eq('user_id', userId)
+        .eq('status', 'published')
+        .eq('marked_for_restart', true)
+        .order('published_at', { ascending: false })
+        .limit(2),
+    ])
+
+    return {
+      proven: provenResult.data || [],
+      avoid: avoidResult.data || [],
+    }
+  } catch (error) {
+    console.error('[Generate Action] Failed to fetch past performance examples:', error)
+    return { proven: [], avoid: [] }
+  }
+}
+
 export async function generateThreadsPost(params: GenerateParams): Promise<{ variations: string[] } | { error: string }> {
   let resolvedReferences = params.referencePosts
   if (params.referencePosts) {
     resolvedReferences = await resolveReferenceUrls(params.referencePosts)
   }
+
+  const {
+    data: { user },
+  } = await (await createClient()).auth.getUser()
+  const pastPerformance = user ? await getPastPerformanceExamples(user.id) : { proven: [], avoid: [] }
 
   const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY
 
@@ -109,7 +161,15 @@ ${
 - TARGET AUDIENCE: ${params.targetAudience || 'Developers, creators, and indie hackers'}
 - PREFERRED TONE: ${params.preferredTone || 'Conversational, authoritative, punchy'}
 - WRITING STYLE RULES: ${params.writingStyleRules || 'Use clear line breaks, punchy hooks, and keep sentences short.'}
-
+${
+  pastPerformance.proven.length > 0
+    ? `\nPROVEN HIGH-PERFORMING STRUCTURES (the author's own past posts that drove strong engagement — emulate their angle/structure/format, not the literal topic):\n${pastPerformance.proven.map((p) => `- ${p.generated_content}`).join('\n')}\n`
+    : ''
+}${
+  pastPerformance.avoid.length > 0
+    ? `\nPATTERNS TO AVOID (the author's own past posts that underperformed — do not repeat this angle/structure):\n${pastPerformance.avoid.map((p) => `- ${p.generated_content}`).join('\n')}\n`
+    : ''
+}
 CRITICAL CONSTRAINTS:
 - Each post strictly under 500 characters.
 - Each must deliver the specified core message clearly, from its own distinct angle.
