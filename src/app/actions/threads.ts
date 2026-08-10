@@ -17,7 +17,7 @@ export async function getThreadsAuthUrl() {
   const origin = `https://${host}`
 
   const redirectUri = encodeURIComponent(`${origin}/auth/threads/callback`)
-  const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish,threads_manage_insights&response_type=code`
+  const url = `https://threads.net/oauth/authorize?client_id=${appId}&redirect_uri=${redirectUri}&scope=threads_basic,threads_content_publish,threads_manage_insights,threads_keyword_search&response_type=code`
 
   return { url }
 }
@@ -165,6 +165,54 @@ export async function fetchThreadsInsights(accessToken: string, mediaId: string)
   } catch (err: any) {
     console.error('Threads Insights Request Failure:', err)
     return { error: err.message || 'Network error occurred while fetching insights.' }
+  }
+}
+
+export interface ThreadsSearchResult {
+  id: string
+  text: string
+  permalink: string
+  username: string
+}
+
+// Real public post discovery by topic, on behalf of the connected user.
+// Requires the threads_keyword_search scope granted during OAuth — tokens issued
+// before this scope existed will fail here until the user reconnects their account.
+export async function searchThreadsByKeyword(accessToken: string, query: string, limit = 5) {
+  try {
+    const url = new URL('https://graph.threads.net/v1.0/keyword_search')
+    url.searchParams.set('q', query)
+    url.searchParams.set('search_type', 'TOP')
+    url.searchParams.set('media_type', 'TEXT')
+    url.searchParams.set('limit', String(limit))
+    url.searchParams.set('fields', 'id,text,permalink,username')
+    url.searchParams.set('access_token', accessToken)
+
+    const res = await fetch(url.toString())
+    const data = await res.json()
+
+    // Temporary verbose logging while debugging why searches return zero results —
+    // logs the full raw Threads response so we can see the actual API behavior.
+    console.log(`[Threads Keyword Search] q="${query}" HTTP ${res.status}:`, JSON.stringify(data))
+
+    if (data.error) {
+      console.error('Threads Keyword Search Error:', data.error)
+      return { error: data.error.message || 'Failed to search Threads.' }
+    }
+
+    const posts: ThreadsSearchResult[] = (data.data || [])
+      .filter((p: any) => typeof p.text === 'string' && p.text.trim().length > 0)
+      .map((p: any) => ({
+        id: p.id,
+        text: p.text,
+        permalink: p.permalink || '',
+        username: p.username || '',
+      }))
+
+    return { success: true as const, posts }
+  } catch (err: any) {
+    console.error('Threads Keyword Search Request Failure:', err)
+    return { error: err.message || 'Network error occurred while searching Threads.' }
   }
 }
 

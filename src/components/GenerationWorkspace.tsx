@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Sparkles, MessageSquare, Lightbulb, Search, Loader2, CheckCircle2, ArrowRight, FileText } from 'lucide-react'
 import { ProfileData } from './ProfileWorkspace'
 import { PostEditor } from './PostEditor'
-import { generateThreadsPost, suggestPostIdea } from '@/app/actions/generate'
+import { generateThreadsPost, suggestPostIdea, getSearchKeywordCandidates, searchThreadsForKeyword } from '@/app/actions/generate'
 import { publishToThreadsApi, checkThreadsConnection } from '@/app/actions/threads'
 import { saveDraftPost, scheduleNewPost } from '@/app/actions/posts'
 import { useLanguage } from './LanguageContext'
@@ -146,6 +146,10 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   const [savingIndex, setSavingIndex] = useState<number | null>(null)
   const [threadsAccount, setThreadsAccount] = useState<{ username: string; avatarUrl: string } | null>(null)
   const [autofilling, setAutofilling] = useState(false)
+  const [discoveredPosts, setDiscoveredPosts] = useState<{ text: string; permalink: string; username: string }[]>([])
+  const [discoverySearched, setDiscoverySearched] = useState(false)
+  const [discoveryError, setDiscoveryError] = useState<string | null>(null)
+  const [searchKeywordsTried, setSearchKeywordsTried] = useState<string[]>([])
 
   useEffect(() => {
     async function loadThreadsConnection() {
@@ -234,10 +238,43 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     setVariations(null)
     setSelectedIndex(null)
     setSavedIndices([])
+    setDiscoveredPosts([])
+    setDiscoveryError(null)
+    setDiscoverySearched(false)
+    setSearchKeywordsTried([])
 
-    // Step 1: Searching Threads
+    // Step 1: Searching Threads for real reference posts on this topic.
+    // Tries several AI-suggested keyword angles in sequence (not parallel, so the UI
+    // can show live progress between calls), stopping once enough posts are found or
+    // a real time budget is spent — this is genuine work, not a padded animation.
     setGenerationStep('searching')
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    const SEARCH_POST_TARGET = 5
+    const SEARCH_TIME_BUDGET_MS = 10000
+    const searchStartedAt = Date.now()
+
+    const keywords = await getSearchKeywordCandidates(topic, language)
+    const accumulatedPosts: { text: string; permalink: string; username: string }[] = []
+    const triedKeywords: string[] = []
+
+    for (const keyword of keywords) {
+      if (accumulatedPosts.length >= SEARCH_POST_TARGET) break
+      if (Date.now() - searchStartedAt >= SEARCH_TIME_BUDGET_MS) break
+
+      const searchResult = await searchThreadsForKeyword(keyword)
+      triedKeywords.push(keyword)
+      setSearchKeywordsTried([...triedKeywords])
+
+      if ('error' in searchResult) {
+        console.error('[GenerationWorkspace] searchThreadsForKeyword failed:', searchResult.error)
+        setDiscoveryError(searchResult.error)
+        break // account-level error (not linked/authenticated) — more keywords won't help
+      }
+
+      accumulatedPosts.push(...searchResult.posts)
+      setDiscoveredPosts([...accumulatedPosts])
+    }
+
+    setDiscoverySearched(true)
 
     // Step 2: Analyzing structures
     setGenerationStep('analyzing')
@@ -255,6 +292,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         topic,
         coreMessage,
         referencePosts: referencePosts.trim() || undefined,
+        discoveredReferencePosts: accumulatedPosts,
         authorPersona: profile.authorPersona,
         personalityTraits: profile.personalityTraits,
         likesDislikes: profile.likesDislikes,
@@ -397,6 +435,46 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                   placeholder={t('gen.reference.placeholder')}
                   className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-sans-custom leading-relaxed"
                 />
+                {searchKeywordsTried.length > 0 && (
+                  <span className="text-[9px] font-mono-custom text-zinc-400 dark:text-zinc-500">
+                    {language === 'jp' ? '検索キーワード' : 'Searched'}: {searchKeywordsTried.map((k) => `"${k}"`).join(', ')}
+                  </span>
+                )}
+                {discoveredPosts.length > 0 && (
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-1 animate-fade-in">
+                    <span className="text-[10px] font-mono-custom font-semibold text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                      <Search className="w-3 h-3" />
+                      {language === 'jp'
+                        ? `このトピックで実際のThreads投稿を${discoveredPosts.length}件発見しました`
+                        : `Found ${discoveredPosts.length} real Threads posts on this topic`}
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {discoveredPosts.map((post, idx) => (
+                        <a
+                          key={idx}
+                          href={post.permalink || undefined}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] font-mono-custom text-purple-600 dark:text-purple-400 hover:underline"
+                        >
+                          @{post.username || 'unknown'}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {discoverySearched && discoveredPosts.length === 0 && (
+                  <div className={`p-2.5 rounded-xl border text-[10px] font-mono-custom flex items-center gap-1.5 animate-fade-in ${
+                    discoveryError
+                      ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300'
+                      : 'bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400'
+                  }`}>
+                    <Search className="w-3 h-3 shrink-0" />
+                    {discoveryError
+                      ? (language === 'jp' ? `Threads検索に失敗しました: ${discoveryError}` : `Threads search failed: ${discoveryError}`)
+                      : (language === 'jp' ? 'このトピックの投稿は見つかりませんでした。' : 'No matching posts found on Threads for this topic.')}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -452,7 +530,11 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               )}
               <span className={`text-xs font-mono-custom ${generationStep === 'searching' ? 'text-purple-600 font-bold' : 'text-zinc-500 dark:text-zinc-400'}`}>
-                {language === 'jp' ? '1. Threadsで類似の投稿を検索中...' : '1. Searching Threads for similar posts...'}
+                {generationStep === 'searching' && searchKeywordsTried.length > 0
+                  ? (language === 'jp'
+                      ? `1. 検索中: "${searchKeywordsTried[searchKeywordsTried.length - 1]}"（${discoveredPosts.length}件発見）`
+                      : `1. Searching "${searchKeywordsTried[searchKeywordsTried.length - 1]}"... (${discoveredPosts.length} found)`)
+                  : (language === 'jp' ? '1. Threadsで類似の投稿を検索中...' : '1. Searching Threads for similar posts...')}
               </span>
             </div>
 

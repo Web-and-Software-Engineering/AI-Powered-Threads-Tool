@@ -2,11 +2,13 @@
 
 import OpenAI from 'openai'
 import { createClient } from '@/lib/supabase/server'
+import { searchThreadsByKeyword } from './threads'
 
 interface GenerateParams {
   topic: string
   coreMessage: string
   referencePosts?: string
+  discoveredReferencePosts?: { text: string; username: string }[]
   authorPersona?: string
   personalityTraits?: string
   likesDislikes?: string
@@ -114,6 +116,95 @@ async function getPastPerformanceExamples(userId: string): Promise<PastPerforman
   }
 }
 
+// Threads' /keyword_search matches literal keywords, not full descriptive phrases — a
+// topic like "Debunking Test-Driven Development (TDD)" needs to become "TDD" or similar
+// to find anything. Returns several ranked candidate keywords (most literal/specific
+// first) so the caller can try more than one angle; falls back to [topic] (today's
+// single-attempt behavior) if no API key is configured or the call fails.
+export async function getSearchKeywordCandidates(topic: string, language?: 'en' | 'jp'): Promise<string[]> {
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY
+
+  if (!apiKey || apiKey === 'your-openai-api-key-here' || apiKey === 'your-openrouter-api-key-here') {
+    return [topic]
+  }
+
+  const openai = new OpenAI({
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey: apiKey,
+    defaultHeaders: {
+      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      'X-OpenRouter-Title': 'ThreadCraft AI',
+    },
+  })
+
+  const systemPrompt = `Suggest 3-5 short, literal search keywords or phrases (1-3 words each) for the given Threads post topic, suitable for a keyword-search API that matches literal text in posts — not semantic/descriptive titles.
+
+Rank them from most specific/literal to broadest, e.g. a well-known acronym or proper noun first (e.g. "TDD"), then the full term (e.g. "test-driven development"), then a broader related category (e.g. "software testing"). Do not include filler words like "Debunking", "The Power of", "Getting Your First", "誤解と真実", etc. Keep them distinct from each other, not near-duplicates.
+
+${language === 'jp' ? 'Respond in Japanese (日本語).' : 'Respond in English.'}
+
+RESPONSE FORMAT: Respond with ONLY a JSON object of the exact shape {"keywords": ["...", "...", "..."]}. No other text, no markdown code fences.`
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'google/gemini-2.5-flash',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: topic },
+      ],
+      temperature: 0.4,
+      max_tokens: 150,
+      response_format: { type: 'json_object' },
+    })
+
+    const raw = response.choices[0]?.message?.content?.trim() || ''
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed?.keywords)) {
+      const keywords = parsed.keywords.filter((k: unknown): k is string => typeof k === 'string' && k.trim().length > 0).map((k: string) => k.trim())
+      if (keywords.length > 0) return keywords
+    }
+  } catch (error) {
+    console.error('[Generate Action] getSearchKeywordCandidates failed, falling back to raw topic:', error)
+  }
+
+  return [topic]
+}
+
+// Real Threads post discovery for ONE keyword, via the /keyword_search API on behalf of
+// the current user's connected Threads account. Returns { error } (never throws) if the
+// account isn't connected, the token lacks threads_keyword_search, or the call fails —
+// callers must treat that as "no discovered posts" and continue generation regardless.
+// Intended to be called once per candidate from getSearchKeywordCandidates.
+export async function searchThreadsForKeyword(keyword: string): Promise<{ posts: { text: string; permalink: string; username: string }[] } | { error: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated' }
+  }
+
+  const { data: account } = await supabase
+    .from('social_accounts')
+    .select('access_token')
+    .eq('user_id', user.id)
+    .eq('platform', 'threads')
+    .maybeSingle()
+
+  if (!account?.access_token) {
+    return { error: 'Threads account is not linked.' }
+  }
+
+  const result = await searchThreadsByKeyword(account.access_token, keyword)
+
+  if ('error' in result) {
+    return { error: result.error }
+  }
+
+  return { posts: result.posts.map((p) => ({ text: p.text, permalink: p.permalink, username: p.username })) }
+}
+
 export async function generateThreadsPost(params: GenerateParams): Promise<{ variations: string[] } | { error: string }> {
   let resolvedReferences = params.referencePosts
   if (params.referencePosts) {
@@ -168,6 +259,10 @@ ${
 }${
   pastPerformance.avoid.length > 0
     ? `\nPATTERNS TO AVOID (the author's own past posts that underperformed — do not repeat this angle/structure):\n${pastPerformance.avoid.map((p) => `- ${p.generated_content}`).join('\n')}\n`
+    : ''
+}${
+  params.discoveredReferencePosts && params.discoveredReferencePosts.length > 0
+    ? `\nREAL THREADS POSTS FOUND FOR THIS TOPIC (analyze their hook/structure/format and adapt it — do not copy verbatim):\n${params.discoveredReferencePosts.map((p) => `- ${p.text}`).join('\n')}\n`
     : ''
 }
 CRITICAL CONSTRAINTS:
