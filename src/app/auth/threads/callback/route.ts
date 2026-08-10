@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   }
 
   const appId = process.env.NEXT_PUBLIC_THREAD_APP_ID
-  const appSecret = process.env.NEXT_PUBLIC_THREAD_APP_SECRET
+  const appSecret = process.env.THREAD_APP_SECRET
 
   if (!appId || !appSecret) {
     return NextResponse.redirect(`${origin}/account?error=threads_env_missing`)
