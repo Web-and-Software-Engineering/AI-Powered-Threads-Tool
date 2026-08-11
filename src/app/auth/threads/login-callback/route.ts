@@ -51,7 +51,10 @@ async function exchangeCodeForTokens(code: string, redirectUri: string, appId: s
 }
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000'
+  const protocol = request.headers.get('x-forwarded-proto') || 'https'
+  const origin = `${protocol}://${host}`
   const code = searchParams.get('code')
   const errorMsg = searchParams.get('error')
 
