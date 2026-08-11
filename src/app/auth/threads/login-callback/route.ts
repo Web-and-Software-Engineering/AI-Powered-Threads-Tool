@@ -60,6 +60,17 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   const errorMsg = searchParams.get('error')
 
+  if (searchParams.get('debug') === '1') {
+    return NextResponse.json({
+      origin,
+      host,
+      protocol,
+      allHeaders: Object.fromEntries(headersList.entries()),
+      appIdPresent: Boolean(process.env.NEXT_PUBLIC_THREAD_APP_ID),
+      appSecretPresent: Boolean(process.env.THREAD_APP_SECRET),
+    })
+  }
+
   if (errorMsg) {
     return NextResponse.redirect(`${origin}/auth?error=threads_oauth_failed&details=${encodeURIComponent(errorMsg)}`)
   }
