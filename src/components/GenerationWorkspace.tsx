@@ -150,6 +150,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   const [discoverySearched, setDiscoverySearched] = useState(false)
   const [discoveryError, setDiscoveryError] = useState<string | null>(null)
   const [searchKeywordsTried, setSearchKeywordsTried] = useState<string[]>([])
+  const [recentAttempts, setRecentAttempts] = useState<string[]>([])
 
   useEffect(() => {
     async function loadThreadsConnection() {
@@ -293,6 +294,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         coreMessage,
         referencePosts: referencePosts.trim() || undefined,
         discoveredReferencePosts: accumulatedPosts,
+        recentAttempts,
         authorPersona: profile.authorPersona,
         personalityTraits: profile.personalityTraits,
         likesDislikes: profile.likesDislikes,
@@ -313,6 +315,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
       }
 
       setVariations(result.variations)
+      setRecentAttempts((prev) => [...result.variations, ...prev].slice(0, 9))
       setGenerationStep('completed')
     } catch (err) {
       console.error(err)

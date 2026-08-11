@@ -9,6 +9,7 @@ interface GenerateParams {
   coreMessage: string
   referencePosts?: string
   discoveredReferencePosts?: { text: string; username: string }[]
+  recentAttempts?: string[]
   authorPersona?: string
   personalityTraits?: string
   likesDislikes?: string
@@ -78,16 +79,19 @@ interface PastPerformanceExample {
 interface PastPerformanceExamples {
   proven: PastPerformanceExample[]
   avoid: PastPerformanceExample[]
+  recentDrafts: PastPerformanceExample[]
 }
 
 // Pulls the user's own past posts already flagged by the real analytics sync
 // (syncAnalyticsMetrics in posts.ts) so the prompt can emulate what worked and
-// avoid repeating what didn't — no Threads API calls involved.
+// avoid repeating what didn't — no Threads API calls involved. Also pulls recently
+// saved drafts, which have no engagement data to judge but still count as "already
+// tried this" for anti-repetition purposes.
 async function getPastPerformanceExamples(userId: string): Promise<PastPerformanceExamples> {
   try {
     const supabase = await createClient()
 
-    const [provenResult, avoidResult] = await Promise.all([
+    const [provenResult, avoidResult, draftsResult] = await Promise.all([
       supabase
         .from('posts')
         .select('topic, generated_content')
@@ -104,15 +108,23 @@ async function getPastPerformanceExamples(userId: string): Promise<PastPerforman
         .eq('marked_for_restart', true)
         .order('published_at', { ascending: false })
         .limit(2),
+      supabase
+        .from('posts')
+        .select('topic, generated_content')
+        .eq('user_id', userId)
+        .eq('status', 'draft')
+        .order('created_at', { ascending: false })
+        .limit(5),
     ])
 
     return {
       proven: provenResult.data || [],
       avoid: avoidResult.data || [],
+      recentDrafts: draftsResult.data || [],
     }
   } catch (error) {
     console.error('[Generate Action] Failed to fetch past performance examples:', error)
-    return { proven: [], avoid: [] }
+    return { proven: [], avoid: [], recentDrafts: [] }
   }
 }
 
@@ -214,7 +226,7 @@ export async function generateThreadsPost(params: GenerateParams): Promise<{ var
   const {
     data: { user },
   } = await (await createClient()).auth.getUser()
-  const pastPerformance = user ? await getPastPerformanceExamples(user.id) : { proven: [], avoid: [] }
+  const pastPerformance = user ? await getPastPerformanceExamples(user.id) : { proven: [], avoid: [], recentDrafts: [] }
 
   const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY
 
@@ -231,11 +243,41 @@ export async function generateThreadsPost(params: GenerateParams): Promise<{ var
     },
   })
 
+  // Force structural variety instead of leaving it to chance — assign each variation
+  // a specific required angle rather than just suggesting "be different."
+  const ANGLE_POOL = [
+    'a bold, contrarian claim that challenges conventional wisdom',
+    'a personal story or anecdote',
+    'a numbered listicle/framework breakdown',
+    'a myth vs. reality comparison',
+    'a direct question posed to the reader',
+    'a surprising stat or fact-led hook',
+    'a "here is what nobody tells you about X" reveal',
+    'a before/after or mistake-then-fix narrative',
+  ]
+  const shuffledAngles = [...ANGLE_POOL].sort(() => Math.random() - 0.5)
+  const [angle1, angle2, angle3] = shuffledAngles
+
+  // Anti-repetition memory: recently saved drafts (cross-session, DB) plus this-session's
+  // prior attempts (client-supplied, not yet saved) — neither is a performance signal,
+  // just "already tried this, don't repeat it."
+  const recentlyGenerated = [
+    ...pastPerformance.recentDrafts.map((p) => p.generated_content).filter((c): c is string => !!c),
+    ...(params.recentAttempts || []),
+  ].slice(0, 6)
+
   const systemPrompt = `You are a high-performing social media content creator specializing in Threads posts.
 Your goal is to write THREE single-text Threads posts (each under 500 characters) that achieve maximum engagement.
 
-The three posts MUST take genuinely different angles or hooks on the same topic and core message (e.g. a bold claim, a personal story/anecdote, a listicle/framework breakdown, a contrarian take, a question hook) — do not just reword the same post three times.
-
+The three posts MUST take genuinely different angles — do not just reword the same post three times. Follow these required angles exactly:
+- Variation 1 MUST open with: ${angle1}
+- Variation 2 MUST open with: ${angle2}
+- Variation 3 MUST open with: ${angle3}
+${
+  recentlyGenerated.length > 0
+    ? `\nRECENTLY GENERATED POSTS FOR THIS AUTHOR (do not repeat their opening line, structure, or wording — write something meaningfully different from all of these):\n${recentlyGenerated.map((c) => `- ${c}`).join('\n')}\n`
+    : ''
+}
 FRAMEWORK RULES TO FOLLOW:
 - POCKET PERSONA & BACKGROUND (Casual background, personality notes, values, lifestyle, dreams, or life views):
 ${
@@ -278,7 +320,7 @@ RESPONSE FORMAT: Respond with ONLY a JSON object of the exact shape {"variations
   const userPrompt = `
 Topic: ${params.topic}
 Key Message/Value to Deliver: ${params.coreMessage || 'N/A'}
-${resolvedReferences ? `Reference Posts for Pattern Matching:\n${resolvedReferences}` : ''}
+${resolvedReferences ? `Reference Posts — closely mirror their hook style, structural pacing (line breaks, list vs. prose), and closing pattern, not just their general tone:\n${resolvedReferences}` : ''}
 
 Generate three authentic, high-converting Threads single-text post variations now:
 `
@@ -482,6 +524,7 @@ async function fetchAndParseThreadsPost(url: string): Promise<string> {
     })
 
     if (!res.ok) {
+      console.log(`[Generate Action] Reference scrape FAILED (HTTP ${res.status}) for ${url} — falling back to URL-only context.`)
       return `[Reference URL: ${url}] (Note: The server failed to fetch this link. Please write the output based on the theme & metadata in the URL if possible: ${url})`
     }
 
@@ -502,12 +545,15 @@ async function fetchAndParseThreadsPost(url: string): Promise<string> {
 
       // Catch fallback pages (such as redirect login gates)
       if (content.includes('Join Threads to share ideas') || content.includes('Log in with your Instagram')) {
+        console.log(`[Generate Action] Reference scrape LOGIN-GATED for ${url} — falling back to URL-only context.`)
         return `[Reference URL: ${url}] (Note: Meta restricted browser scraping on this page. Please write the output post using pattern matching guided by the URL context: ${url})`
       }
 
+      console.log(`[Generate Action] Reference scrape SUCCEEDED for ${url}: "${content.slice(0, 120)}${content.length > 120 ? '...' : ''}"`)
       return `[Reference Post Content from ${url}]:\n${content}`
     }
 
+    console.log(`[Generate Action] Reference scrape found NO og:description for ${url} — falling back to URL-only context.`)
     return `[Reference URL: ${url}]`
   } catch (err: any) {
     console.error(`[Generate Action] Failed to resolve URL ${url}:`, err)
