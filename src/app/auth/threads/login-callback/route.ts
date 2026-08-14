@@ -68,6 +68,11 @@ export async function GET(request: Request) {
       allHeaders: Object.fromEntries(headersList.entries()),
       appIdPresent: Boolean(process.env.NEXT_PUBLIC_THREAD_APP_ID),
       appSecretPresent: Boolean(process.env.THREAD_APP_SECRET),
+      openaiKeyPresent: Boolean(process.env.OPENAI_API_KEY),
+      openrouterKeyPresent: Boolean(process.env.OPENROUTER_API_KEY),
+      supabaseServiceRoleKeyPresent: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+      nodeEnv: process.env.NODE_ENV,
+      envKeysStartingWithThread: Object.keys(process.env).filter((k) => k.toUpperCase().includes('THREAD')),
     })
   }
 
