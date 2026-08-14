@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
+
+function getAdminClient() {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!serviceRoleKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured')
+  }
+  return createServiceClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
 
 async function exchangeCodeForTokens(code: string, redirectUri: string, appId: string, appSecret: string) {
   // Step 1: Short-lived token
@@ -114,15 +125,16 @@ export async function GET(request: Request) {
     }
 
     if (authError) {
-      // New user — sign up
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      // New user — create via admin API (bypasses the public signUp domain validation,
+      // which rejects our synthetic non-deliverable email addresses)
+      const adminClient = getAdminClient()
+      const { error: signUpError } = await adminClient.auth.admin.createUser({
         email: syntheticEmail,
         password: syntheticPassword,
-        options: {
-          data: {
-            display_name: displayName,
-            avatar_url: profilePictureUrl,
-          },
+        email_confirm: true,
+        user_metadata: {
+          display_name: displayName,
+          avatar_url: profilePictureUrl,
         },
       })
 
