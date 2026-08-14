@@ -80,7 +80,7 @@ export async function GET(request: Request) {
     const { threadsUserId, longLivedToken, expiresInSeconds, username, displayName, profilePictureUrl } =
       await exchangeCodeForTokens(code, redirectUri, appId, appSecret)
 
-    const syntheticEmail = `threads_${threadsUserId}@threads-auth.internal`
+    const syntheticEmail = `threads_${threadsUserId}@threads-auth.app`
     const syntheticPassword = `${threadsUserId}_${appSecret}`
     const supabase = await createClient()
 
