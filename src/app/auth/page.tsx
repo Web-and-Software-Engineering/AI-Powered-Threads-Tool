@@ -155,11 +155,11 @@ export default function AuthPage() {
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] flex items-center justify-center p-4 md:p-8 font-sans-custom transition-colors duration-200">
       <div className="w-full max-w-md glass-panel p-6 md:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
         {/* Glow accent */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Brand Header */}
         <div className="text-center space-y-2 mb-8">
-          <div className="inline-flex w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 items-center justify-center shadow-md">
+          <div className="inline-flex w-10 h-10 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 items-center justify-center shadow-md">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -187,7 +187,7 @@ export default function AuthPage() {
         {isForgotPassword ? (
           <>
             <div className="flex items-center gap-2.5 mb-6">
-              <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 text-purple-600 dark:text-purple-400">
+              <div className="p-2 rounded-xl bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 text-orange-600 dark:text-orange-400">
                 <KeyRound className="w-4 h-4" />
               </div>
               <div>
@@ -203,7 +203,7 @@ export default function AuthPage() {
             <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-purple-600" />
+                  <Mail className="w-3.5 h-3.5 text-orange-600" />
                   {language === 'jp' ? 'メールアドレス' : 'Email Address'}
                 </label>
                 <input
@@ -211,14 +211,14 @@ export default function AuthPage() {
                   name="email"
                   required
                   placeholder="name@domain.com"
-                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono-custom"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 mt-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 mt-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading
                   ? (language === 'jp' ? '送信中...' : 'Sending...')
@@ -234,7 +234,7 @@ export default function AuthPage() {
                   setError(null)
                   setSuccess(null)
                 }}
-                className="text-xs text-purple-600 hover:text-purple-700 font-semibold transition-colors cursor-pointer"
+                className="text-xs text-orange-600 hover:text-orange-700 font-semibold transition-colors cursor-pointer"
               >
                 {language === 'jp' ? '← ログインに戻る' : '← Back to Sign In'}
               </button>
@@ -247,7 +247,7 @@ export default function AuthPage() {
               {/* Email field */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-purple-600" />
+                  <Mail className="w-3.5 h-3.5 text-orange-600" />
                   {language === 'jp' ? 'メールアドレス' : 'Email Address'}
                 </label>
                 <input
@@ -255,7 +255,7 @@ export default function AuthPage() {
                   name="email"
                   required
                   placeholder="name@domain.com"
-                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono-custom"
                 />
               </div>
 
@@ -263,7 +263,7 @@ export default function AuthPage() {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-purple-600" />
+                    <Lock className="w-3.5 h-3.5 text-orange-600" />
                     {language === 'jp' ? 'パスワード' : 'Password'}
                   </label>
                   {!isRegister && (
@@ -274,7 +274,7 @@ export default function AuthPage() {
                         setError(null)
                         setSuccess(null)
                       }}
-                      className="text-[10px] text-purple-600 hover:text-purple-700 font-semibold transition-colors cursor-pointer"
+                      className="text-[10px] text-orange-600 hover:text-orange-700 font-semibold transition-colors cursor-pointer"
                     >
                       {language === 'jp' ? 'パスワードをお忘れですか？' : 'Forgot password?'}
                     </button>
@@ -286,7 +286,7 @@ export default function AuthPage() {
                     name="password"
                     required
                     placeholder="••••••••"
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono-custom"
                   />
                   <button
                     type="button"
@@ -302,7 +302,7 @@ export default function AuthPage() {
               {isRegister && (
                 <div className="space-y-1.5 animate-fade-in">
                   <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-purple-600" />
+                    <Lock className="w-3.5 h-3.5 text-orange-600" />
                     {language === 'jp' ? 'パスワード（確認）' : 'Confirm Password'}
                   </label>
                   <div className="relative">
@@ -311,7 +311,7 @@ export default function AuthPage() {
                       name="confirmPassword"
                       required
                       placeholder="••••••••"
-                      className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 dark:text-zinc-205 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                      className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 pr-10 text-xs text-zinc-800 dark:text-zinc-205 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono-custom"
                     />
                     <button
                       type="button"
@@ -328,7 +328,7 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 mt-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 mt-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading 
                   ? (language === 'jp' ? '認証中...' : 'Authenticating...') 
@@ -351,7 +351,7 @@ export default function AuthPage() {
               onClick={handleOAuthClick}
               className="w-full py-3.5 bg-black dark:bg-white hover:bg-zinc-900 dark:hover:bg-zinc-100 text-white dark:text-black rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer shadow-md"
             >
-              <Sparkles className="w-4.5 h-4.5 text-purple-400 animate-pulse" />
+              <Sparkles className="w-4.5 h-4.5 text-orange-400 animate-pulse" />
               {language === 'jp' ? 'Threadsでサインイン' : 'Continue with Threads'}
             </button>
 
@@ -363,7 +363,7 @@ export default function AuthPage() {
                   setError(null)
                   setSuccess(null)
                 }}
-                className="text-xs text-purple-600 hover:text-purple-700 font-semibold transition-colors cursor-pointer"
+                className="text-xs text-orange-600 hover:text-orange-700 font-semibold transition-colors cursor-pointer"
               >
                 {isRegister 
                   ? (language === 'jp' ? 'すでにアカウントをお持ちですか？ログイン' : 'Already have an account? Sign In') 

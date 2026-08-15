@@ -29,7 +29,7 @@ export function SavedPostsList({ posts, onEdit, onPublishNow, onCancelSchedule, 
   const statusBadge = (status: string) => {
     if (status === 'scheduled') {
       return (
-        <span className="text-[10px] px-2.5 py-1 rounded-full bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-mono-custom font-semibold flex items-center gap-1">
+        <span className="text-[10px] px-2.5 py-1 rounded-full bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 font-mono-custom font-semibold flex items-center gap-1">
           <CalendarClock className="w-3 h-3" /> {t('saved.status.scheduled')}
         </span>
       )
@@ -59,7 +59,7 @@ export function SavedPostsList({ posts, onEdit, onPublishNow, onCancelSchedule, 
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <span className="text-[11px] font-mono-custom text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">
+                <span className="text-[11px] font-mono-custom text-orange-600 dark:text-orange-400 font-bold uppercase tracking-wider">
                   {post.topic || 'General Topic'}
                 </span>
                 <p className="text-xs text-zinc-800 dark:text-zinc-200 mt-1 whitespace-pre-wrap break-words font-sans-custom leading-relaxed">
@@ -70,7 +70,7 @@ export function SavedPostsList({ posts, onEdit, onPublishNow, onCancelSchedule, 
             </div>
 
             {post.status === 'scheduled' && post.scheduledAt && (
-              <p className="text-[11px] text-purple-700 dark:text-purple-350 font-mono-custom">
+              <p className="text-[11px] text-orange-700 dark:text-orange-350 font-mono-custom">
                 {t('saved.scheduledFor')}: {new Date(post.scheduledAt).toLocaleString()}
               </p>
             )}

@@ -81,7 +81,7 @@ export default function SavedPostsPage() {
     <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in px-2 md:px-0">
       <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+          <div className="p-2.5 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
             <FolderHeart className="w-5 h-5" />
           </div>
           <div>
@@ -93,7 +93,7 @@ export default function SavedPostsPage() {
 
       {posts === null ? (
         <div className="flex items-center justify-center min-h-[30vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
         </div>
       ) : (
         <SavedPostsList

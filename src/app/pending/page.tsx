@@ -54,11 +54,11 @@ export default function PendingPage() {
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] flex items-center justify-center p-4 md:p-8 font-sans-custom">
       <div className="w-full max-w-md glass-panel p-6 md:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl relative overflow-hidden text-center space-y-6 animate-fade-in">
         {/* Glow decoration */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Header */}
         <div className="space-y-2">
-          <div className="inline-flex w-12 h-12 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 items-center justify-center shadow-lg shadow-purple-500/20 mb-2">
+          <div className="inline-flex w-12 h-12 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 items-center justify-center shadow-lg shadow-orange-500/20 mb-2">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">ThreadCraft Pocket</h1>
@@ -87,7 +87,7 @@ export default function PendingPage() {
           <button
             onClick={checkStatus}
             disabled={checking}
-            className="w-full py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer font-sans-custom"
+            className="w-full py-3 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer font-sans-custom"
           >
             <RefreshCw className={`w-4 h-4 ${checking ? 'animate-spin' : ''}`} />
             {checking 

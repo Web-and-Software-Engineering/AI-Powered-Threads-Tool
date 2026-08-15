@@ -8,10 +8,10 @@
     --bg-card: rgba(255, 255, 255, 0.9);
     --bg-card-hover: rgba(244, 244, 245, 1);
     --border-color: rgba(0, 0, 0, 0.08);
-    --border-color-active: rgba(147, 51, 234, 0.5);
+    --border-color-active: rgba(234, 88, 12, 0.5);
     --text-primary: #09090b;
     --text-secondary: #71717a;
-    --accent-purple: #9333ea;
+    --accent-orange: #ea580c;
     --accent-threads: #ffffff;
   }
 
@@ -20,10 +20,10 @@
     --bg-card: rgba(24, 24, 27, 0.85);
     --bg-card-hover: rgba(39, 39, 42, 0.9);
     --border-color: rgba(255, 255, 255, 0.08);
-    --border-color-active: rgba(168, 85, 247, 0.6);
+    --border-color-active: rgba(249, 115, 22, 0.6);
     --text-primary: #f4f4f5;
     --text-secondary: #a1a1aa;
-    --accent-purple: #a855f7;
+    --accent-orange: #f97316;
     --accent-threads: #18181b;
   }
 
@@ -38,7 +38,7 @@
   }
 
   .dark input:focus, .dark textarea:focus {
-    border-color: #a855f7 !important;
+    border-color: #f97316 !important;
   }
 
   body {
@@ -86,7 +86,7 @@
   background: var(--bg-card-hover);
   border-color: var(--border-color-active);
   transform: translateY(-1px);
-  box-shadow: 0 8px 25px -4px rgba(147, 51, 234, 0.12);
+  box-shadow: 0 8px 25px -4px rgba(234, 88, 12, 0.12);
 }
 
 /* Micro-animations */

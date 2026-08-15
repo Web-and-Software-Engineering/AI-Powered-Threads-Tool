@@ -45,12 +45,12 @@ export function Navigation() {
       <header className="hidden md:block fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass-panel border border-zinc-200/85 dark:border-zinc-800/85 px-6 py-2.5 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/40 max-w-max w-auto">
         <div className="flex items-center justify-between gap-8 md:gap-12">
           <div className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-md shadow-purple-500/20">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex items-center justify-center shadow-md shadow-orange-500/20">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
               <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 whitespace-nowrap">
-                ThreadCraft <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-semibold">Pocket</span>
+                ThreadCraft <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 font-semibold">Pocket</span>
               </h1>
             </div>
           </div>
@@ -61,7 +61,7 @@ export function Navigation() {
                 href="/profile"
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'profile'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30 font-semibold'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                 }`}
               >
@@ -73,7 +73,7 @@ export function Navigation() {
                 href="/"
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'workspace'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30 font-semibold'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                 }`}
               >
@@ -85,7 +85,7 @@ export function Navigation() {
                 href="/saved"
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'saved'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30 font-semibold'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                 }`}
               >
@@ -97,7 +97,7 @@ export function Navigation() {
                 href="/analytics"
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'analytics'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30 font-semibold'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                 }`}
               >
@@ -109,7 +109,7 @@ export function Navigation() {
                 href="/account"
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   activeTab === 'account'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30 font-semibold'
                     : 'text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                 }`}
               >
@@ -122,7 +122,7 @@ export function Navigation() {
                   href="/admin"
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     activeTab === 'admin'
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 font-semibold'
+                      ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30 font-semibold'
                       : 'text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                   }`}
                 >
@@ -163,7 +163,7 @@ export function Navigation() {
       <header className="block md:hidden glass-panel border-b border-zinc-200/80 dark:border-zinc-800/85 px-4 py-3 mb-6 sticky top-0 z-50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex items-center justify-center">
               <Sparkles className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
@@ -203,7 +203,7 @@ export function Navigation() {
         <Link
           href="/profile"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-            activeTab === 'profile' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-500 dark:text-zinc-450'
+            activeTab === 'profile' ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-500 dark:text-zinc-450'
           }`}
         >
           <FolderHeart className="w-5 h-5" />
@@ -213,7 +213,7 @@ export function Navigation() {
         <Link
           href="/"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-            activeTab === 'workspace' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-500 dark:text-zinc-450'
+            activeTab === 'workspace' ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-500 dark:text-zinc-450'
           }`}
         >
           <PenSquare className="w-5 h-5" />
@@ -223,7 +223,7 @@ export function Navigation() {
         <Link
           href="/saved"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-            activeTab === 'saved' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-500 dark:text-zinc-450'
+            activeTab === 'saved' ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-500 dark:text-zinc-450'
           }`}
         >
           <Bookmark className="w-5 h-5" />
@@ -233,7 +233,7 @@ export function Navigation() {
         <Link
           href="/analytics"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-            activeTab === 'analytics' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-500 dark:text-zinc-450'
+            activeTab === 'analytics' ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-500 dark:text-zinc-450'
           }`}
         >
           <BarChart3 className="w-5 h-5" />
@@ -243,7 +243,7 @@ export function Navigation() {
         <Link
           href="/account"
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-            activeTab === 'account' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-550 dark:text-zinc-450'
+            activeTab === 'account' ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-550 dark:text-zinc-450'
           }`}
         >
           <User className="w-5 h-5" />
@@ -254,7 +254,7 @@ export function Navigation() {
           <Link
             href="/admin"
             className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
-              activeTab === 'admin' ? 'text-purple-600 dark:text-purple-400' : 'text-zinc-550 dark:text-zinc-450'
+              activeTab === 'admin' ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-550 dark:text-zinc-450'
             }`}
           >
             <Shield className="w-5 h-5" />

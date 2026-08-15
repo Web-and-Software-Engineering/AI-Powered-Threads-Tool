@@ -98,7 +98,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
       <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BarChart3 className="w-5 h-5 text-purple-600" />
+            <BarChart3 className="w-5 h-5 text-orange-600" />
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{language === 'jp' ? '分析 ＆ 再構築ループ' : 'Analysis & Restart Loop'}</h2>
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom font-medium">
@@ -109,7 +109,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
         <button
           onClick={handleRunSync}
           disabled={syncing}
-          className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/30 transition-all active:scale-95 cursor-pointer"
+          className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-orange-600/30 transition-all active:scale-95 cursor-pointer"
         >
           <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
           {syncing ? (language === 'jp' ? 'ループ分析中...' : 'Analyzing Loop...') : (language === 'jp' ? 'ループレポート同期' : 'Sync Loop Metrics')}
@@ -128,9 +128,9 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
 
       {/* Synced AI Insights Banner */}
       {syncedLogs.length > 0 && (
-        <div className="glass-panel p-5 rounded-2xl border border-purple-200 dark:border-purple-900/50 bg-purple-50/60 dark:bg-purple-950/20 space-y-2 animate-fade-in">
-          <h3 className="text-xs font-bold text-purple-800 dark:text-purple-300 flex items-center gap-2 uppercase tracking-wider font-mono-custom">
-            <Sparkles className="w-4 h-4 text-purple-600" /> {language === 'jp' ? 'ループ処理ログ' : 'Loop Actions Log'}
+        <div className="glass-panel p-5 rounded-2xl border border-orange-200 dark:border-orange-900/50 bg-orange-50/60 dark:bg-orange-950/20 space-y-2 animate-fade-in">
+          <h3 className="text-xs font-bold text-orange-800 dark:text-orange-300 flex items-center gap-2 uppercase tracking-wider font-mono-custom">
+            <Sparkles className="w-4 h-4 text-orange-600" /> {language === 'jp' ? 'ループ処理ログ' : 'Loop Actions Log'}
           </h3>
           <ul className="space-y-1.5 text-xs text-zinc-700 dark:text-zinc-300 font-mono-custom">
             {syncedLogs.map((log, idx) => (
@@ -169,7 +169,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] font-mono-custom text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">
+                    <span className="text-[11px] font-mono-custom text-orange-600 dark:text-orange-400 font-bold uppercase tracking-wider">
                       {post.topic || 'General Topic'}
                     </span>
                     {post.platformPostUrl && (
@@ -177,7 +177,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                         href={post.platformPostUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[10px] font-mono-custom font-semibold text-zinc-500 dark:text-zinc-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                        className="inline-flex items-center gap-1 text-[10px] font-mono-custom font-semibold text-zinc-500 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
                       >
                         <ExternalLink className="w-2.5 h-2.5" /> {language === 'jp' ? '投稿を見る' : 'View Post'}
                       </a>
@@ -212,7 +212,7 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
               <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800 text-xs font-mono-custom">
                 <div className="flex items-center gap-4 md:gap-6 text-zinc-500 dark:text-zinc-400">
                   <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                    <ThumbsUp className="w-3.5 h-3.5 text-purple-600" />
+                    <ThumbsUp className="w-3.5 h-3.5 text-orange-600" />
                     {post.metrics?.likes || 0}
                   </span>
                   <span className="flex items-center gap-1 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
@@ -240,14 +240,14 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                     ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300'
                     : post.markedForRestart
                       ? 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-300'
-                      : 'bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40 text-purple-900 dark:text-purple-300'
+                      : 'bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900/40 text-orange-900 dark:text-orange-300'
                 }`}>
                   <Sparkles className={`w-3.5 h-3.5 shrink-0 ${
                     post.structureCloned
                       ? 'text-emerald-600'
                       : post.markedForRestart
                         ? 'text-rose-600'
-                        : 'text-purple-600'
+                        : 'text-orange-600'
                   }`} />
                   <span className="break-words flex-1">{post.aiInsight}</span>
                 </div>

@@ -163,7 +163,7 @@ export function AccountSettings({
       {/* Tab Header Banner */}
       <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-2">
-          <User className="w-5 h-5 text-purple-600" />
+          <User className="w-5 h-5 text-orange-600" />
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{t('settings.title')}</h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom font-medium">
@@ -178,7 +178,7 @@ export function AccountSettings({
         <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <Camera className="w-4 h-4 text-purple-600" /> {t('settings.public')}
+              <Camera className="w-4 h-4 text-orange-600" /> {t('settings.public')}
             </h3>
 
             {profileError && (
@@ -200,7 +200,7 @@ export function AccountSettings({
               <img
                 src={avatarUrl}
                 alt="Profile"
-                className="w-16 h-16 rounded-full object-cover border-2 border-purple-600 shadow-md shrink-0 bg-zinc-100"
+                className="w-16 h-16 rounded-full object-cover border-2 border-orange-600 shadow-md shrink-0 bg-zinc-100"
               />
               <div>
                 <span className="text-[11px] font-bold text-zinc-500 block uppercase tracking-wider">{t('settings.photo')}</span>
@@ -217,7 +217,7 @@ export function AccountSettings({
                   required
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono-custom"
                 />
               </div>
 
@@ -238,7 +238,7 @@ export function AccountSettings({
                 <button
                   type="submit"
                   disabled={profileSaving || !displayName.trim()}
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 cursor-pointer font-sans-custom"
+                  className="px-5 py-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-orange-600/25 transition-all active:scale-95 cursor-pointer font-sans-custom"
                 >
                   {profileSaving ? t('settings.saving') : t('settings.save')}
                 </button>
@@ -251,7 +251,7 @@ export function AccountSettings({
         <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <Key className="w-4 h-4 text-purple-600" /> {t('settings.password')}
+              <Key className="w-4 h-4 text-orange-600" /> {t('settings.password')}
             </h3>
 
             {pwdError && (
@@ -279,7 +279,7 @@ export function AccountSettings({
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono-custom"
                   />
                   <button
                     type="button"
@@ -301,7 +301,7 @@ export function AccountSettings({
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-mono-custom"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 pr-10 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono-custom"
                   />
                   <button
                     type="button"
@@ -317,7 +317,7 @@ export function AccountSettings({
                 <button
                   type="submit"
                   disabled={pwdSaving || password.length < 6 || password !== confirmPassword}
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 cursor-pointer font-sans-custom"
+                  className="px-5 py-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-orange-600/25 transition-all active:scale-95 cursor-pointer font-sans-custom"
                 >
                   {pwdSaving ? t('settings.pwd.changing') : t('settings.pwd.change')}
                 </button>
@@ -330,7 +330,7 @@ export function AccountSettings({
       {/* Threads Connection Panel */}
       <div className="glass-panel p-5 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-4">
         <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" /> {t('settings.threads')}
+          <Sparkles className="w-4 h-4 text-orange-600 animate-pulse" /> {t('settings.threads')}
         </h3>
 
         {threadsError && (
@@ -365,7 +365,7 @@ export function AccountSettings({
                 <img
                   src={connAvatarUrl}
                   alt={connDisplayName || connUsername}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-purple-200 dark:border-purple-800 shadow-sm shrink-0"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-orange-200 dark:border-orange-800 shadow-sm shrink-0"
                 />
               ) : (
               <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-700 flex items-center justify-center shrink-0">
@@ -389,7 +389,7 @@ export function AccountSettings({
                       href={`https://threads.net/@${connUsername}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors inline-flex items-center gap-0.5 text-[10px] font-bold"
+                      className="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors inline-flex items-center gap-0.5 text-[10px] font-bold"
                       title="View profile on Threads"
                     >
                       <ExternalLink className="w-3.5 h-3.5" /> {language === 'jp' ? 'プロフィールを表示' : 'View Profile'}

@@ -138,7 +138,7 @@ export function PostEditor({
               rows={8}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all font-sans-custom leading-relaxed shadow-sm"
+              className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-sans-custom leading-relaxed shadow-sm"
             />
 
             <div className="flex items-center justify-between mt-2 px-1">
@@ -153,7 +153,7 @@ export function PostEditor({
                 <div className="w-16 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                   <div
                      className={`h-full transition-all ${
-                      isOverLimit ? 'bg-rose-500' : 'bg-purple-600'
+                      isOverLimit ? 'bg-rose-500' : 'bg-orange-600'
                     }`}
                     style={{ width: `${Math.min((charCount / maxChars) * 100, 100)}%` }}
                   />
@@ -222,12 +222,12 @@ export function PostEditor({
               setScheduledAt(e.target.value)
               setScheduled(false)
             }}
-            className="flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+            className="flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
           />
           <button
             onClick={handleSchedule}
             disabled={scheduling || isOverLimit || !content.trim() || !scheduledAt}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all active:scale-95 shrink-0"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all active:scale-95 shrink-0"
           >
             {scheduling ? (
               <>

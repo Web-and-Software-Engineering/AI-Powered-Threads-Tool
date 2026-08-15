@@ -118,11 +118,11 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-fade-in px-2 md:px-0">
       <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Section Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900">
+          <div className="p-2.5 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900">
             <FolderHeart className="w-5 h-5" />
           </div>
           <div>
@@ -139,7 +139,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
             onClick={() => setActiveSubTab('pocket')}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
               activeSubTab === 'pocket'
-                ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/60 dark:border-purple-800/60 shadow-sm'
+                ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border border-orange-200/60 dark:border-orange-800/60 shadow-sm'
                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
@@ -149,7 +149,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
             onClick={() => setActiveSubTab('audience')}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
               activeSubTab === 'audience'
-                ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/60 dark:border-purple-800/60 shadow-sm'
+                ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border border-orange-200/60 dark:border-orange-800/60 shadow-sm'
                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             }`}
           >
@@ -163,7 +163,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
               {/* Single Broad Pocket Notes Field */}
               <div className="space-y-1.5 animate-fade-in">
                 <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-purple-600" />
+                  <User className="w-3.5 h-3.5 text-orange-600" />
                   {t('profile.bio')}
                 </label>
                 <textarea
@@ -171,7 +171,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
                   value={formData.authorPersona}
                   onChange={(e) => setFormData({ ...formData, authorPersona: e.target.value })}
                   placeholder={t('profile.bio.placeholder')}
-                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed font-sans-custom"
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 transition-all leading-relaxed font-sans-custom"
                 />
               </div>
             </div>
@@ -180,7 +180,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
               {/* Target Audience Profile */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-purple-600" />
+                  <User className="w-3.5 h-3.5 text-orange-600" />
                   {t('profile.audience')}
                 </label>
                 <textarea
@@ -188,7 +188,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
                   value={formData.targetAudience}
                   onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
                   placeholder={t('profile.audience.placeholder')}
-                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all leading-relaxed"
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 transition-all leading-relaxed"
                 />
               </div>
 
@@ -201,7 +201,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
                     value={formData.preferredTone}
                     onChange={(e) => setFormData({ ...formData, preferredTone: e.target.value })}
                     placeholder={t('profile.tone.placeholder')}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 transition-all"
                   />
                 </div>
 
@@ -213,7 +213,7 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
                     value={formData.writingStyleRules}
                     onChange={(e) => setFormData({ ...formData, writingStyleRules: e.target.value })}
                     placeholder={t('profile.constraints.placeholder')}
-                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 transition-all"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/10 transition-all"
                   />
                 </div>
               </div>
@@ -237,13 +237,13 @@ export function ProfileWorkspace({ profile, onSave }: ProfileWorkspaceProps) {
               onClick={handleAutofill}
               className="px-4 py-2.5 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-semibold transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer font-sans-custom"
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-650 dark:text-purple-400 shrink-0" />
+              <Sparkles className="w-3.5 h-3.5 text-orange-650 dark:text-orange-400 shrink-0" />
               {language === 'jp' ? 'サンプル自動入力' : 'Autofill Template'}
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-purple-600/25 transition-all active:scale-95 flex items-center gap-2 cursor-pointer font-sans-custom"
+              className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md shadow-orange-600/25 transition-all active:scale-95 flex items-center gap-2 cursor-pointer font-sans-custom"
             >
               {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               {t('profile.save')}

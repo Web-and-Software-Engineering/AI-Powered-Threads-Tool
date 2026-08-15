@@ -290,7 +290,7 @@ export default function AdminPage() {
       {/* Header Banner */}
       <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+          <div className="p-2.5 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
             <Users className="w-5 h-5" />
           </div>
           <div>
@@ -329,7 +329,7 @@ export default function AdminPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder={language === 'jp' ? 'メールまたは名前で検索...' : 'Search by email or name...'}
-                className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 transition-all font-mono-custom"
+                className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 transition-all font-mono-custom"
               />
             </div>
 
@@ -341,7 +341,7 @@ export default function AdminPage() {
                   onClick={() => setStatusFilter(tab)}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer font-sans-custom ${
                     statusFilter === tab
-                      ? 'bg-purple-600 text-white shadow-md'
+                      ? 'bg-orange-600 text-white shadow-md'
                       : 'text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                   }`}
                 >
@@ -371,7 +371,7 @@ export default function AdminPage() {
                   {loading ? (
                     <tr>
                       <td colSpan={5} className="py-12 text-center text-zinc-400 dark:text-zinc-500 font-mono-custom">
-                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-purple-600" />
+                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-orange-600" />
                         {language === 'jp' ? 'ユーザー読み込み中...' : 'Loading users list...'}
                       </td>
                     </tr>
@@ -395,7 +395,7 @@ export default function AdminPage() {
                                 referrerPolicy="no-referrer"
                               />
                             ) : (
-                              <div className="w-8.5 h-8.5 rounded-full bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800/40 flex items-center justify-center font-bold">
+                              <div className="w-8.5 h-8.5 rounded-full bg-orange-50 dark:bg-orange-950/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800/40 flex items-center justify-center font-bold">
                                 {user.display_name?.slice(0, 2).toUpperCase() || 'US'}
                               </div>
                             )}
@@ -423,7 +423,7 @@ export default function AdminPage() {
                         <td className="py-4 px-6">
                           <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded font-mono-custom text-[10px] font-bold ${
                             user.role === 'admin'
-                              ? 'bg-purple-100 dark:bg-purple-950/30 text-purple-700 dark:text-purple-350 border border-purple-200 dark:border-purple-900'
+                              ? 'bg-orange-100 dark:bg-orange-950/30 text-orange-700 dark:text-orange-350 border border-orange-200 dark:border-orange-900'
                               : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-650 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800'
                           }`}>
                             {user.role === 'admin' ? (
@@ -552,7 +552,7 @@ export default function AdminPage() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4 animate-fade-in">
           <div className="w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
             {/* Ambient Background Glow */}
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 mb-2">
               {language === 'jp' ? 'ユーザー承認期間の選択' : 'Select Approval Duration'}
@@ -576,7 +576,7 @@ export default function AdminPage() {
                   key={opt.value}
                   className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer text-xs font-semibold ${
                     durationOption === opt.value
-                      ? 'bg-purple-50/50 dark:bg-purple-950/10 border-purple-500/50 text-purple-700 dark:text-purple-300'
+                      ? 'bg-orange-50/50 dark:bg-orange-950/10 border-orange-500/50 text-orange-700 dark:text-orange-300'
                       : 'bg-zinc-50/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/50 dark:hover:bg-zinc-850/30'
                   }`}
                 >
@@ -591,12 +591,12 @@ export default function AdminPage() {
                   <div
                     className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                       durationOption === opt.value
-                        ? 'border-purple-500'
+                        ? 'border-orange-500'
                         : 'border-zinc-300 dark:border-zinc-700'
                     }`}
                   >
                     {durationOption === opt.value && (
-                      <div className="w-2 h-2 rounded-full bg-purple-500" />
+                      <div className="w-2 h-2 rounded-full bg-orange-500" />
                     )}
                   </div>
                   <span>{opt.label}</span>
@@ -610,7 +610,7 @@ export default function AdminPage() {
                     type="datetime-local"
                     value={customDate}
                     onChange={(e) => setCustomDate(e.target.value)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-purple-500 transition-all font-mono-custom"
+                    className="w-full bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 transition-all font-mono-custom"
                   />
                 </div>
               )}
@@ -628,7 +628,7 @@ export default function AdminPage() {
               </button>
               <button
                 onClick={handleConfirmApproval}
-                className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all active:scale-95 shadow-md shadow-purple-500/10 cursor-pointer"
+                className="flex-1 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold transition-all active:scale-95 shadow-md shadow-orange-500/10 cursor-pointer"
               >
                 {language === 'jp' ? '承認を適用' : 'Approve User'}
               </button>
