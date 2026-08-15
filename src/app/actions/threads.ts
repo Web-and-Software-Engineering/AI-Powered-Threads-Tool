@@ -88,6 +88,26 @@ export async function publishThreadsContent(accessToken: string, threadsUserId: 
 
     const creationId = containerData.id
 
+    // Step 1.5: Poll the container until Threads finishes processing it.
+    // Publishing immediately after creation is a known race condition — the
+    // container can still be IN_PROGRESS, and threads_publish then fails with
+    // "Media Not Found" even though creation itself succeeded.
+    const maxPollAttempts = 10
+    const pollIntervalMs = 1500
+    for (let attempt = 0; attempt < maxPollAttempts; attempt++) {
+      const statusRes = await fetch(
+        `https://graph.threads.net/v1.0/${creationId}?fields=status,error_message&access_token=${encodeURIComponent(accessToken)}`
+      )
+      const statusData = await statusRes.json()
+
+      if (statusData.status === 'FINISHED') break
+      if (statusData.status === 'ERROR') {
+        return { error: statusData.error_message || 'Threads failed to process the post container.' }
+      }
+      // Still IN_PROGRESS (or status missing) — wait and check again.
+      await new Promise((resolve) => setTimeout(resolve, pollIntervalMs))
+    }
+
     // Step 2: Publish the media container using POST request body
     const publishRes = await fetch(
       `https://graph.threads.net/v1.0/${threadsUserId}/threads_publish`,
