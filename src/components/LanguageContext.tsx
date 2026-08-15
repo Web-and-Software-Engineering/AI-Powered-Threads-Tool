@@ -14,7 +14,7 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     // Nav / Global
     "nav.profile": "Persona",
-    "nav.generate": "Generator",
+    "nav.generate": "Cooking",
     "nav.analytics": "Analytics",
     "nav.account": "Settings",
     "nav.saved": "Saved Posts",
@@ -23,7 +23,7 @@ const translations: Record<Language, Record<string, string>> = {
     "global.theme.light": "Light Mode",
 
     // Auth
-    "auth.title": "ThreadCraft Pocket",
+    "auth.title": "LETTER COOK",
     "auth.subtitle": "Automated Reference & Rewrite Loop",
     "auth.email": "Email Address",
     "auth.password": "Password",
@@ -39,7 +39,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Generator Workspace
     "gen.title": "Create New Threads Post",
     "gen.subtitle": "Enter your theme and target message. The AI handles Threads scraping and structure analysis.",
-    "gen.theme": "Desired Theme",
+    "gen.theme": "Theme (Title)",
     "gen.theme.placeholder": "e.g. Productivity habits for remote builders",
     "gen.message": "Key Message / Value to Deliver",
     "gen.message.placeholder": "e.g. Sleep & deep work blocks beat grinding 14-hour days.",
@@ -105,11 +105,11 @@ const translations: Record<Language, Record<string, string>> = {
     "analytics.card.restart": "Low Engagement",
 
     // Pocket (Profile)
-    "profile.title": "Pocket & Audience Hub",
+    "profile.title": "Chef & Target",
     "profile.subtitle": "Store your personal persona details (\"Pocket\") and target avatars.",
-    "profile.tab.pocket": "① The \"Pocket\" (My Persona)",
-    "profile.tab.audience": "② \"To Whom\" (Target Audience)",
-    "profile.bio": "Pocket Persona Notes",
+    "profile.tab.pocket": "① Chef Profile (Your Background & Strengths)",
+    "profile.tab.audience": "② Target Definition (Target Audience)",
+    "profile.bio": "Chef Information",
     "profile.bio.placeholder": "[Bio & Background]\n...\n\n[Personality Traits]\n...\n\n[Likes & Dislikes]\n...\n\n[Values]\n...\n\n[Lifestyle]\n...\n\n[Dreams & Goals]\n...\n\n[Outlook on Life]\n...",
     "profile.audience": "Target Customer / Reader Profile",
     "profile.audience.placeholder": "Describe your target audience...",
@@ -154,7 +154,7 @@ const translations: Record<Language, Record<string, string>> = {
   jp: {
     // Nav / Global
     "nav.profile": "ペルソナ",
-    "nav.generate": "ジェネレーター",
+    "nav.generate": "クッキング",
     "nav.analytics": "分析",
     "nav.account": "設定",
     "nav.saved": "保存済み投稿",
@@ -163,7 +163,7 @@ const translations: Record<Language, Record<string, string>> = {
     "global.theme.light": "ライトモード",
 
     // Auth
-    "auth.title": "ThreadCraft Pocket",
+    "auth.title": "LETTER COOK",
     "auth.subtitle": "自動ペルソナ参照・リライトループ",
     "auth.email": "メールアドレス",
     "auth.password": "パスワード",
@@ -179,7 +179,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Generator Workspace
     "gen.title": "スレッド新規作成",
     "gen.subtitle": "テーマと伝えたい内容を入力してください。AIがThreadsの構造分析に基づいて投稿を作成します。",
-    "gen.theme": "テーマ",
+    "gen.theme": "テーマ（タイトル）",
     "gen.theme.placeholder": "例: リモートワーカー向けの生産性向上ハック",
     "gen.message": "キーメッセージ / 伝えたい価値",
     "gen.message.placeholder": "例: 14時間ダラダラ働くより、睡眠と深い集中が効果的。",
@@ -245,11 +245,11 @@ const translations: Record<Language, Record<string, string>> = {
     "analytics.card.restart": "エンゲージメント低調",
 
     // Pocket (Profile)
-    "profile.title": "ペルソナ＆ターゲット設定",
+    "profile.title": "シェフ＆ターゲット",
     "profile.subtitle": "あなたのペルソナ情報とターゲット属性を設定します。",
-    "profile.tab.pocket": "① ペルソナ設定 (あなたの経歴・強み)",
-    "profile.tab.audience": "② ターゲット設定 (対象読者層)",
-    "profile.bio": "ペルソナ情報 (Pocket)",
+    "profile.tab.pocket": "① シェフプロフィール (あなたの経歴・強み)",
+    "profile.tab.audience": "② ターゲット設定 (ターゲット層)",
+    "profile.bio": "シェフ情報",
     "profile.bio.placeholder": "【自己紹介・経歴】\n...\n\n【性格・特徴】\n...\n\n【好きなこと・嫌いなこと】\n...\n\n【価値観】\n...\n\n【ライフスタイル】\n...\n\n【将来の夢・目標】\n...\n\n【人生観】\n...",
     "profile.audience": "ターゲット読者層",
     "profile.audience.placeholder": "あなたのターゲット層を説明してください...",

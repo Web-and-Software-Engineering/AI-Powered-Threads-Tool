@@ -145,7 +145,7 @@ export async function getSearchKeywordCandidates(topic: string, language?: 'en' 
     apiKey: apiKey,
     defaultHeaders: {
       'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-      'X-OpenRouter-Title': 'ThreadCraft AI',
+      'X-OpenRouter-Title': 'LETTER COOK',
     },
   })
 
@@ -239,7 +239,7 @@ export async function generateThreadsPost(params: GenerateParams): Promise<{ var
     apiKey: apiKey,
     defaultHeaders: {
       'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-      'X-OpenRouter-Title': 'ThreadCraft AI',
+      'X-OpenRouter-Title': 'LETTER COOK',
     },
   })
 
@@ -410,7 +410,7 @@ export async function suggestPostIdea(params: SuggestPostIdeaParams): Promise<{ 
     apiKey: apiKey,
     defaultHeaders: {
       'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-      'X-OpenRouter-Title': 'ThreadCraft AI',
+      'X-OpenRouter-Title': 'LETTER COOK',
     },
   })
 

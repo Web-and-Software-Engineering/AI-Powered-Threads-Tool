@@ -50,7 +50,7 @@ export function Navigation() {
             </div>
             <div>
               <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 whitespace-nowrap">
-                ThreadCraft <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 font-semibold">Pocket</span>
+                LETTER <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 font-semibold">COOK</span>
               </h1>
             </div>
           </div>
@@ -167,7 +167,7 @@ export function Navigation() {
               <Sparkles className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100">ThreadCraft Pocket</h1>
+              <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK</h1>
               <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono-custom">Automated Search & Analysis Loop</p>
             </div>
           </div>

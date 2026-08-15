@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/ThemeContext";
 import { LanguageProvider } from "@/components/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "ThreadCraft AI • Threads Content Generator & Analytics Engine",
+  title: "LETTER COOK • Threads Content Generator & Analytics Engine",
   description: "Automate, personalize, publish, and analyze your Threads content with AI feedback loops.",
 };
 

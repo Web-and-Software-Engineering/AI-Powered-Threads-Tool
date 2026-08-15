@@ -139,7 +139,7 @@ async function extractPersonaFields(rawText: string, language: 'en' | 'jp'): Pro
     apiKey: apiKey,
     defaultHeaders: {
       'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-      'X-OpenRouter-Title': 'ThreadCraft AI',
+      'X-OpenRouter-Title': 'LETTER COOK',
     },
   })
 

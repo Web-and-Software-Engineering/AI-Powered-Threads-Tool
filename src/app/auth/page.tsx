@@ -163,7 +163,7 @@ export default function AuthPage() {
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">ThreadCraft Pocket</h1>
+            <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK</h1>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">{language === 'jp' ? '参考投稿の自動取得・リライトループ' : 'Automated Reference & Rewrite Loop'}</p>
           </div>
         </div>

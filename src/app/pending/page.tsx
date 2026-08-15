@@ -61,7 +61,7 @@ export default function PendingPage() {
           <div className="inline-flex w-12 h-12 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 items-center justify-center shadow-lg shadow-orange-500/20 mb-2">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">ThreadCraft Pocket</h1>
+          <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK</h1>
           <p className="text-[10px] text-zinc-450 dark:text-zinc-500 font-mono-custom uppercase tracking-widest">
             {language === 'jp' ? '自動承認ワークフロー' : 'Automated Approval Loop'}
           </p>
