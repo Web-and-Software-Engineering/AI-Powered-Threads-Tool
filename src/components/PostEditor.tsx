@@ -10,9 +10,10 @@ interface PostEditorProps {
   initialContent: string
   topic: string
   coreMessage: string
-  onPublish: (content: string) => Promise<ActionResult>
-  onSave?: (content: string) => Promise<ActionResult>
-  onSchedule?: (content: string, scheduledAt: string) => Promise<ActionResult>
+  initialTopicTag?: string
+  onPublish: (content: string, topicTag: string) => Promise<ActionResult>
+  onSave?: (content: string, topicTag: string) => Promise<ActionResult>
+  onSchedule?: (content: string, scheduledAt: string, topicTag: string) => Promise<ActionResult>
   initialScheduledAt?: string
   onRegenerate?: () => void
   threadsAccount?: { username: string; avatarUrl: string } | null
@@ -22,6 +23,7 @@ export function PostEditor({
   initialContent,
   topic,
   coreMessage,
+  initialTopicTag,
   onPublish,
   onSave,
   onSchedule,
@@ -31,6 +33,7 @@ export function PostEditor({
 }: PostEditorProps) {
   const { t, language } = useLanguage()
   const [content, setContent] = useState(initialContent)
+  const [topicTag, setTopicTag] = useState(initialTopicTag || '')
   const [publishing, setPublishing] = useState(false)
   const [published, setPublished] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -55,7 +58,7 @@ export function PostEditor({
     setError(null)
 
     try {
-      const result = await onPublish(content)
+      const result = await onPublish(content, topicTag)
       if (result?.error) {
         setError(result.error)
       } else {
@@ -74,7 +77,7 @@ export function PostEditor({
     setError(null)
 
     try {
-      const result = await onSave(content)
+      const result = await onSave(content, topicTag)
       if (result?.error) {
         setError(result.error)
       } else {
@@ -94,7 +97,7 @@ export function PostEditor({
 
     try {
       const isoScheduledAt = new Date(scheduledAt).toISOString()
-      const result = await onSchedule(content, isoScheduledAt)
+      const result = await onSchedule(content, isoScheduledAt, topicTag)
       if (result?.error) {
         setError(result.error)
       } else {
@@ -167,6 +170,17 @@ export function PostEditor({
               <AlertCircle className="w-3.5 h-3.5" /> {language === 'jp' ? 'Threadsの500文字制限を超えています。' : 'Exceeds Threads 500-character limit.'}
             </p>
           )}
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">{t('gen.topicTag')}</label>
+            <input
+              type="text"
+              value={topicTag}
+              onChange={(e) => setTopicTag(e.target.value)}
+              placeholder={t('gen.topicTag.placeholder')}
+              className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+            />
+          </div>
         </div>
 
         {/* Live Preview Column */}

@@ -14,6 +14,7 @@ export default function AnalyticsPage() {
         result.posts.map((p) => ({
           id: p.id,
           topic: p.topic,
+          topicTag: p.topicTag || undefined,
           coreMessage: p.coreMessage,
           generatedContent: p.generatedContent,
           platformPostUrl: p.platformPostUrl || undefined,

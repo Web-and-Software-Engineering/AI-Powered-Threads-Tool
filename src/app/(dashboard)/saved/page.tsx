@@ -120,15 +120,16 @@ export default function SavedPostsPage() {
               initialContent={editingPost.generatedContent}
               topic={editingPost.topic}
               coreMessage={editingPost.coreMessage}
+              initialTopicTag={editingPost.topicTag || ''}
               initialScheduledAt={editingPost.scheduledAt ? editingPost.scheduledAt.slice(0, 16) : undefined}
               threadsAccount={threadsAccount}
-              onSave={async (content) => {
-                const result = await updateSavedPost(editingPost.id, content)
+              onSave={async (content, topicTag) => {
+                const result = await updateSavedPost(editingPost.id, content, topicTag)
                 await refresh()
                 return result
               }}
-              onPublish={async (content) => {
-                await updateSavedPost(editingPost.id, content)
+              onPublish={async (content, topicTag) => {
+                await updateSavedPost(editingPost.id, content, topicTag)
                 const result = await publishSavedPost(editingPost.id)
                 await refresh()
                 if (!result?.error) {
@@ -136,8 +137,8 @@ export default function SavedPostsPage() {
                 }
                 return result
               }}
-              onSchedule={async (content, scheduledAt) => {
-                await updateSavedPost(editingPost.id, content)
+              onSchedule={async (content, scheduledAt, topicTag) => {
+                await updateSavedPost(editingPost.id, content, topicTag)
                 const result = await schedulePost(editingPost.id, scheduledAt)
                 await refresh()
                 if (!result?.error) {

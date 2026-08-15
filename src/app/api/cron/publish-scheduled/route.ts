@@ -9,6 +9,7 @@ interface ClaimedPost {
   id: string
   user_id: string
   generated_content: string
+  topic_tag: string | null
   success_email_sent_at: string | null
   failure_email_sent_at: string | null
 }
@@ -69,7 +70,7 @@ async function processPost(supabase: ReturnType<typeof getAdminClient>, post: Cl
       return { id: post.id, status: 'failed' }
     }
 
-    const publishResult = await publishThreadsContent(account.access_token, account.account_id, post.generated_content)
+    const publishResult = await publishThreadsContent(account.access_token, account.account_id, post.generated_content, post.topic_tag || undefined)
 
     if ('error' in publishResult) {
       await markFailed(supabase, post, publishResult.error || 'Unknown publish error')

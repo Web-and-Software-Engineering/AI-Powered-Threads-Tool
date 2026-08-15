@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useState } from 'react'
-import { BarChart3, RefreshCw, Sparkles, ThumbsUp, MessageCircle, Eye, Repeat, CheckCircle, Lightbulb, TrendingDown, Copy, ExternalLink, AlertTriangle } from 'lucide-react'
+import { BarChart3, RefreshCw, Sparkles, ThumbsUp, MessageCircle, Eye, Repeat, CheckCircle, Lightbulb, TrendingDown, Copy, ExternalLink, AlertTriangle, Hash } from 'lucide-react'
 import { useLanguage } from './LanguageContext'
 
 export interface PostItem {
   id: string
   topic: string
+  topicTag?: string
   coreMessage: string
   generatedContent: string
   platformPostUrl?: string
@@ -172,6 +173,12 @@ export function AnalyticsDashboard({ posts, onSyncAnalytics }: AnalyticsDashboar
                     <span className="text-[11px] font-mono-custom text-orange-600 dark:text-orange-400 font-bold uppercase tracking-wider">
                       {post.topic || 'General Topic'}
                     </span>
+                    {post.topicTag && (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800 font-mono-custom font-semibold">
+                        <Hash className="w-2.5 h-2.5" />
+                        {post.topicTag}
+                      </span>
+                    )}
                     {post.platformPostUrl && (
                       <a
                         href={post.platformPostUrl}

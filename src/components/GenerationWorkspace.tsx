@@ -13,6 +13,7 @@ interface GenerationWorkspaceProps {
   profile: ProfileData
   onPostCreated: (post: {
     topic: string
+    topicTag?: string
     coreMessage: string
     referencePosts: string
     generatedContent: string
@@ -137,6 +138,7 @@ const TEMPLATES_EN = {
 export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorkspaceProps) {
   const { t, language } = useLanguage()
   const [topic, setTopic] = useState('')
+  const [topicTag, setTopicTag] = useState('')
   const [coreMessage, setCoreMessage] = useState('')
   const [referencePosts, setReferencePosts] = useState('')
   const [generationStep, setGenerationStep] = useState<StepState>('idle')
@@ -329,6 +331,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     try {
       const result = await saveDraftPost({
         topic,
+        topicTag: topicTag || undefined,
         coreMessage,
         referencePosts: referencePosts.trim() || '[Auto-scraped via AI Theme Search]',
         generatedContent: variations[index],
@@ -341,14 +344,15 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     }
   }
 
-  const handlePublish = async (finalContent: string) => {
-    const result = await publishToThreadsApi(finalContent)
+  const handlePublish = async (finalContent: string, topicTag: string) => {
+    const result = await publishToThreadsApi(finalContent, topicTag || undefined)
     if (result?.error) {
       return { error: result.error }
     }
 
     await onPostCreated({
       topic,
+      topicTag: topicTag || undefined,
       coreMessage,
       referencePosts: referencePosts.trim() || '[Auto-scraped via AI Theme Search]',
       generatedContent: finalContent,
@@ -359,10 +363,11 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
     return { success: true }
   }
 
-  const handleScheduleFromEditor = async (finalContent: string, scheduledAt: string) => {
+  const handleScheduleFromEditor = async (finalContent: string, scheduledAt: string, topicTag: string) => {
     const result = await scheduleNewPost(
       {
         topic,
+        topicTag: topicTag || undefined,
         coreMessage,
         referencePosts: referencePosts.trim() || '[Auto-scraped via AI Theme Search]',
         generatedContent: finalContent,
@@ -478,6 +483,21 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                       : (language === 'jp' ? 'このトピックの投稿は見つかりませんでした。' : 'No matching posts found on Threads for this topic.')}
                   </div>
                 )}
+              </div>
+
+              {/* Threads Community/Topic Tag */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-orange-700 dark:text-orange-400 flex items-center gap-1.5">
+                  <Search className="w-3.5 h-3.5" />
+                  {t('gen.topicTag')}
+                </label>
+                <input
+                  type="text"
+                  value={topicTag}
+                  onChange={(e) => setTopicTag(e.target.value)}
+                  placeholder={t('gen.topicTag.placeholder')}
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
+                />
               </div>
             </div>
 
@@ -666,6 +686,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
               initialContent={variations[selectedIndex]}
               topic={topic}
               coreMessage={coreMessage}
+              initialTopicTag={topicTag}
               onPublish={handlePublish}
               onSchedule={handleScheduleFromEditor}
               threadsAccount={threadsAccount}

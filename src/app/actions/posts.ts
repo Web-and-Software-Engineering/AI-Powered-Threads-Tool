@@ -7,6 +7,7 @@ import { publishThreadsContent, fetchThreadsInsights } from './threads'
 export interface PostRecord {
   id: string
   topic: string
+  topicTag: string | null
   coreMessage: string
   referencePosts: string
   generatedContent: string
@@ -32,6 +33,7 @@ export interface PostRecord {
 interface PostRow {
   id: string
   topic: string | null
+  topic_tag: string | null
   core_message: string | null
   reference_posts: string | null
   generated_content: string | null
@@ -52,6 +54,7 @@ function mapRow(row: PostRow): PostRecord {
   return {
     id: row.id,
     topic: row.topic || '',
+    topicTag: row.topic_tag,
     coreMessage: row.core_message || '',
     referencePosts: row.reference_posts || '',
     generatedContent: row.generated_content || '',
@@ -87,6 +90,7 @@ async function getAuthedClientAndAccount() {
 
 export async function recordPublishedPost(data: {
   topic: string
+  topicTag?: string
   coreMessage: string
   referencePosts?: string
   generatedContent: string
@@ -109,6 +113,7 @@ export async function recordPublishedPost(data: {
     account_id: account?.id || null,
     platform: 'threads',
     topic: data.topic,
+    topic_tag: data.topicTag || null,
     core_message: data.coreMessage,
     reference_posts: data.referencePosts || null,
     generated_content: data.generatedContent,
@@ -260,6 +265,7 @@ export async function syncAnalyticsMetrics(postIds: string[]) {
 
 export async function saveDraftPost(data: {
   topic: string
+  topicTag?: string
   coreMessage: string
   referencePosts?: string
   generatedContent: string
@@ -280,6 +286,7 @@ export async function saveDraftPost(data: {
     account_id: account?.id || null,
     platform: 'threads',
     topic: data.topic,
+    topic_tag: data.topicTag || null,
     core_message: data.coreMessage,
     reference_posts: data.referencePosts || null,
     generated_content: data.generatedContent,
@@ -315,14 +322,14 @@ export async function listSavedPosts(): Promise<{ posts: PostRecord[] } | { erro
   return { posts: data.map(mapRow) }
 }
 
-export async function updateSavedPost(id: string, content: string) {
+export async function updateSavedPost(id: string, content: string, topicTag?: string) {
   const auth = await getAuthedClientAndAccount()
   if (!auth) return { error: 'Not authenticated' }
   const { supabase, user } = auth
 
   const { error } = await supabase
     .from('posts')
-    .update({ generated_content: content, updated_at: new Date().toISOString() })
+    .update({ generated_content: content, topic_tag: topicTag || null, updated_at: new Date().toISOString() })
     .eq('id', id)
     .eq('user_id', user.id)
 
@@ -358,7 +365,7 @@ export async function publishSavedPost(id: string) {
 
   const { data: post, error: postError } = await supabase
     .from('posts')
-    .select('generated_content')
+    .select('generated_content, topic_tag')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
@@ -378,7 +385,7 @@ export async function publishSavedPost(id: string) {
     return { error: 'Threads account is not linked. Please go to the Account tab to connect your account first.' }
   }
 
-  const result = await publishThreadsContent(account.access_token, account.account_id, post.generated_content)
+  const result = await publishThreadsContent(account.access_token, account.account_id, post.generated_content, post.topic_tag || undefined)
 
   if ('error' in result) {
     return { error: result.error }
@@ -409,6 +416,7 @@ export async function publishSavedPost(id: string) {
 export async function scheduleNewPost(
   data: {
     topic: string
+    topicTag?: string
     coreMessage: string
     referencePosts?: string
     generatedContent: string
@@ -435,6 +443,7 @@ export async function scheduleNewPost(
     account_id: account?.id || null,
     platform: 'threads',
     topic: data.topic,
+    topic_tag: data.topicTag || null,
     core_message: data.coreMessage,
     reference_posts: data.referencePosts || null,
     generated_content: data.generatedContent,

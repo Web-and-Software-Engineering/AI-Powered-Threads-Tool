@@ -18,6 +18,7 @@ export default function Home() {
 
   const handlePostCreated = async (newPostData: {
     topic: string
+    topicTag?: string
     coreMessage: string
     referencePosts: string
     generatedContent: string
@@ -27,6 +28,7 @@ export default function Home() {
   }) => {
     await recordPublishedPost({
       topic: newPostData.topic,
+      topicTag: newPostData.topicTag,
       coreMessage: newPostData.coreMessage,
       referencePosts: newPostData.referencePosts,
       generatedContent: newPostData.generatedContent,
