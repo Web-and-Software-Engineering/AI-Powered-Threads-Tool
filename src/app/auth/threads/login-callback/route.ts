@@ -95,8 +95,10 @@ export async function GET(request: Request) {
     const syntheticPassword = `${threadsUserId}_${appSecret}`
     const supabase = await createClient()
 
-    // Check if this Threads account is already linked to a DIFFERENT Supabase user
-    const { data: existingMapping } = await supabase
+    // Check if this Threads account is already linked to a DIFFERENT Supabase user.
+    // Must use the admin client: RLS restricts this table to auth.uid() = user_id, so
+    // an unauthenticated (or different-user) request would never see an existing row here.
+    const { data: existingMapping } = await getAdminClient()
       .from('social_accounts')
       .select('user_id')
       .eq('platform', 'threads')
