@@ -13,7 +13,7 @@ export interface LanguageContextProps {
 const translations: Record<Language, Record<string, string>> = {
   en: {
     // Nav / Global
-    "nav.profile": "Persona",
+    "nav.profile": "Chef",
     "nav.generate": "Cooking",
     "nav.analytics": "Analytics",
     "nav.account": "Settings",
@@ -155,7 +155,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   jp: {
     // Nav / Global
-    "nav.profile": "ペルソナ",
+    "nav.profile": "シェフ",
     "nav.generate": "クッキング",
     "nav.analytics": "分析",
     "nav.account": "設定",
@@ -304,15 +304,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const cached = localStorage.getItem('language') as Language
-    if (cached === 'en' || cached === 'jp') {
-      setLanguageState(cached)
-      document.documentElement.setAttribute('lang', cached)
-    } else {
-      // Default to jp
-      setLanguageState('jp')
-      document.documentElement.setAttribute('lang', 'jp')
-    }
+    // Always start in Japanese; there is no UI control to switch languages.
+    setLanguageState('jp')
+    document.documentElement.setAttribute('lang', 'jp')
     setMounted(true)
   }, [])
 

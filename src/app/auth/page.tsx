@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { login, signup, loginWithThreads, requestPasswordReset } from '@/app/actions/auth'
 import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff, KeyRound } from 'lucide-react'
 import { useLanguage } from '@/components/LanguageContext'
+import { BrandMark } from '@/components/BrandMark'
 
 export default function AuthPage() {
   const { t, language } = useLanguage()
@@ -159,9 +160,7 @@ export default function AuthPage() {
 
         {/* Brand Header */}
         <div className="text-center space-y-2 mb-8">
-          <div className="inline-flex w-10 h-10 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 items-center justify-center shadow-md">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
+          <BrandMark className="w-10 h-10 inline-flex" />
           <div>
             <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK</h1>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">{language === 'jp' ? '参考投稿の自動取得・リライトループ' : 'Automated Reference & Rewrite Loop'}</p>

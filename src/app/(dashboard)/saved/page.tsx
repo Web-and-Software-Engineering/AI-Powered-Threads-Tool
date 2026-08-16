@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
-import { FolderHeart } from 'lucide-react'
+import { X, Bookmark } from 'lucide-react'
 import { SavedPostsList } from '@/components/SavedPostsList'
 import { PostEditor } from '@/components/PostEditor'
 import { useLanguage } from '@/components/LanguageContext'
@@ -82,7 +81,7 @@ export default function SavedPostsPage() {
       <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
-            <FolderHeart className="w-5 h-5" />
+            <Bookmark className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{t('saved.title')}</h2>

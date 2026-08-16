@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Sparkles, MessageSquare, Lightbulb, Search, Loader2, CheckCircle2, ArrowRight, FileText } from 'lucide-react'
+import { Sparkles, MessageSquare, Lightbulb, Search, Loader2, CheckCircle2, ArrowRight, FileText, PenSquare } from 'lucide-react'
 import { ProfileData } from './ProfileWorkspace'
 import { PostEditor } from './PostEditor'
 import { generateThreadsPost, suggestPostIdea, getSearchKeywordCandidates, searchThreadsForKeyword } from '@/app/actions/generate'
@@ -387,7 +387,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         <div className="glass-panel p-4 md:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2.5 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
-              <Sparkles className="w-5 h-5" />
+              <PenSquare className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{t('gen.title')}</h2>

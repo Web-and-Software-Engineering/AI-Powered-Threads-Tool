@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Sparkles, Clock, LogOut, RefreshCw } from 'lucide-react'
+import { Clock, LogOut, RefreshCw } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 import { getAccountDetails } from '@/app/actions/profile'
 import { useLanguage } from '@/components/LanguageContext'
+import { BrandMark } from '@/components/BrandMark'
 
 export default function PendingPage() {
   const router = useRouter()
@@ -58,9 +59,7 @@ export default function PendingPage() {
 
         {/* Header */}
         <div className="space-y-2">
-          <div className="inline-flex w-12 h-12 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 items-center justify-center shadow-lg shadow-orange-500/20 mb-2">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
+          <BrandMark className="w-12 h-12 inline-flex mb-2" />
           <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK</h1>
           <p className="text-[10px] text-zinc-450 dark:text-zinc-500 font-mono-custom uppercase tracking-widest">
             {language === 'jp' ? '自動承認ワークフロー' : 'Automated Approval Loop'}

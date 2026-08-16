@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react'
 import { updatePassword } from '@/app/actions/auth'
-import { Sparkles, Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { useLanguage } from '@/components/LanguageContext'
+import { BrandMark } from '@/components/BrandMark'
 
 export default function UpdatePasswordPage() {
   const { language } = useLanguage()
@@ -46,9 +47,7 @@ export default function UpdatePasswordPage() {
 
         {/* Brand Header */}
         <div className="text-center space-y-2 mb-8">
-          <div className="inline-flex w-10 h-10 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 items-center justify-center shadow-md">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
+          <BrandMark className="w-10 h-10 inline-flex" />
           <div>
             <h1 className="font-bold text-xl tracking-wide text-zinc-900 dark:text-zinc-100">
               {language === 'jp' ? '新しいパスワードを設定' : 'Set New Password'}
