@@ -18,20 +18,8 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: `
           try {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-              document.documentElement.classList.add('dark');
-            } else {
-              document.documentElement.classList.remove('dark');
-            }
-
-            const savedLang = localStorage.getItem('language');
-            if (savedLang === 'en' || savedLang === 'jp') {
-              document.documentElement.setAttribute('lang', savedLang);
-            } else if (navigator.language.startsWith('ja')) {
-              document.documentElement.setAttribute('lang', 'jp');
-            }
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('lang', 'jp');
           } catch (_) {}
         `}} />
       </head>
