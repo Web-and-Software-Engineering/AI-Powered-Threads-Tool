@@ -147,7 +147,7 @@ export function Navigation() {
             <BrandMark className="w-8 h-8" />
             <div>
               <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK</h1>
-              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono-custom">Automated Search & Analysis Loop</p>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono-custom">{t('nav.tagline')}</p>
             </div>
           </div>
 

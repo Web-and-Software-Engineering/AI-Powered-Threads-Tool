@@ -19,6 +19,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.account": "Settings",
     "nav.saved": "Saved Posts",
     "nav.signout": "Sign Out",
+    "nav.tagline": "AI cooks up threads for you.",
     "global.theme.dark": "Dark Mode",
     "global.theme.light": "Light Mode",
 
@@ -37,16 +38,13 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.toSignin": "Already have an account? Sign In",
 
     // Generator Workspace
-    "gen.title": "Create New Threads Post",
+    "gen.title": "Let's cook!",
     "gen.subtitle": "Enter your theme and target message. The AI handles Threads scraping and structure analysis.",
     "gen.theme": "Theme (Title)",
-    "gen.theme.placeholder": "e.g. Productivity habits for remote builders",
     "gen.message": "Key Message / Value to Deliver",
-    "gen.message.placeholder": "e.g. Sleep & deep work blocks beat grinding 14-hour days.",
     "gen.reference": "Reference Posts (Optional)",
     "gen.reference.placeholder": "Paste post text or a link to a Threads post (one per line, e.g. https://www.threads.net/@username/post/xyz)...",
     "gen.topicTag": "Community or Topic (Optional)",
-    "gen.topicTag.placeholder": "e.g. Technology",
     "gen.activePocket": "Active Pocket",
     "gen.audience": "Audience",
     "gen.loaded": "Loaded",
@@ -161,6 +159,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.account": "設定",
     "nav.saved": "保存済み投稿",
     "nav.signout": "サインアウト",
+    "nav.tagline": "AIがあなたに代わってスレッドを調理します。",
     "global.theme.dark": "ダークモード",
     "global.theme.light": "ライトモード",
 
@@ -179,16 +178,13 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.toSignin": "すでにアカウントをお持ちですか？ ログイン",
 
     // Generator Workspace
-    "gen.title": "スレッド新規作成",
+    "gen.title": "レッツクッキング！",
     "gen.subtitle": "テーマと伝えたい内容を入力してください。AIがThreadsの構造分析に基づいて投稿を作成します。",
     "gen.theme": "テーマ（タイトル）",
-    "gen.theme.placeholder": "例: リモートワーカー向けの生産性向上ハック",
     "gen.message": "キーメッセージ / 伝えたい価値",
-    "gen.message.placeholder": "例: 14時間ダラダラ働くより、睡眠と深い集中が効果的。",
     "gen.reference": "参考にする投稿 (任意)",
     "gen.reference.placeholder": "参考にする投稿の文章、またはThreadsの投稿リンクを貼り付けてください (1行に1件、例: https://www.threads.net/@username/post/xyz)...",
     "gen.topicTag": "コミュニティまたはトピック (任意)",
-    "gen.topicTag.placeholder": "例: テクノロジー",
     "gen.activePocket": "有効なペルソナ",
     "gen.audience": "ターゲット層",
     "gen.loaded": "読み込み済み",

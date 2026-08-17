@@ -410,7 +410,6 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                   required
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  placeholder={t('gen.theme.placeholder')}
                   className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
                 />
               </div>
@@ -425,7 +424,6 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                   rows={3}
                   value={coreMessage}
                   onChange={(e) => setCoreMessage(e.target.value)}
-                  placeholder={t('gen.message.placeholder')}
                   className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-sans-custom leading-relaxed"
                 />
               </div>
@@ -495,7 +493,6 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
                   type="text"
                   value={topicTag}
                   onChange={(e) => setTopicTag(e.target.value)}
-                  placeholder={t('gen.topicTag.placeholder')}
                   className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all"
                 />
               </div>
