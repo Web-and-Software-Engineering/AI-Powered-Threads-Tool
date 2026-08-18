@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/ThemeContext";
 import { LanguageProvider } from "@/components/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "LETTER COOK • Threads Content Generator & Analytics Engine",
+  title: "LETTER COOK for threads!",
   description: "Automate, personalize, publish, and analyze your Threads content with AI feedback loops.",
 };
 

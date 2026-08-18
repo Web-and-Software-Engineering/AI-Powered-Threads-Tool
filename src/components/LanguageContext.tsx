@@ -13,8 +13,6 @@ export interface LanguageContextProps {
 const translations: Record<Language, Record<string, string>> = {
   en: {
     // Nav / Global
-    "nav.profile": "Chef",
-    "nav.generate": "Cooking",
     "nav.analytics": "Analytics",
     "nav.account": "Settings",
     "nav.saved": "Saved Posts",
@@ -38,7 +36,6 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.toSignin": "Already have an account? Sign In",
 
     // Generator Workspace
-    "gen.title": "Let's cook!",
     "gen.subtitle": "Enter your theme and target message. The AI handles Threads scraping and structure analysis.",
     "gen.theme": "Theme (Title)",
     "gen.message": "Key Message / Value to Deliver",
@@ -153,13 +150,11 @@ const translations: Record<Language, Record<string, string>> = {
   },
   jp: {
     // Nav / Global
-    "nav.profile": "シェフ",
-    "nav.generate": "クッキング",
     "nav.analytics": "分析",
     "nav.account": "設定",
     "nav.saved": "保存済み投稿",
     "nav.signout": "サインアウト",
-    "nav.tagline": "AIがあなたに代わってスレッドを調理します。",
+    "nav.tagline": "AI cooks up threads for you.",
     "global.theme.dark": "ダークモード",
     "global.theme.light": "ライトモード",
 
@@ -178,7 +173,6 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.toSignin": "すでにアカウントをお持ちですか？ ログイン",
 
     // Generator Workspace
-    "gen.title": "レッツクッキング！",
     "gen.subtitle": "テーマと伝えたい内容を入力してください。AIがThreadsの構造分析に基づいて投稿を作成します。",
     "gen.theme": "テーマ（タイトル）",
     "gen.message": "キーメッセージ / 伝えたい価値",

@@ -47,7 +47,7 @@ export function Navigation() {
             <BrandMark className="w-8 h-8" />
             <div>
               <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
-                LETTER COOK
+                LETTER COOK for threads!
               </h1>
             </div>
           </div>
@@ -63,7 +63,7 @@ export function Navigation() {
                 }`}
               >
                 <FolderHeart className="w-3.5 h-3.5" />
-                {t('nav.profile')}
+                Chef
               </Link>
 
               <Link
@@ -75,7 +75,7 @@ export function Navigation() {
                 }`}
               >
                 <PenSquare className="w-3.5 h-3.5" />
-                {t('nav.generate')}
+                Cooking
               </Link>
 
               <Link
@@ -146,7 +146,7 @@ export function Navigation() {
           <div className="flex items-center gap-2.5">
             <BrandMark className="w-8 h-8" />
             <div>
-              <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK</h1>
+              <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK for threads!</h1>
               <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono-custom">{t('nav.tagline')}</p>
             </div>
           </div>
@@ -171,7 +171,7 @@ export function Navigation() {
           }`}
         >
           <FolderHeart className="w-5 h-5" />
-          <span className="text-[10px] font-medium">{t('nav.profile')}</span>
+          <span className="text-[10px] font-medium">Chef</span>
         </Link>
 
         <Link
@@ -181,7 +181,7 @@ export function Navigation() {
           }`}
         >
           <PenSquare className="w-5 h-5" />
-          <span className="text-[10px] font-medium">{t('nav.generate')}</span>
+          <span className="text-[10px] font-medium">Cooking</span>
         </Link>
 
         <Link
