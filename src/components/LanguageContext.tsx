@@ -17,7 +17,6 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.account": "Settings",
     "nav.saved": "Saved Posts",
     "nav.signout": "Sign Out",
-    "nav.tagline": "AI cooks up threads for you.",
     "global.theme.dark": "Dark Mode",
     "global.theme.light": "Light Mode",
 
@@ -154,7 +153,6 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.account": "設定",
     "nav.saved": "保存済み投稿",
     "nav.signout": "サインアウト",
-    "nav.tagline": "AI cooks up threads for you.",
     "global.theme.dark": "ダークモード",
     "global.theme.light": "ライトモード",
 

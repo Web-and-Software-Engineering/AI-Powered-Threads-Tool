@@ -47,7 +47,7 @@ export function Navigation() {
             <BrandMark className="w-8 h-8" />
             <div>
               <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
-                LETTER COOK for threads!
+                LETTER COOK for threads
               </h1>
             </div>
           </div>
@@ -146,8 +146,8 @@ export function Navigation() {
           <div className="flex items-center gap-2.5">
             <BrandMark className="w-8 h-8" />
             <div>
-              <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK for threads!</h1>
-              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono-custom">{t('nav.tagline')}</p>
+              <h1 className="font-bold text-sm tracking-wide text-zinc-900 dark:text-zinc-100">LETTER COOK for threads</h1>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono-custom">AI cooks up threads for you.</p>
             </div>
           </div>
 

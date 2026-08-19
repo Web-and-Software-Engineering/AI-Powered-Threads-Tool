@@ -390,7 +390,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
               <PenSquare className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Let&apos;s Cooking!</h2>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Let&apos;s Cooking</h2>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-custom">
                 {t('gen.subtitle')}
               </p>
