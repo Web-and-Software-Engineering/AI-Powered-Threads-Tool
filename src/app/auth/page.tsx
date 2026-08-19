@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { login, signup, loginWithThreads, requestPasswordReset } from '@/app/actions/auth'
-import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff, KeyRound } from 'lucide-react'
+import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight, Eye, EyeOff, KeyRound, Ticket } from 'lucide-react'
 import { useLanguage } from '@/components/LanguageContext'
 import { BrandMark } from '@/components/BrandMark'
 
@@ -34,6 +34,18 @@ export default function AuthPage() {
     }
     if (lower.includes('all fields are required')) {
       return 'すべてのフィールドを入力してください。'
+    }
+    if (lower.includes('invalid invitation code')) {
+      return '招待コードが無効です。'
+    }
+    if (lower.includes('invitation code is no longer active')) {
+      return 'この招待コードは無効化されています。'
+    }
+    if (lower.includes('invitation code has expired')) {
+      return 'この招待コードは有効期限が切れています。'
+    }
+    if (lower.includes('invitation code has already been used')) {
+      return 'この招待コードは既に使用されています。'
     }
     if (lower.includes('passwords do not match')) {
       return 'パスワードが一致しません。'
@@ -320,6 +332,23 @@ export default function AuthPage() {
                       {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
+                </div>
+              )}
+
+              {/* Invitation Code field (Register only) */}
+              {isRegister && (
+                <div className="space-y-1.5 animate-fade-in">
+                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                    <Ticket className="w-3.5 h-3.5 text-orange-600" />
+                    {language === 'jp' ? '招待コード' : 'Invitation Code'}
+                  </label>
+                  <input
+                    type="text"
+                    name="invitationCode"
+                    required
+                    placeholder={language === 'jp' ? '招待コードを入力' : 'Enter your invitation code'}
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-mono-custom uppercase placeholder:normal-case"
+                  />
                 </div>
               )}
 

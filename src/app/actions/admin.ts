@@ -175,3 +175,102 @@ export async function resetUserPassword(userId: string, newPassword: string) {
   return { success: true }
 }
 
+async function requireAdmin() {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { error: 'Not authenticated' } as const
+  }
+
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('role, is_approved')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!profile || profile.role !== 'admin' || !profile.is_approved) {
+    return { error: 'Access denied: Admin privileges required' } as const
+  }
+
+  return { supabase } as const
+}
+
+export async function getInvitationCodes() {
+  const check = await requireAdmin()
+  if ('error' in check) return { error: check.error }
+
+  const { data, error } = await check.supabase.rpc('get_invitation_codes')
+
+  if (error) {
+    console.error('[Admin Actions] Failed to fetch invitation codes:', error)
+    return { error: error.message }
+  }
+
+  return { codes: data || [] }
+}
+
+export async function createInvitationCode(
+  code: string,
+  maxUses: number,
+  expiresAt: string | null,
+  note: string | null
+) {
+  const check = await requireAdmin()
+  if ('error' in check) return { error: check.error }
+
+  const { error } = await check.supabase.rpc('create_invitation_code', {
+    p_code: code,
+    p_max_uses: maxUses,
+    p_expires_at: expiresAt,
+    p_note: note,
+  })
+
+  if (error) {
+    console.error('[Admin Actions] Failed to create invitation code:', error)
+    return { error: error.message }
+  }
+
+  revalidatePath('/admin')
+  return { success: true }
+}
+
+export async function setInvitationCodeActive(id: string, isActive: boolean) {
+  const check = await requireAdmin()
+  if ('error' in check) return { error: check.error }
+
+  const { error } = await check.supabase.rpc('set_invitation_code_active', {
+    p_id: id,
+    p_is_active: isActive,
+  })
+
+  if (error) {
+    console.error('[Admin Actions] Failed to update invitation code:', error)
+    return { error: error.message }
+  }
+
+  revalidatePath('/admin')
+  return { success: true }
+}
+
+export async function deleteInvitationCode(id: string) {
+  const check = await requireAdmin()
+  if ('error' in check) return { error: check.error }
+
+  const { error } = await check.supabase.rpc('delete_invitation_code', {
+    p_id: id,
+  })
+
+  if (error) {
+    console.error('[Admin Actions] Failed to delete invitation code:', error)
+    return { error: error.message }
+  }
+
+  revalidatePath('/admin')
+  return { success: true }
+}
+

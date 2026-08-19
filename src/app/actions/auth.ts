@@ -30,8 +30,9 @@ export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const confirmPassword = formData.get('confirmPassword') as string
+  const invitationCode = formData.get('invitationCode') as string
 
-  if (!email || !password || !confirmPassword) {
+  if (!email || !password || !confirmPassword || !invitationCode) {
     return { error: 'All fields are required' }
   }
 
@@ -45,6 +46,17 @@ export async function signup(formData: FormData) {
 
   const supabase = await createClient()
 
+  // Reserve the invitation code slot atomically before creating the account,
+  // so two concurrent signups can't both consume the last remaining use.
+  const { data: invitationId, error: invitationError } = await supabase.rpc(
+    'reserve_invitation_code',
+    { p_code: invitationCode }
+  )
+
+  if (invitationError) {
+    return { error: invitationError.message }
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -54,7 +66,18 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
+    await supabase.rpc('release_invitation_code', { p_invitation_id: invitationId })
     return { error: error.message }
+  }
+
+  if (data?.user) {
+    const { error: redemptionError } = await supabase.rpc('finalize_invitation_redemption', {
+      p_invitation_id: invitationId,
+      p_user_id: data.user.id,
+    })
+    if (redemptionError) {
+      console.error('[Auth Actions] Failed to record invitation redemption:', redemptionError)
+    }
   }
 
   if (data?.session) {
