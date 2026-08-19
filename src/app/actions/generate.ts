@@ -10,6 +10,7 @@ interface GenerateParams {
   referencePosts?: string
   discoveredReferencePosts?: { text: string; username: string }[]
   recentAttempts?: string[]
+  recentAngles?: string[]
   authorPersona?: string
   personalityTraits?: string
   likesDislikes?: string
@@ -217,11 +218,8 @@ export async function searchThreadsForKeyword(keyword: string): Promise<{ posts:
   return { posts: result.posts.map((p) => ({ text: p.text, permalink: p.permalink, username: p.username })) }
 }
 
-export async function generateThreadsPost(params: GenerateParams): Promise<{ variations: string[] } | { error: string }> {
-  let resolvedReferences = params.referencePosts
-  if (params.referencePosts) {
-    resolvedReferences = await resolveReferenceUrls(params.referencePosts)
-  }
+export async function generateThreadsPost(params: GenerateParams): Promise<{ variations: string[]; anglesUsed: string[] } | { error: string }> {
+  const resolvedReferences = params.referencePosts
 
   const {
     data: { user },
@@ -231,7 +229,7 @@ export async function generateThreadsPost(params: GenerateParams): Promise<{ var
   const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY
 
   if (!apiKey || apiKey === 'your-openai-api-key-here' || apiKey === 'your-openrouter-api-key-here') {
-    return { variations: fallbackVariations(params) }
+    return { variations: fallbackVariations(params), anglesUsed: [] }
   }
 
   const openai = new OpenAI({
@@ -243,20 +241,51 @@ export async function generateThreadsPost(params: GenerateParams): Promise<{ var
     },
   })
 
-  // Force structural variety instead of leaving it to chance — assign each variation
-  // a specific required angle rather than just suggesting "be different."
-  const ANGLE_POOL = [
-    'a bold, contrarian claim that challenges conventional wisdom',
-    'a personal story or anecdote',
-    'a numbered listicle/framework breakdown',
-    'a myth vs. reality comparison',
-    'a direct question posed to the reader',
-    'a surprising stat or fact-led hook',
-    'a "here is what nobody tells you about X" reveal',
-    'a before/after or mistake-then-fix narrative',
-  ]
-  const shuffledAngles = [...ANGLE_POOL].sort(() => Math.random() - 0.5)
-  const [angle1, angle2, angle3] = shuffledAngles
+  // Have real structure to mirror (pasted reference text and/or auto-discovered posts)?
+  // Forcing unrelated canned angles (contrarian claim, listicle, etc.) directly
+  // contradicts "mirror the reference's structure" when the reference doesn't fit that
+  // angle — so skip angle-forcing entirely and vary within the reference's own pattern
+  // instead. Angle-forcing only kicks in when there's no structure to mirror.
+  const hasReferenceMaterial = Boolean(
+    resolvedReferences || (params.discoveredReferencePosts && params.discoveredReferencePosts.length > 0)
+  )
+
+  let angleInstruction: string
+  let anglesUsed: string[] = []
+  if (hasReferenceMaterial) {
+    angleInstruction = `The three posts MUST reproduce the EXACT structural/rhetorical pattern of the reference material below — not just its general vibe or tone. Before writing, break the reference down into: (1) its opening formula (e.g. a specific time/context hook, a bold claim, a direct question), (2) any rhetorical device it uses and how many times (e.g. a "not because X, not because Y, but because Z" negation-then-reveal contrast — note it uses exactly two negations before the reveal, not one, not three), and (3) its closing style (e.g. a one-line elaboration, a call to action). Every one of the three variations MUST reuse that same opening formula, the same rhetorical device with the same repetition count and order, and the same closing style — only the specific words, reasons, and topic details should change. The three variations must differ from EACH OTHER only in wording, specific reasons, and emphasis — never in the underlying structure or rhetorical device. If a variation would require abandoning the reference's structure to sound natural, keep the structure anyway — matching it is the priority.`
+  } else {
+    // Force structural variety instead of leaving it to chance — assign each variation
+    // a specific required angle rather than just suggesting "be different."
+    const ANGLE_POOL = [
+      'a bold, contrarian claim that challenges conventional wisdom',
+      'a personal story or anecdote',
+      'a numbered listicle/framework breakdown',
+      'a myth vs. reality comparison',
+      'a direct question posed to the reader',
+      'a surprising stat or fact-led hook',
+      'a "here is what nobody tells you about X" reveal',
+      'a before/after or mistake-then-fix narrative',
+      'a "day in the life" or behind-the-scenes glimpse',
+      'a bold prediction about where things are headed',
+      'a common-mistake breakdown (what most people get wrong)',
+      'a step-by-step how-to walkthrough',
+    ]
+    // Exclude angles used in recent generations (client-supplied, this-session only) so
+    // back-to-back generations don't keep landing on the same angle — fall back to the
+    // full pool if exclusion would leave fewer than 3 to pick from.
+    const excludedAngles = new Set(params.recentAngles || [])
+    const availablePool = ANGLE_POOL.filter((a) => !excludedAngles.has(a))
+    const effectivePool = availablePool.length >= 3 ? availablePool : ANGLE_POOL
+
+    const shuffledAngles = [...effectivePool].sort(() => Math.random() - 0.5)
+    const [angle1, angle2, angle3] = shuffledAngles
+    anglesUsed = [angle1, angle2, angle3]
+    angleInstruction = `The three posts MUST take genuinely different angles — do not just reword the same post three times. Follow these required angles exactly:
+- Variation 1 MUST open with: ${angle1}
+- Variation 2 MUST open with: ${angle2}
+- Variation 3 MUST open with: ${angle3}`
+  }
 
   // Anti-repetition memory: recently saved drafts (cross-session, DB) plus this-session's
   // prior attempts (client-supplied, not yet saved) — neither is a performance signal,
@@ -269,10 +298,7 @@ export async function generateThreadsPost(params: GenerateParams): Promise<{ var
   const systemPrompt = `You are a high-performing social media content creator specializing in Threads posts.
 Your goal is to write THREE single-text Threads posts (each under 500 characters) that achieve maximum engagement.
 
-The three posts MUST take genuinely different angles — do not just reword the same post three times. Follow these required angles exactly:
-- Variation 1 MUST open with: ${angle1}
-- Variation 2 MUST open with: ${angle2}
-- Variation 3 MUST open with: ${angle3}
+${angleInstruction}
 ${
   recentlyGenerated.length > 0
     ? `\nRECENTLY GENERATED POSTS FOR THIS AUTHOR (do not repeat their opening line, structure, or wording — write something meaningfully different from all of these):\n${recentlyGenerated.map((c) => `- ${c}`).join('\n')}\n`
@@ -309,10 +335,10 @@ ${
 }
 CRITICAL CONSTRAINTS:
 - Each post strictly under 500 characters.
-- Each must deliver the specified core message clearly, from its own distinct angle.
+- Each must deliver the specified core message clearly${hasReferenceMaterial ? ', reusing the reference\'s exact structure and varying only wording, reasons, and emphasis' : ", from its own distinct angle"}.
 - No spammy hashtags or cheesy engagement bait.
 - Strictly write in PLAIN TEXT. Never use Markdown formatting (do NOT use **bold**, *italics*, _italics_, or headings). Threads does not support rich text or markdown formatting and will display them as raw characters.
-${params.language === 'jp' ? '- Write the final output posts in Japanese (日本語).' : '- Write the final output posts in English.'}
+- Write the final output posts in whichever language the Topic, Key Message, and Pocket Persona below are written in — detect it from that content, do not assume a language.
 
 RESPONSE FORMAT: Respond with ONLY a JSON object of the exact shape {"variations": ["post one text", "post two text", "post three text"]}. No other text, no markdown code fences.
 `
@@ -320,7 +346,7 @@ RESPONSE FORMAT: Respond with ONLY a JSON object of the exact shape {"variations
   const userPrompt = `
 Topic: ${params.topic}
 Key Message/Value to Deliver: ${params.coreMessage || 'N/A'}
-${resolvedReferences ? `Reference Posts — closely mirror their hook style, structural pacing (line breaks, list vs. prose), and closing pattern, not just their general tone:\n${resolvedReferences}` : ''}
+${resolvedReferences ? `Reference Posts — reproduce their exact opening formula, rhetorical device (including how many times it repeats, e.g. how many negations before a reveal), and closing style. Match the mechanical pattern, not just the tone:\n${resolvedReferences}` : ''}
 
 Generate three authentic, high-converting Threads single-text post variations now:
 `
@@ -350,7 +376,7 @@ Generate three authentic, high-converting Threads single-text post variations no
       variations.push(fallbackVariations(params)[variations.length] || fallbackVariations(params)[0])
     }
 
-    return { variations: variations.slice(0, 3) }
+    return { variations: variations.slice(0, 3), anglesUsed }
   } catch (error: any) {
     console.error('OpenAI Generation Error:', error)
     return { error: error.message || 'AI generation failed. Please try again.' }
@@ -483,80 +509,3 @@ function parsePostIdea(raw: string): { topic: string; coreMessage: string } | nu
   return null
 }
 
-async function resolveReferenceUrls(referencePosts: string): Promise<string> {
-  const lines = referencePosts.split('\n')
-  const resolvedLines: string[] = []
-
-  for (const line of lines) {
-    const trimmed = line.trim()
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      console.log(`[Generate Action] Attempting to resolve URL reference: ${trimmed}`)
-      const resolved = await fetchAndParseThreadsPost(trimmed)
-      resolvedLines.push(resolved)
-    } else {
-      resolvedLines.push(line)
-    }
-  }
-
-  return resolvedLines.join('\n')
-}
-
-async function fetchAndParseThreadsPost(url: string): Promise<string> {
-  try {
-    let fetchUrl = url
-    if (url.includes('threads.net')) {
-      const urlObj = new URL(url)
-      // Normalize pathname to ensure it points to the public embed endpoint
-      if (!urlObj.pathname.endsWith('/embed')) {
-        urlObj.pathname = urlObj.pathname.replace(/\/$/, '') + '/embed'
-      }
-      fetchUrl = urlObj.toString()
-    }
-
-    console.log(`[Generate Action] Fetching public embed reference: ${fetchUrl}`)
-    const res = await fetch(fetchUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-      next: { revalidate: 3600 } // Cache for 1 hour
-    })
-
-    if (!res.ok) {
-      console.log(`[Generate Action] Reference scrape FAILED (HTTP ${res.status}) for ${url} — falling back to URL-only context.`)
-      return `[Reference URL: ${url}] (Note: The server failed to fetch this link. Please write the output based on the theme & metadata in the URL if possible: ${url})`
-    }
-
-    const html = await res.text()
-    
-    // Attempt to match og:description or name description meta tags
-    const descMatch = html.match(/<meta[^>]*property="og:description"[^>]*content="([^"]*)"/i) ||
-                      html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"/i)
-
-    if (descMatch && descMatch[1]) {
-      let content = descMatch[1]
-        .replace(/&quot;/g, '"')
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&#x27;/g, "'")
-        .replace(/&#39;/g, "'")
-
-      // Catch fallback pages (such as redirect login gates)
-      if (content.includes('Join Threads to share ideas') || content.includes('Log in with your Instagram')) {
-        console.log(`[Generate Action] Reference scrape LOGIN-GATED for ${url} — falling back to URL-only context.`)
-        return `[Reference URL: ${url}] (Note: Meta restricted browser scraping on this page. Please write the output post using pattern matching guided by the URL context: ${url})`
-      }
-
-      console.log(`[Generate Action] Reference scrape SUCCEEDED for ${url}: "${content.slice(0, 120)}${content.length > 120 ? '...' : ''}"`)
-      return `[Reference Post Content from ${url}]:\n${content}`
-    }
-
-    console.log(`[Generate Action] Reference scrape found NO og:description for ${url} — falling back to URL-only context.`)
-    return `[Reference URL: ${url}]`
-  } catch (err: any) {
-    console.error(`[Generate Action] Failed to resolve URL ${url}:`, err)
-    return `[Reference URL: ${url}]`
-  }
-}

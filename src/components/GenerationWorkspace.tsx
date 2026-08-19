@@ -153,6 +153,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
   const [discoveryError, setDiscoveryError] = useState<string | null>(null)
   const [searchKeywordsTried, setSearchKeywordsTried] = useState<string[]>([])
   const [recentAttempts, setRecentAttempts] = useState<string[]>([])
+  const [recentAngles, setRecentAngles] = useState<string[]>([])
 
   useEffect(() => {
     async function loadThreadsConnection() {
@@ -268,7 +269,9 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
       setSearchKeywordsTried([...triedKeywords])
 
       if ('error' in searchResult) {
-        console.error('[GenerationWorkspace] searchThreadsForKeyword failed:', searchResult.error)
+        // Expected, already surfaced to the user via discoveryError below (e.g. Threads
+        // account not linked) — not a bug, so don't log at `error` level.
+        console.warn('[GenerationWorkspace] searchThreadsForKeyword unavailable:', searchResult.error)
         setDiscoveryError(searchResult.error)
         break // account-level error (not linked/authenticated) — more keywords won't help
       }
@@ -297,6 +300,7 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
         referencePosts: referencePosts.trim() || undefined,
         discoveredReferencePosts: accumulatedPosts,
         recentAttempts,
+        recentAngles,
         authorPersona: profile.authorPersona,
         personalityTraits: profile.personalityTraits,
         likesDislikes: profile.likesDislikes,
@@ -318,6 +322,9 @@ export function GenerationWorkspace({ profile, onPostCreated }: GenerationWorksp
 
       setVariations(result.variations)
       setRecentAttempts((prev) => [...result.variations, ...prev].slice(0, 9))
+      if (result.anglesUsed.length > 0) {
+        setRecentAngles((prev) => [...result.anglesUsed, ...prev].slice(0, 6))
+      }
       setGenerationStep('completed')
     } catch (err) {
       console.error(err)
